@@ -11,12 +11,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import org.osmdroid.ResourceProxy;
-
-import de.k3b.android.locationMapViewer.constants.Constants;
-import de.k3b.android.locationMapViewer.geo.OsmPoiGeoPointDto;
-import de.k3b.android.locationMapViewer.geo.POIOverlayItem;
-import de.k3b.geo.io.GeoUri;
-
+import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -29,17 +24,26 @@ import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.osmdroid.ResourceProxy.bitmap;
+
+import de.k3b.android.locationMapViewer.constants.Constants;
+import de.k3b.android.locationMapViewer.geo.OsmPoiGeoPointDto;
+import de.k3b.android.locationMapViewer.geo.POIOverlayItem;
+import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.io.GeoUri;
+import microsoft.mappoint.TileSystem;
 
 /**
  * minimal android cardviewer app for Android 2.1 (Eclair, API 7).<br/>
  * no support for actionbar and fragments.<br/>
  * The code is based on "org.osmdroid.samples.SampleWithMinimapItemizedoverlay in DemoApp OpenStreetMapViewer"
  */
-public class LocationMapViewer extends Activity  implements Constants {
+public class LocationMapViewer extends Activity implements Constants {
+    private static final Logger logger = LoggerFactory.getLogger(LocationMapViewer.class);
 
     // ===========================================================
     // Constants
@@ -53,19 +57,27 @@ public class LocationMapViewer extends Activity  implements Constants {
     // Fields
     // ===========================================================
 
-    /** used to remeber last gui settings when app is closed or rotated */
+    /**
+     * used to remeber last gui settings when app is closed or rotated
+     */
     private SharedPreferences mPrefs;
     private MapView mMapView;
     private ItemizedOverlay<OverlayItem> mPointOfInterestOverlay;
     private MyLocationNewOverlay mLocationOverlay;
     private MinimapOverlay mMiniMapOverlay;
-    /** where images/icons are loaded from */
+    /**
+     * where images/icons are loaded from
+     */
     private ResourceProxy mResourceProxy;
+    private OsmPoiGeoPointDto mInitalMapCenterZoom = null;
 
     // ===========================================================
     // Constructors
     // ===========================================================
-    /** Called when the activity is first created. */
+
+    /**
+     * Called when the activity is first created.
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +87,11 @@ public class LocationMapViewer extends Activity  implements Constants {
         Intent whatToDo = this.getIntent();
         final Uri uri = (whatToDo != null) ? whatToDo.getData() : null;
         String uriAsString = (uri != null) ? uri.toString() : null;
-        OsmPoiGeoPointDto targetPoint = null;
+        OsmPoiGeoPointDto initalMapCenterZoom = null;
         if (uriAsString != null) {
             Toast.makeText(this, getString(R.string.app_name) + ": received  " + uriAsString, Toast.LENGTH_LONG).show();
             GeoUri parser = new GeoUri(GeoUri.OPT_PARSE_INFER_MISSING);
-            targetPoint = (OsmPoiGeoPointDto) parser.fromUri(uriAsString, new OsmPoiGeoPointDto());
+            initalMapCenterZoom = (OsmPoiGeoPointDto) parser.fromUri(uriAsString, new OsmPoiGeoPointDto());
         }
 
         mResourceProxy = new ResourceProxyImpl(getApplicationContext());
@@ -90,7 +102,7 @@ public class LocationMapViewer extends Activity  implements Constants {
 
         final List<Overlay> overlays = this.mMapView.getOverlays();
 
-        final ArrayList<OverlayItem> items = loadPointOfInterests(targetPoint);
+        final ArrayList<OverlayItem> items = loadPointOfInterests(initalMapCenterZoom);
 
         createPointOfInterestOverlay(overlays, items);
 
@@ -101,10 +113,35 @@ public class LocationMapViewer extends Activity  implements Constants {
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
 
+        // setCenterZoom does not work in onCreate() because getHeight() and getWidth() return 0;
+        // initial center must be set later
+        // see http://stackoverflow.com/questions/10411975/how-to-get-the-width-and-height-of-an-image-view-in-android/10412209#10412209
+//        if (initalMapCenterZoom != null) {
+//            setCenterZoom(initalMapCenterZoom);
+//        }
+
+        this.mInitalMapCenterZoom = initalMapCenterZoom;
+
     }
 
-    /** Create some Hardcoded Markers on some cities.
-     * @param targetPoint*/
+    private void setCenterZoom(OsmPoiGeoPointDto targetPoint) {
+        int zoom = targetPoint.getZoomMin();
+        if (zoom == GeoPointDto.NO_ZOOM) zoom = 5;
+        final IMapController controller = mMapView.getController();
+        controller.setZoom(zoom);
+
+        controller.setCenter(targetPoint);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("setCenterZoom XYZ:" + targetPoint + "; " + getStatusForDebug());
+        }
+    }
+
+    /**
+     * Create some Hardcoded Markers on some cities.
+     *
+     * @param targetPoint
+     */
     private ArrayList<OverlayItem> loadPointOfInterests(OsmPoiGeoPointDto targetPoint) {
         final ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
         if (targetPoint != null) {
@@ -157,25 +194,51 @@ public class LocationMapViewer extends Activity  implements Constants {
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         final SharedPreferences.Editor edit = mPrefs.edit();
         edit.putString(PREFS_TILE_SOURCE, mMapView.getTileProvider().getTileSource().name());
-        edit.putInt(PREFS_SCROLL_X, mMapView.getScrollX());
-        edit.putInt(PREFS_SCROLL_Y, mMapView.getScrollY());
-        edit.putInt(PREFS_ZOOM_LEVEL, mMapView.getZoomLevel());
         edit.putBoolean(PREFS_SHOW_LOCATION, mLocationOverlay.isMyLocationEnabled());
         edit.putBoolean(PREFS_SHOW_MINIMAP, mMiniMapOverlay.isEnabled());
         edit.commit();
+
+        saveLastXYZ();
 
         this.mLocationOverlay.disableMyLocation();
 
         super.onPause();
     }
 
+    private void saveLastXYZ() {
+        final SharedPreferences.Editor edit = mPrefs.edit();
+        edit.putInt(PREFS_SCROLL_X, mMapView.getScrollX());
+        edit.putInt(PREFS_SCROLL_Y, mMapView.getScrollY());
+        edit.putInt(PREFS_ZOOM_LEVEL, mMapView.getZoomLevel());
+        edit.commit();
+        if (logger.isDebugEnabled()) {
+            logger.debug("saved LastXYZ:" + getStatusForDebug());
+        }
+    }
+
+    private String getStatusForDebug() {
+        if (logger.isDebugEnabled()) {
+            StringBuilder result = new StringBuilder();
+            final int scrollX = mMapView.getScrollX();
+            final int scrollY = mMapView.getScrollY();
+            final int zoomLevel = mMapView.getZoomLevel();
+            GeoPoint geoPoint = TileSystem.PixelXYToLatLong(scrollX, scrollY, zoomLevel, null);
+            GeoPoint geoPointLR = TileSystem.PixelXYToLatLong(scrollX + this.mMapView.getWidth(), scrollY + this.mMapView.getHeight(), zoomLevel, null);
+            result.append("Current scrollXYZ:")
+                    .append(scrollX).append("/").append(scrollY).append("/").append(zoomLevel)
+                    .append("; screen w/h:").append(this.mMapView.getWidth()).append("/").append(this.mMapView.getHeight())
+                    .append("; LatLon:").append(geoPoint.toDoubleString()).append("..").append(geoPointLR.toDoubleString());
+            ;
+            return result.toString();
+        }
+        return null;
+    }
+
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
         final String tileSourceName = mPrefs.getString(PREFS_TILE_SOURCE,
                 TileSourceFactory.DEFAULT_TILE_SOURCE.name());
@@ -190,6 +253,30 @@ public class LocationMapViewer extends Activity  implements Constants {
         }
 
         this.mMiniMapOverlay.setEnabled(mPrefs.getBoolean(PREFS_SHOW_MINIMAP, true));
+
+        final int zoom = mPrefs.getInt(PREFS_ZOOM_LEVEL, 3);
+        final int scrollX = mPrefs.getInt(PREFS_SCROLL_X, 0);
+        final int scrollY = mPrefs.getInt(PREFS_SCROLL_Y, 0);
+
+        final IMapController controller = mMapView.getController();
+        controller.setZoom(mPrefs.getInt(PREFS_ZOOM_LEVEL, zoom));
+
+        mMapView.scrollTo(scrollX, scrollY);
+        if (logger.isDebugEnabled()) {
+            logger.debug("onResume loaded lastXYZ:" + scrollX + "/" + scrollY + "/" + zoom + " => "
+                    + getStatusForDebug());
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus){
+        if (this.mInitalMapCenterZoom != null) {
+            // setCenterZoom does not work in onCreate() because getHeight() and getWidth() return 0;
+            // initial center must be set later
+            // see http://stackoverflow.com/questions/10411975/how-to-get-the-width-and-height-of-an-image-view-in-android/10412209#10412209
+            setCenterZoom(mInitalMapCenterZoom);
+            mInitalMapCenterZoom = null;
+        }
     }
 
     // ===========================================================

@@ -22,8 +22,32 @@ import java.util.List;
  */
 public class GpxOverlay extends ItemizedOverlayWithFocus<POIOverlayItem> {
 
+    public GpxOverlay(final Context context, final List<POIOverlayItem> items, ResourceProxy aResourceProxy) {
+        super(items,
+                new ItemizedIconOverlay.OnItemGestureListener<POIOverlayItem>() {
+                    @Override
+                    public boolean onItemSingleTapUp(final int index, final POIOverlayItem item) {
+                        Toast.makeText(
+                                context,
+                                "Item '" + item.getTitle() + "' (index=" + index
+                                        + ") got single tapped up", Toast.LENGTH_LONG).show();
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onItemLongPress(final int index, final POIOverlayItem item) {
+                        Toast.makeText(
+                                context,
+                                "Item '" + item.getTitle() + "' (index=" + index
+                                        + ") got long pressed", Toast.LENGTH_LONG).show();
+                        return false;
+                    }
+                }, aResourceProxy);
+        this.setFocusItemsOnTap(true);
+        this.setFocusedItem(0);
+    }
+
     /**
-     *
      * @param context
      * @param mMapView
      * @param gpxFile
@@ -64,30 +88,5 @@ public class GpxOverlay extends ItemizedOverlayWithFocus<POIOverlayItem> {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public GpxOverlay(final Context context, final List<POIOverlayItem> items, ResourceProxy aResourceProxy) {
-        super(items,
-                new ItemizedIconOverlay.OnItemGestureListener<POIOverlayItem>() {
-                    @Override
-                    public boolean onItemSingleTapUp(final int index, final POIOverlayItem item) {
-                        Toast.makeText(
-                                context,
-                                "Item '" + item.getTitle() + "' (index=" + index
-                                        + ") got single tapped up", Toast.LENGTH_LONG).show();
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onItemLongPress(final int index, final POIOverlayItem item) {
-                        Toast.makeText(
-                                context,
-                                "Item '" + item.getTitle() + "' (index=" + index
-                                        + ") got long pressed", Toast.LENGTH_LONG).show();
-                        return false;
-                    }
-                }, aResourceProxy);
-        this.setFocusItemsOnTap(true);
-        this.setFocusedItem(0);
     }
 }

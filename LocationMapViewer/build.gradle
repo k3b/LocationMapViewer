@@ -26,20 +26,19 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-	
+
     // required by osmdroid
     compile 'com.android.support:support-v4:21.0.2'
-	
+
     // this is osmdroid
     // compile project(':osmdroid-android') // local copy
     compile 'org.osmdroid:osmdroid-android:4.2' // non local copy from repositories
 
     compile 'org.slf4j:slf4j-api:1.7.7@jar'
     // include if you want to see debug/trace logmessages
-    compile 'org.slf4j:slf4j-android:1.7.7@jar'
+    // compile 'org.slf4j:slf4j-android:1.7.7@jar'
     // only error and warn
-    // compile 'eu.lp0.slf4j:slf4j-android:1.7.7-1@jar' if you want to see debug traces, too. requires config file
-	
-	
+    compile 'eu.lp0.slf4j:slf4j-android:1.7.7-1@jar' // if you want to see debug traces, too. requires config file
+
     compile project(':k3b-geoHelper')
 }

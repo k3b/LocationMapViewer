@@ -1,11 +1,10 @@
 package de.k3b.android.locationMapViewer.geo;
 
-import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.overlay.OverlayItem;
-
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.overlay.OverlayItem;
 
 
 /**

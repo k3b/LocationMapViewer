@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
  * <p/>

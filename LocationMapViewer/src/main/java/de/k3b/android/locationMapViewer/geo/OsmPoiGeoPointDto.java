@@ -37,7 +37,8 @@ public class OsmPoiGeoPointDto extends GeoPointDto implements IGeoPoint {
         return this.mLongitudeE6;
     }
 
-    @Override public void clear() {
+    @Override
+    public void clear() {
         super.clear();
         mLatitudeE6 = NO_E6VALUE;
         mLongitudeE6 = NO_E6VALUE;

@@ -1,0 +1,82 @@
+package de.k3b.geo.io;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.Date;
+
+import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.api.IGeoPoint;
+
+/**
+ * Created by EVE on 13.01.2015.
+ */
+public class GeoUriTests {
+    /**
+     * geo:{lat{,lon{,hight_ignore}}}{?q={lat{,lon{,hight_ignore}}}{(name)}{|uri{|id}|}{description}}{&z={{zmin}-zmax}}
+     * */
+    @Test
+    public void ShouldFormat() throws Exception {
+        GeoUri sut = new GeoUri(GeoUri.OPT_DEFAULT);
+        GeoUri sutRedundant = new GeoUri(GeoUri.OPT_FORMAT_REDUNDANT_LAT_LON);
+
+        System.out.print(sutRedundant.toUriString(createTestGeoPoint()));
+
+        Assert.assertEquals("geo:", sut.toUriString(new GeoPointDto()));
+        Assert.assertEquals("geo:123.456", sut.toUriString(new GeoPointDto().setLatitude(123.456)));
+        Assert.assertEquals("geo:,-23", sut.toUriString(new GeoPointDto().setLongitude(-23.0)));
+        Assert.assertEquals("geo:0,0", sut.toUriString(new GeoPointDto().setLongitude(0.0).setLatitude(0.0)));
+        Assert.assertEquals("geo:123.456,-23?q=123.456,-23", sutRedundant.toUriString(new GeoPointDto().setLatitude(123.456).setLongitude(-23.0)));
+    }
+
+    @Test
+    public void ShouldParse() throws Exception {
+        GeoUri sut = new GeoUri(GeoUri.OPT_DEFAULT);
+
+        String original = sut.toUriString(createTestGeoPoint());
+
+        IGeoPoint parsed = sut.fromUri(original);
+
+        Assert.assertEquals(original, sut.toUriString(parsed));
+    }
+
+    @Test
+    public void ParseShouldNotInfer() throws Exception {
+        GeoUri sut = new GeoUri(GeoUri.OPT_DEFAULT);
+
+        String uri = "geo:?d=I was in (Hamburg) located at 53,10 on 1991-03-03T04:05:06Z";
+
+        GeoPointDto parsed = (GeoPointDto)sut.fromUri(uri);
+        parsed.setDescription(null); // remove "d=description" so only the infered data remains
+
+        Assert.assertEquals("geo:", sut.toUriString(parsed));
+    }
+
+    @Test
+    public void ParseShouldInfer() throws Exception {
+        GeoUri sut = new GeoUri(GeoUri.OPT_PARSE_INFER_MISSING);
+
+        String uri = "geo:?d=I was in (Hamburg) located at 53,10 on 1991-03-03T04:05:06Z";
+
+        GeoPointDto parsed = (GeoPointDto)sut.fromUri(uri);
+        parsed.setDescription(null); // remove "d=description" so only the infered data remains
+
+        Assert.assertEquals("geo:53,10?q=(Hamburg)&t=1991-03-03T04:05:06Z", sut.toUriString(parsed));
+    }
+
+    @Test
+    public void ClearedDtoShouldFormatEmpty() throws Exception {
+        GeoUri formatter = new GeoUri(GeoUri.OPT_DEFAULT);
+
+        final GeoPointDto testGeoPoint = createTestGeoPoint();
+        testGeoPoint.clear();
+        String result = formatter.toUriString(testGeoPoint);
+
+        Assert.assertEquals("geo:", result);
+    }
+
+
+    private GeoPointDto createTestGeoPoint() {
+        return new GeoPointDto(12.345, -56.78901234, "name", "uri", "id", "description", 5, 7, new Date(91, 2, 3, 4, 5, 6));
+    }
+}

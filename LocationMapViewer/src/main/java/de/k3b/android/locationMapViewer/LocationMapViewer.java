@@ -19,6 +19,7 @@
 package de.k3b.android.locationMapViewer;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -44,14 +45,20 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.k3b.android.locationMapViewer.constants.Constants;
-import de.k3b.android.locationMapViewer.geo.POIOverlayItem;
 import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.api.IGeoInfoHandler;
+import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.GeoUri;
+import de.k3b.geo.io.gpx.GpxReaderBase;
 import microsoft.mappoint.TileSystem;
 
 /**
@@ -109,12 +116,24 @@ public class LocationMapViewer extends Activity implements Constants {
 
         final List<Overlay> overlays = this.mMapView.getOverlays();
 
+        final ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+        final IGeoInfoHandler pointCollector = new IGeoInfoHandler() {
+            @Override
+            public void onGeoInfo(IGeoPointInfo aGeoPoint) {
+                if (aGeoPoint != null) {
+                    final OverlayItem overlayItem = new OverlayItem(aGeoPoint.getId(), aGeoPoint.getName(), aGeoPoint.getDescription(), new GeoPoint(aGeoPoint.getLatitude(), aGeoPoint.getLongitude()));
+                    items.add(overlayItem);
+                }
+            }
+        };
+
         Intent intent = this.getIntent();
         GeoPointDto geoPointFromIntent = getGeoPointDto(intent);
+        pointCollector.onGeoInfo(geoPointFromIntent);
 
-        ///TODO implement file / mime aplication/xml+gpx
-        //!!! List<GeoPointDto> points = getGeoPointDtos(whatToDo);
-        final ArrayList<OverlayItem> items = loadPointOfInterests(geoPointFromIntent);
+        loadGeoPointDtosFromFile(intent, pointCollector);
+
+        loadDemoItemsIfEmpty(items);
         this.mInitalMapCenterZoom = geoPointFromIntent;
 
         createPointOfInterestOverlay(overlays, items);
@@ -136,8 +155,24 @@ public class LocationMapViewer extends Activity implements Constants {
 
     }
 
-    private GeoPointDto getGeoPointDto(Intent whatToDo) {
-        final Uri uri = (whatToDo != null) ? whatToDo.getData() : null;
+    private void loadGeoPointDtosFromFile(Intent intent, IGeoInfoHandler pointCollector) {
+        final Uri uri = (intent != null) ? intent.getData() : null;
+        if (uri != null) {
+            ContentResolver cr = getContentResolver();
+            GeoPointDto p = new GeoPointDto();
+            try {
+                InputStream is = cr.openInputStream(uri);
+                GpxReaderBase parser = new GpxReaderBase(pointCollector, p);
+                parser.parse(new InputSource(is));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private GeoPointDto getGeoPointDto(Intent intent) {
+        final Uri uri = (intent != null) ? intent.getData() : null;
         String uriAsString = (uri != null) ? uri.toString() : null;
         GeoPointDto initalMapCenterZoom = null;
         if (uriAsString != null) {
@@ -164,19 +199,15 @@ public class LocationMapViewer extends Activity implements Constants {
     /**
      * Create some Hardcoded Markers on some cities.
      *
-     * @param targetPoint
      */
-    private ArrayList<OverlayItem> loadPointOfInterests(GeoPointDto targetPoint) {
-        final ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
-        if (targetPoint != null) {
-            items.add(new POIOverlayItem(targetPoint, getResources().getDrawable(R.drawable.marker_red), null));
+    private void loadDemoItemsIfEmpty(final List<OverlayItem> items) {
+        if (items.size() == 0) {
+            items.add(new OverlayItem("Hannover", "SampleDescription", new GeoPoint(52370816, 9735936)));
+            items.add(new OverlayItem("Berlin", "SampleDescription", new GeoPoint(52518333, 13408333)));
+            items.add(new OverlayItem("Washington", "SampleDescription", new GeoPoint(38895000, -77036667)));
+            items.add(new OverlayItem("San Francisco", "SampleDescription", new GeoPoint(37779300, -122419200)));
+            items.add(new OverlayItem("Tolaga Bay", "SampleDescription", new GeoPoint(-38371000, 178298000)));
         }
-        items.add(new OverlayItem("Hannover", "SampleDescription", new GeoPoint(52370816, 9735936)));
-        items.add(new OverlayItem("Berlin", "SampleDescription", new GeoPoint(52518333, 13408333)));
-        items.add(new OverlayItem("Washington", "SampleDescription", new GeoPoint(38895000, -77036667)));
-        items.add(new OverlayItem("San Francisco", "SampleDescription", new GeoPoint(37779300, -122419200)));
-        items.add(new OverlayItem("Tolaga Bay", "SampleDescription", new GeoPoint(-38371000, 178298000)));
-        return items;
     }
 
     private void createPointOfInterestOverlay(List<Overlay> overlays, ArrayList<OverlayItem> items) {

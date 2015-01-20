@@ -19,6 +19,8 @@
 
 package de.k3b.geo.io.gpx;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -26,8 +28,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -35,12 +35,13 @@ import javax.xml.parsers.SAXParserFactory;
 
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
-import de.k3b.geo.api.IGeoPointInfo;
 
 /**
  * Created by k3b on 20.01.2015.
  */
 public class GpxReaderBase extends DefaultHandler {
+    private static final Logger logger = LoggerFactory.getLogger(GpxReaderBase.class);
+
     protected IGeoInfoHandler onGotNewWaypoint;
 
     /** if not null this instance is cleared and then reused for every new gpx found */
@@ -57,12 +58,14 @@ public class GpxReaderBase extends DefaultHandler {
     public void parse(InputSource in) throws IOException {
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
-            factory.setValidating(true);
+            // factory.setValidating(true);
             SAXParser parser = factory.newSAXParser();
             parser.parse(in, this);
         } catch (ParserConfigurationException e) {
+            logger.error("Error parsing gpx", e);
             throw new IOException(e.getMessage());
         } catch (SAXException e) {
+            logger.error("Error parsing gpx", e);
             throw new IOException(e.getMessage());
         }
     }
@@ -74,10 +77,12 @@ public class GpxReaderBase extends DefaultHandler {
     }
 
     @Override
-    public void startElement(String uri, String localName, String qName,
+    public void startElement(String uri, String localName2, String qName,
             Attributes attributes) throws SAXException {
+        String localName = (localName2.length() > 0) ? localName2 : qName;
         buf.setLength(0);
-        if (qName.equals("trkpt")) {
+        // logger.debug("startElement {}-{}", localName, qName);
+        if (localName.equals("trkpt")) {
             current = this.newInstance();
             current.setLatitude(Double.parseDouble(attributes.getValue("lat")));
             current.setLongitude(Double.parseDouble(attributes.getValue("lon")));
@@ -86,17 +91,19 @@ public class GpxReaderBase extends DefaultHandler {
 
     // gpx//trkpt/time|name|desc|@lat|@lon
     @Override
-    public void endElement(String uri, String localName, String qName)
+    public void endElement(String uri, String localName2, String qName)
             throws SAXException {
-        if (qName.equals("trkpt")) {
+        String localName = (localName2.length() > 0) ? localName2 : qName;
+        // logger.debug("endElement {} {}", localName, qName);
+        if (localName.equals("trkpt")) {
             this.onGotNewWaypoint.onGeoInfo(current);
             current = null;
         } else if (current != null) {
-            if (qName.equals("name")) {
+            if (localName.equals("name")) {
                 current.setName(buf.toString());
-            } else if (qName.equals("desc")) {
+            } else if (localName.equals("desc")) {
                 current.setDescription(buf.toString());
-            } else if (qName.equals("time")) {
+            } else if (localName.equals("time")) {
                 try {
                     current.setTimeOfMeasurement(GpxFormatter.TIME_FORMAT.parse(buf.toString()));
                 } catch (ParseException e) {

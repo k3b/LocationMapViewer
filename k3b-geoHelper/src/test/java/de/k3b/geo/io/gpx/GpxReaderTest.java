@@ -33,6 +33,8 @@ import de.k3b.geo.api.IGeoPointInfo;
 public class GpxReaderTest {
     String xmlMinimal = "<trkpt lat='53.1099972' lon='8.7178206'><time>2014-12-19T21:13:21Z</time><name>262:3:562:54989</name><desc>type: cell, accuracy: 1640, confidence: 75</desc></trkpt>\n";
 
+    String xmlFull = "<gpx xmlns='http://www.topografix.com/GPX/1/1' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' version='1.1' xsi:schemaLocation='http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd' creator='Location Cache Map'>"+
+            "<trk><trkseg>" + xmlMinimal + "</trkseg></trk></gpx>";
     @Test
     public void parseFormatTest() throws IOException {
         GpxReader reader = new GpxReader(null);
@@ -41,4 +43,14 @@ public class GpxReaderTest {
 
         Assert.assertEquals(xmlMinimal, formatted);
     }
+
+    @Test
+    public void parseFormatFullTest() throws IOException {
+        GpxReader reader = new GpxReader(null);
+        IGeoPointInfo location = reader.getTracks(new InputSource(new StringReader(xmlFull))).get(0);
+        String formatted = GpxFormatter.toGpx(new StringBuffer(), location, location.getDescription()).toString();
+
+        Assert.assertEquals(xmlMinimal, formatted);
+    }
+
 }

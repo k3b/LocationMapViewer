@@ -2,6 +2,25 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.k3b.android.locationMapViewer">
 
+    <!--
+    * Copyright (C) 2015 k3b
+    *
+    * This file is part of de.k3b.android.LocationMapViewer (https://github.com/k3b/LocationMapViewer/) .
+    *
+    * This program is free software: you can redistribute it and/or modify it
+    * under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful, but WITHOUT
+    * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    * FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    * for more details.
+    *
+    * You should have received a copy of the GNU General Public License along with
+    * this program. If not, see <http://www.gnu.org/licenses/>
+    -->
+
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
@@ -89,6 +108,16 @@
                 <data android:scheme="geo" />
             </intent-filter>
 
+            <!--TODO !!!
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+                <data android:scheme="file" />
+                <data android:host="*" />
+                <data android:pathPattern=".*\\.gpx" />
+            </intent-filter>
+            -->
         </activity>
         <activity
             android:name=".SettingsActivity"

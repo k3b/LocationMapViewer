@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 k3b
+ *
+ * This file is part of de.k3b.android.LocationMapViewer (https://github.com/k3b/LocationMapViewer/) .
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>
+ */
 package de.k3b.android.locationMapViewer;
 
 import android.app.Activity;
@@ -31,14 +49,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.k3b.android.locationMapViewer.constants.Constants;
-import de.k3b.android.locationMapViewer.geo.OsmPoiGeoPointDto;
 import de.k3b.android.locationMapViewer.geo.POIOverlayItem;
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.io.GeoUri;
 import microsoft.mappoint.TileSystem;
 
 /**
- * minimal android cardviewer app for Android 2.1 (Eclair, API 7).<br/>
+ * An app that can display geografic info in a map for Android 2.1 (Eclair, API 7) .<br/>
  * no support for actionbar and fragments.<br/>
  * The code is based on "org.osmdroid.samples.SampleWithMinimapItemizedoverlay in DemoApp OpenStreetMapViewer"
  */
@@ -69,7 +86,7 @@ public class LocationMapViewer extends Activity implements Constants {
      * where images/icons are loaded from
      */
     private ResourceProxy mResourceProxy;
-    private OsmPoiGeoPointDto mInitalMapCenterZoom = null;
+    private GeoPointDto mInitalMapCenterZoom = null;
 
     // ===========================================================
     // Constructors
@@ -84,16 +101,6 @@ public class LocationMapViewer extends Activity implements Constants {
         super.onCreate(savedInstanceState);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        Intent whatToDo = this.getIntent();
-        final Uri uri = (whatToDo != null) ? whatToDo.getData() : null;
-        String uriAsString = (uri != null) ? uri.toString() : null;
-        OsmPoiGeoPointDto initalMapCenterZoom = null;
-        if (uriAsString != null) {
-            Toast.makeText(this, getString(R.string.app_name) + ": received  " + uriAsString, Toast.LENGTH_LONG).show();
-            GeoUri parser = new GeoUri(GeoUri.OPT_PARSE_INFER_MISSING);
-            initalMapCenterZoom = (OsmPoiGeoPointDto) parser.fromUri(uriAsString, new OsmPoiGeoPointDto());
-        }
-
         mResourceProxy = new ResourceProxyImpl(getApplicationContext());
 
         this.setContentView(R.layout.mapview);
@@ -102,7 +109,13 @@ public class LocationMapViewer extends Activity implements Constants {
 
         final List<Overlay> overlays = this.mMapView.getOverlays();
 
-        final ArrayList<OverlayItem> items = loadPointOfInterests(initalMapCenterZoom);
+        Intent intent = this.getIntent();
+        GeoPointDto geoPointFromIntent = getGeoPointDto(intent);
+
+        ///TODO implement file / mime aplication/xml+gpx
+        //!!! List<GeoPointDto> points = getGeoPointDtos(whatToDo);
+        final ArrayList<OverlayItem> items = loadPointOfInterests(geoPointFromIntent);
+        this.mInitalMapCenterZoom = geoPointFromIntent;
 
         createPointOfInterestOverlay(overlays, items);
 
@@ -120,17 +133,28 @@ public class LocationMapViewer extends Activity implements Constants {
 //            setCenterZoom(initalMapCenterZoom);
 //        }
 
-        this.mInitalMapCenterZoom = initalMapCenterZoom;
 
     }
 
-    private void setCenterZoom(OsmPoiGeoPointDto targetPoint) {
+    private GeoPointDto getGeoPointDto(Intent whatToDo) {
+        final Uri uri = (whatToDo != null) ? whatToDo.getData() : null;
+        String uriAsString = (uri != null) ? uri.toString() : null;
+        GeoPointDto initalMapCenterZoom = null;
+        if (uriAsString != null) {
+            Toast.makeText(this, getString(R.string.app_name) + ": received  " + uriAsString, Toast.LENGTH_LONG).show();
+            GeoUri parser = new GeoUri(GeoUri.OPT_PARSE_INFER_MISSING);
+            initalMapCenterZoom = (GeoPointDto) parser.fromUri(uriAsString, new GeoPointDto());
+        }
+        return initalMapCenterZoom;
+    }
+
+    private void setCenterZoom(GeoPointDto targetPoint) {
         int zoom = targetPoint.getZoomMin();
         if (zoom == GeoPointDto.NO_ZOOM) zoom = 5;
         final IMapController controller = mMapView.getController();
         controller.setZoom(zoom);
 
-        controller.setCenter(targetPoint);
+        controller.setCenter(new GeoPoint(targetPoint.getLatitude(), targetPoint.getLongitude()));
 
         if (logger.isDebugEnabled()) {
             logger.debug("setCenterZoom XYZ:" + targetPoint + "; " + getStatusForDebug());
@@ -142,7 +166,7 @@ public class LocationMapViewer extends Activity implements Constants {
      *
      * @param targetPoint
      */
-    private ArrayList<OverlayItem> loadPointOfInterests(OsmPoiGeoPointDto targetPoint) {
+    private ArrayList<OverlayItem> loadPointOfInterests(GeoPointDto targetPoint) {
         final ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
         if (targetPoint != null) {
             items.add(new POIOverlayItem(targetPoint, getResources().getDrawable(R.drawable.marker_red), null));

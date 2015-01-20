@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 k3b
+ *
+ * This file is part of de.k3b.android.LocationMapViewer (https://github.com/k3b/LocationMapViewer/) .
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>
+ */
 package de.k3b.android.locationMapViewer.geo;
 
 import android.content.Context;
@@ -16,6 +34,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.io.gpx.GpxReader;
 
 /**
  * Created by EVE on 07.01.2015.
@@ -55,12 +76,12 @@ public class GpxOverlay extends ItemizedOverlayWithFocus<POIOverlayItem> {
      */
     public static GpxOverlay addGpxOverlay(final Context context, MapView mMapView, File gpxFile) {
         try {
-            List<OsmPoiGeoPointDto> gpxLocations = new OsmGpxLocationReader().readTrack(new InputSource(new FileInputStream(gpxFile)));
+            List<GeoPointDto> gpxLocations = new GpxReader(null).readTrack(new InputSource(new FileInputStream(gpxFile)));
 
             if ((gpxLocations != null) && (gpxLocations.size() > 0)) {
                 ResourceProxy resourceProxy = new DefaultResourceProxyImpl(context);
                 final List<POIOverlayItem> overlayItems = new ArrayList<POIOverlayItem>(gpxLocations.size());
-                for (OsmPoiGeoPointDto loc : gpxLocations) {
+                for (GeoPointDto loc : gpxLocations) {
                     overlayItems.add(new POIOverlayItem(loc,
                             resourceProxy.getDrawable(ResourceProxy.bitmap.marker_default), OverlayItem.HotspotPlace.CENTER));
 

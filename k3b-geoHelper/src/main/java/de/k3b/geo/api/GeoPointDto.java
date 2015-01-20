@@ -1,13 +1,32 @@
+/*
+ * Copyright (C) 2015 k3b
+ *
+ * This file is part of de.k3b.android.LocationMapViewer (https://github.com/k3b/LocationMapViewer/) .
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>
+ */
+
 package de.k3b.geo.api;
 
 import java.util.Date;
 
 /**
- * A location or trackpoint that displayed in a locationmap.<br/>
+ * A location or trackpoint that can be displayed in a locationmap.<br/>
  * <p/>
  * Created by k3b on 07.01.2015.
  */
-public class GeoPointDto implements ILocation, IGeoPoint {
+public class GeoPointDto implements ILocation, IGeoPointInfo {
     /**
      * Latitude, in degrees north. NO_LAT_LON if not set
      */
@@ -208,7 +227,12 @@ public class GeoPointDto implements ILocation, IGeoPoint {
         return this;
     }
 
-    public void clear() {
+    /**
+     * sets all members back to defaultvalue to allow reuse of class.
+     *
+     * @return this to to allow chains
+     */
+    public GeoPointDto clear() {
         this.latitude = GeoPointDto.NO_LAT_LON;
         this.longitude = GeoPointDto.NO_LAT_LON;
         this.name = null;
@@ -218,6 +242,6 @@ public class GeoPointDto implements ILocation, IGeoPoint {
         this.zoomMin = NO_ZOOM;
         this.zoomMax = NO_ZOOM;
         this.timeOfMeasurement = null;
-
+        return this;
     }
 }

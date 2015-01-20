@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2015 k3b
+ *
+ * This file is part of de.k3b.android.LocationMapViewer (https://github.com/k3b/LocationMapViewer/) .
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>
+ */
+
 package de.k3b.geo.io;
 
 import java.io.UnsupportedEncodingException;
@@ -17,10 +36,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.k3b.geo.api.GeoPointDto;
-import de.k3b.geo.api.IGeoPoint;
+import de.k3b.geo.api.IGeoPointInfo;
 
 /**
- * Converts between a {@link de.k3b.geo.api.IGeoPoint} and a uri string.<br/>
+ * Converts between a {@link de.k3b.geo.api.IGeoPointInfo} and a uri string.<br/>
  * Format:<br/>
  * geo:{lat}{,lon{,hight_ignore}}}{?q={lat}{,lon}{,hight_ignore}{(name)}}{&uri=uri}{&id=id}{&d=description}{&z=zmin{&z2=zmax}}{&t=timeOfMeasurement}
  * Example (with {@link de.k3b.geo.io.GeoUri#OPT_FORMAT_REDUNDANT_LAT_LON} set):<br/>
@@ -80,7 +99,7 @@ public class GeoUri {
     }
 
     /** load IGeopoint from uri-string */
-    public IGeoPoint fromUri(String uri) {
+    public IGeoPointInfo fromUri(String uri) {
         return fromUri(uri, new GeoPointDto());
     }
 
@@ -197,7 +216,7 @@ public class GeoUri {
             } catch (Exception ignore) {
             }
         }
-        return IGeoPoint.NO_ZOOM;
+        return IGeoPointInfo.NO_ZOOM;
     }
 
     /** parsing helper: add a found query-parameter to a map for fast lookup */
@@ -216,13 +235,13 @@ public class GeoUri {
     }
 
     /**
-     * Converts a {@link IGeoPoint} into uri string representatino.<br/>
+     * Converts a {@link de.k3b.geo.api.IGeoPointInfo} into uri string representatino.<br/>
      * <br/>
      * Format
      *
      * geo:{lat{,lon{,hight_ignore}}}{?q={lat}{,lon}{,hight_ignore}{(name)}}{&uri=uri}{&id=id}{&d=description}{&z=zmin{&z2=zmax}}{&t=timeOfMeasurement}
      */
-    public String toUriString(IGeoPoint geoPoint) {
+    public String toUriString(IGeoPointInfo geoPoint) {
         StringBuffer result = new StringBuffer();
         result.append(GEO_SCHEME);
         formatLatLon(result, geoPoint);
@@ -243,7 +262,7 @@ public class GeoUri {
 
     /** formatting helper: */
     private void appendQueryParameter(StringBuffer result, String paramName, int paramValue) {
-        if (paramValue != IGeoPoint.NO_ZOOM) {
+        if (paramValue != IGeoPointInfo.NO_ZOOM) {
             appendQueryParameter(result, paramName, Integer.toString(paramValue), true);
         }
     }
@@ -265,17 +284,17 @@ public class GeoUri {
     }
 
     /** formatting helper: */
-    private void formatLatLon(StringBuffer result, IGeoPoint geoPoint) {
-        if (geoPoint.getLatitude() != IGeoPoint.NO_LAT_LON) {
+    private void formatLatLon(StringBuffer result, IGeoPointInfo geoPoint) {
+        if (geoPoint.getLatitude() != IGeoPointInfo.NO_LAT_LON) {
             result.append(latLonFormatter.format(geoPoint.getLatitude()));
         }
-        if (geoPoint.getLongitude() != IGeoPoint.NO_LAT_LON) {
+        if (geoPoint.getLongitude() != IGeoPointInfo.NO_LAT_LON) {
             result.append(",").append(latLonFormatter.format(geoPoint.getLongitude()));
         }
     }
 
     /** formatting helper: */
-    private String formatQuery(IGeoPoint geoPoint) {
+    private String formatQuery(IGeoPointInfo geoPoint) {
         // {lat{,lon{,hight_ignore}}}{(name)}{|uri{|id}|}{description}
         StringBuffer result = new StringBuffer();
 

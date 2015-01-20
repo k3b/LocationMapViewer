@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 k3b
+ *
+ * This file is part of de.k3b.android.LocationMapViewer (https://github.com/k3b/LocationMapViewer/) .
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>
+ */
 package de.k3b.geo.io.gpx;
 
 import java.io.IOException;
@@ -15,20 +33,34 @@ import org.xml.sax.helpers.DefaultHandler;
 import de.k3b.geo.api.GeoPointDto;
 
 /**
- * Reads {@link de.k3b.geo.api.GeoPointDto} from file or stream.<br/>
+ * Reads {@link de.k3b.geo.api.GeoPointDto} from gpx file or stream.<br/>
  *
  * inspired by http://stackoverflow.com/questions/672454/how-to-parse-gpx-files-with-saxreader
  */
-public abstract class GpxReader<T extends GeoPointDto> extends DefaultHandler {
-    private List<T> track;
+public class GpxReader extends DefaultHandler {
+    /** if not null this instance is cleared and then reused for every new gpx found */
+    private final GeoPointDto mReuse;
+    private List<GeoPointDto> track;
     private StringBuffer buf = new StringBuffer();
-    private T current;
+    private GeoPointDto current;
 
-    public abstract T getNewInstance();
+    /**
+     * Creates a new GpxReader
+     * @param reuse if not null this instance is cleared and then reused for every new gpx found
+     */
+    public GpxReader(final GeoPointDto reuse) {
+        this.mReuse = reuse;
+    }
 
-    public List<T> readTrack(InputSource in) throws IOException {
+    /** returns an instance of an empty {@link de.k3b.geo.api.GeoPointDto} */
+    protected GeoPointDto newInstance() {
+        if (mReuse != null) return mReuse.clear();
+        return new GeoPointDto();
+    }
+
+    public List<GeoPointDto> readTrack(InputSource in) throws IOException {
         try {
-            track = new ArrayList<T>();
+            track = new ArrayList<GeoPointDto>();
             SAXParserFactory factory = SAXParserFactory.newInstance();
             factory.setValidating(true);
             SAXParser parser = factory.newSAXParser();
@@ -47,7 +79,7 @@ public abstract class GpxReader<T extends GeoPointDto> extends DefaultHandler {
             Attributes attributes) throws SAXException {
         buf.setLength(0);
         if (qName.equals("trkpt")) {
-            current = this.getNewInstance();
+            current = this.newInstance();
             current.setLatitude(Double.parseDouble(attributes.getValue("lat")));
             current.setLongitude(Double.parseDouble(attributes.getValue("lon")));
         }

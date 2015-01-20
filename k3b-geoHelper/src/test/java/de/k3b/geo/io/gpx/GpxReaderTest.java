@@ -25,7 +25,7 @@ import org.xml.sax.InputSource;
 import java.io.IOException;
 import java.io.StringReader;
 
-import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.api.IGeoPointInfo;
 
 /**
  * Created by k3b on 14.06.2014.
@@ -36,7 +36,7 @@ public class GpxReaderTest {
     @Test
     public void parseFormatTest() throws IOException {
         GpxReader reader = new GpxReader(null);
-        GeoPointDto location = reader.readTrack(new InputSource(new StringReader(xmlMinimal))).get(0);
+        IGeoPointInfo location = reader.getTracks(new InputSource(new StringReader(xmlMinimal))).get(0);
         String formatted = GpxFormatter.toGpx(new StringBuffer(), location, location.getDescription()).toString();
 
         Assert.assertEquals(xmlMinimal, formatted);

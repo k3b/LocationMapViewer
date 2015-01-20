@@ -26,7 +26,7 @@ import java.util.Date;
  * <p/>
  * Created by k3b on 13.01.2015.
  */
-public interface IGeoPointInfo {
+public interface IGeoPointInfo extends ILocation {
     public static final double NO_LAT_LON = Double.MIN_VALUE;
     public static final int NO_ZOOM = -1;
 

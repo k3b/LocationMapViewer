@@ -31,85 +31,40 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.api.IGeoInfoHandler;
+import de.k3b.geo.api.IGeoPointInfo;
 
 /**
  * Reads {@link de.k3b.geo.api.GeoPointDto} from gpx file or stream.<br/>
  *
  * inspired by http://stackoverflow.com/questions/672454/how-to-parse-gpx-files-with-saxreader
  */
-public class GpxReader extends DefaultHandler {
-    /** if not null this instance is cleared and then reused for every new gpx found */
-    private final GeoPointDto mReuse;
-    private List<GeoPointDto> track;
-    private StringBuffer buf = new StringBuffer();
-    private GeoPointDto current;
+public class GpxReader extends GpxReaderBase implements IGeoInfoHandler {
+    private List<IGeoPointInfo> track;
 
     /**
      * Creates a new GpxReader
      * @param reuse if not null this instance is cleared and then reused for every new gpx found
      */
     public GpxReader(final GeoPointDto reuse) {
-        this.mReuse = reuse;
+        super(null,reuse);
+        this.onGotNewWaypoint = this; // cannot do this in constructor
     }
 
-    /** returns an instance of an empty {@link de.k3b.geo.api.GeoPointDto} */
-    protected GeoPointDto newInstance() {
-        if (mReuse != null) return mReuse.clear();
-        return new GeoPointDto();
+    public List<IGeoPointInfo> getTracks(InputSource in) throws IOException {
+        track = new ArrayList<IGeoPointInfo>();
+        parse(in);
+        return track;
     }
 
-    public List<GeoPointDto> readTrack(InputSource in) throws IOException {
-        try {
-            track = new ArrayList<GeoPointDto>();
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            factory.setValidating(true);
-            SAXParser parser = factory.newSAXParser();
-            GpxReader reader = this;
-            parser.parse(in, reader);
-            return track;
-        } catch (ParserConfigurationException e) {
-            throw new IOException(e.getMessage());
-        } catch (SAXException e) {
-            throw new IOException(e.getMessage());
+    /** is called for every completed gpx-trackpoint */
+    @Override
+    public void onGeoInfo(IGeoPointInfo geoInfo) {
+        if (mReuse != null) {
+            track.add(mReuse.clone());
+        } else {
+            track.add(this.current);
         }
     }
 
-    @Override
-    public void startElement(String uri, String localName, String qName,
-            Attributes attributes) throws SAXException {
-        buf.setLength(0);
-        if (qName.equals("trkpt")) {
-            current = this.newInstance();
-            current.setLatitude(Double.parseDouble(attributes.getValue("lat")));
-            current.setLongitude(Double.parseDouble(attributes.getValue("lon")));
-        }
-    }
-
-    // gpx//trkpt/time|name|desc|@lat|@lon
-    @Override
-    public void endElement(String uri, String localName, String qName)
-            throws SAXException {
-        if (qName.equals("trkpt")) {
-            track.add(current);
-            current = null;
-        } else if (current != null) {
-            if (qName.equals("name")) {
-                current.setName(buf.toString());
-            } else if (qName.equals("desc")) {
-                current.setDescription(buf.toString());
-            } else if (qName.equals("time")) {
-                try {
-                    current.setTimeOfMeasurement(GpxFormatter.TIME_FORMAT.parse(buf.toString()));
-                } catch (ParseException e) {
-                    throw new SAXException("Invalid time " + buf.toString());
-                }
-            }
-        }
-    }
-
-    @Override
-    public void characters(char[] chars, int start, int length)
-            throws SAXException {
-        buf.append(chars, start, length);
-    }
 }

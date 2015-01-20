@@ -76,7 +76,7 @@ public class GpxOverlay extends ItemizedOverlayWithFocus<POIOverlayItem> {
      */
     public static GpxOverlay addGpxOverlay(final Context context, MapView mMapView, File gpxFile) {
         try {
-            List<GeoPointDto> gpxLocations = new GpxReader(null).readTrack(new InputSource(new FileInputStream(gpxFile)));
+            List<GeoPointDto> gpxLocations = new GpxReader(null).getTracks(new InputSource(new FileInputStream(gpxFile)));
 
             if ((gpxLocations != null) && (gpxLocations.size() > 0)) {
                 ResourceProxy resourceProxy = new DefaultResourceProxyImpl(context);

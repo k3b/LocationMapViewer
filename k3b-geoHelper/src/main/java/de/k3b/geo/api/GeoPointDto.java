@@ -26,7 +26,7 @@ import java.util.Date;
  * <p/>
  * Created by k3b on 07.01.2015.
  */
-public class GeoPointDto implements ILocation, IGeoPointInfo {
+public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
     /**
      * Latitude, in degrees north. NO_LAT_LON if not set
      */
@@ -243,5 +243,14 @@ public class GeoPointDto implements ILocation, IGeoPointInfo {
         this.zoomMax = NO_ZOOM;
         this.timeOfMeasurement = null;
         return this;
+    }
+
+    public GeoPointDto clone() {
+        try {
+            return (GeoPointDto) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

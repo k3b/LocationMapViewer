@@ -1,0 +1,13 @@
+order geopoints by zoomlevel??22??
+different map-markers if there are many in certain zoomlevel 
+
+onTapMarker, onLongTapMarker
+
+
+--- history
+v	uri geo: marker+ZoomTo(if &z=...)
+>	gpx-xmlformat 
+v		uri file:*.gpx
+			gpx-1.0
+			allow namespaces
+-		mime:application/xml+gpx

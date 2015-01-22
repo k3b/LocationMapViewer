@@ -39,6 +39,8 @@ import de.k3b.geo.api.IGeoInfoHandler;
 /**
  * Parser for http://www.topografix.com/GPX/1/1/ and http://www.topografix.com/GPX/1/0/
  * and a little bit of http://www.opengis.net/kml/2.2.
+ *
+ * This parser is not acurate: it might pick elements from wrong namespace.
  * 
  * Created by k3b on 20.01.2015.
  */
@@ -85,9 +87,9 @@ public class GpxReaderBase extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String qName,
             Attributes attributes) throws SAXException {
-        String name = (localName.length() > 0) ? localName : qName;
+        String name = getElementName(localName, qName);
         
-        // logger.debug("startElement {}-{}", localName, qName);
+        logger.debug("startElement {}-{}", localName, qName);
         if (name.equals(GpxDef_11.TRKPT) || name.equals(GpxDef_10.WPT)) {
             current = this.newInstance();
             current.setLatitude(Double.parseDouble(attributes.getValue(GpxDef_11.ATTR_LAT)));
@@ -101,10 +103,10 @@ public class GpxReaderBase extends DefaultHandler {
     }
 
     @Override
-    public void endElement(String uri, String localName2, String qName)
+    public void endElement(String uri, String localName, String qName)
             throws SAXException {
-        String name = (localName2.length() > 0) ? localName2 : qName;
-        // logger.debug("endElement {} {}", localName2, qName);
+        String name = getElementName(localName, qName);
+        logger.debug("endElement {} {}", localName, qName);
         if (name.equals(GpxDef_11.TRKPT) || name.equals(GpxDef_10.WPT) || name.equals(KmlDef_22.PLACEMARK)) {
             this.onGotNewWaypoint.onGeoInfo(current);
             current = null;
@@ -132,6 +134,17 @@ public class GpxReaderBase extends DefaultHandler {
                 }
             }
         }
+    }
+
+    private String getElementName(String localName, String qName) {
+        if ((localName != null) && (localName.length() > 0))
+            return localName;
+        if (qName == null) return "";
+
+        int delim = qName.indexOf(":");
+        if (delim < 0) return qName;
+
+        return qName.substring(delim+1);
     }
 
     @Override

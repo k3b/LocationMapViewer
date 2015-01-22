@@ -32,11 +32,20 @@ import de.k3b.geo.api.IGeoPointInfo;
  * Created by k3b on 14.06.2014.
  */
 public class GpxReaderTest {
-    String xmlMinimal_gpx_v11 = "<trkpt lat='53.1099972' lon='8.7178206'><time>2014-12-19T21:13:21Z</time><name>262:3:562:54989</name><desc>type: cell, accuracy: 1640, confidence: 75</desc><link>geo:0,0?q=12.34,56.78(name)</link></trkpt>\n";
+    /** format for gpx v1.0 */
+    String xmlMinimal_gpx_v10 = "<wpt lat='53.1099972' lon='8.7178206'><time>2014-12-19T21:13:21Z</time><name>262:3:562:54989</name><desc>type: cell, accuracy: 1640, confidence: 75</desc><url>geo:0,0?q=12.34,56.78(name)</url></wpt>\n";
 
+    /** format for gpx v1.1 */
+    String xmlMinimal_gpx_v11 = "<trkpt lat='53.1099972' lon='8.7178206'><time>2014-12-19T21:13:21Z</time><name>262:3:562:54989</name><desc>type: cell, accuracy: 1640, confidence: 75</desc><link>geo:0,0?q=12.34,56.78(name)</link></trkpt>\n";
     String xmlFull_gpx_v11 = "<gpx xmlns='http://www.topografix.com/GPX/1/1' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' version='1.1' xsi:schemaLocation='http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd' creator='Location Cache Map'>"+
             "<trk><trkseg>" + xmlMinimal_gpx_v11 + "</trkseg></trk></gpx>";
 
+    /** format for gpx v1.1 using xml namespace g: */
+    String xmlMinimal_gpx_v11_withNS = "<g:trkpt lat='53.1099972' lon='8.7178206'><g:time>2014-12-19T21:13:21Z</g:time><g:name>262:3:562:54989</g:name><g:desc>type: cell, accuracy: 1640, confidence: 75</g:desc><g:link>geo:0,0?q=12.34,56.78(name)</g:link></g:trkpt>\n";
+    String xmlFull_gpx_v11withNS = "<something xmlns:g='http://www.topografix.com/GPX/1/1' ><g:gpx >"+
+            "<g:trk><g:trkseg>" + xmlMinimal_gpx_v11_withNS + "</g:trkseg></g:trk></g:gpx></something>";
+
+    /** illegal kml format but containing the essential fields understood by the parser */
     String xmlMinimal_kml = "<Placemark><name>262:3:562:54989</name><description>type: cell, accuracy: 1640, confidence: 75</description><Point><coordinates>8.7178206,53.1099972,0</coordinates></Point><when>2014-12-19T21:13:21Z</when></Placemark>\n";
 
     @Test
@@ -48,12 +57,19 @@ public class GpxReaderTest {
         Assert.assertEquals(xmlMinimal_gpx_v11, formatted);
     }
 
-    String xmlMinimal_gpx_v10 = "<wpt lat='53.1099972' lon='8.7178206'><time>2014-12-19T21:13:21Z</time><name>262:3:562:54989</name><desc>type: cell, accuracy: 1640, confidence: 75</desc><url>geo:0,0?q=12.34,56.78(name)</url></wpt>\n";
-
     @Test
     public void parseFormatGpx11FullTest() throws IOException {
         GpxReader reader = new GpxReader(null);
         IGeoPointInfo location = reader.getTracks(new InputSource(new StringReader(xmlFull_gpx_v11))).get(0);
+        String formatted = GpxFormatter.toGpx(new StringBuffer(), location, location.getDescription(), location.getUri()).toString();
+
+        Assert.assertEquals(xmlMinimal_gpx_v11, formatted);
+    }
+
+    @Test
+    public void parseFormatGpx11WithNamespaceTest() throws IOException {
+        GpxReader reader = new GpxReader(null);
+        IGeoPointInfo location = reader.getTracks(new InputSource(new StringReader(xmlFull_gpx_v11withNS))).get(0);
         String formatted = GpxFormatter.toGpx(new StringBuffer(), location, location.getDescription(), location.getUri()).toString();
 
         Assert.assertEquals(xmlMinimal_gpx_v11, formatted);

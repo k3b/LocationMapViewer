@@ -6,8 +6,18 @@ onTapMarker, onLongTapMarker
 
 --- history
 v	uri geo: marker+ZoomTo(if &z=...)
->	gpx-xmlformat 
-v		uri file:*.gpx
+>	gpx-xml-format 
+v		uri file:*.gpx-v1.1
 			gpx-1.0
 			allow namespaces
 -		mime:application/xml+gpx
+
+DefaultHandler-api
+
+public void endElement(String uri,
+              String localName,
+              String qName)
+
+    uri - The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    localName - The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    qName - The qualified name (with prefix), or the empty string if qualified names are not available.

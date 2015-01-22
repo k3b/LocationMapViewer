@@ -114,6 +114,40 @@
                 <data android:mimeType="*/*" />
                 <data android:scheme="file" />
                 <data android:pathPattern=".*\\.gpx" />
+                <data android:pathPattern=".*\\.kml" />
+            </intent-filter>
+
+            <!-- version with host and without host -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:scheme="ftp" />
+                <data android:scheme="content" />
+
+                <data android:mimeType="application/vnd.google-earth.kml+xml" />
+                <data android:mimeType="application/xml+kml" />
+                <data android:mimeType="application/xml+gpx" />
+                <data android:host="*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:scheme="ftp" />
+                <data android:scheme="content" />
+
+                <data android:mimeType="application/vnd.google-earth.kml+xml" />
+                <data android:mimeType="application/xml+kml" />
+                <data android:mimeType="application/xml+gpx" />
             </intent-filter>
 
         </activity>

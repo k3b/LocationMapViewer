@@ -33,26 +33,41 @@ public class GpxFormatter {
     static final DateFormat TIME_FORMAT
             = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    public static StringBuffer toGpx(StringBuffer result, ILocation location, String description) {
-        return toGpx(result, location.getLatitude(), location.getLongitude(), location.getTimeOfMeasurement(), location.toString(),description);
+    public static StringBuffer toGpx(StringBuffer result, ILocation location,
+                                     String description, String uri) {
+        return toGpx(result, location.getLatitude(), location.getLongitude(),
+                location.getTimeOfMeasurement(), location.toString(),description, uri);
     }
 
-    private static StringBuffer toGpx(StringBuffer result, double latitude, double longitude, Date timeOfMeasurement, String name, String description) {
-        result.append("<trkpt lat='")
+    private static StringBuffer toGpx(StringBuffer result, double latitude, double longitude,
+                                      Date timeOfMeasurement, String name,
+                                      String description, String uri) {
+        result.append("<" +
+                GpxDef_11.TRKPT +
+                " " +
+                GpxDef_11.ATTR_LAT +
+                "='")
                 .append(latitude)
-                .append("' lon='")
+                .append("' " +
+                        GpxDef_11.ATTR_LON +
+                        "='")
                 .append(longitude)
                 .append("'>");
         if (timeOfMeasurement != null) {
-            addElement(result, "time", TIME_FORMAT.format(timeOfMeasurement).toString());
+            addElement(result, GpxDef_11.TIME, TIME_FORMAT.format(timeOfMeasurement).toString());
         }
         if (name != null) {
-            addElement(result, "name", name);
+            addElement(result, GpxDef_11.NAME, name);
         }
         if (description != null) {
-            addElement(result, "desc", description);
+            addElement(result, GpxDef_11.DESC, description);
         }
-        result.append("</trkpt>\n");
+        if (uri != null) {
+            addElement(result, GpxDef_11.LINK, uri);
+        }
+        result.append("</" +
+                GpxDef_11.TRKPT +
+                ">\n");
         return result;
     }
 

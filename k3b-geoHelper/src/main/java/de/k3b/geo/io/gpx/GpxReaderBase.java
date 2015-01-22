@@ -37,6 +37,9 @@ import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
 
 /**
+ * Parser for http://www.topografix.com/GPX/1/1/ and http://www.topografix.com/GPX/1/0/
+ * and a little bit of http://www.opengis.net/kml/2.2.
+ * 
  * Created by k3b on 20.01.2015.
  */
 public class GpxReaderBase extends DefaultHandler {
@@ -46,7 +49,10 @@ public class GpxReaderBase extends DefaultHandler {
 
     /** if not null this instance is cleared and then reused for every new gpx found */
     protected final GeoPointDto mReuse;
+
+    /** if not null gpx-v11: "trkpt" parsing is active */
     protected GeoPointDto current;
+	
     private StringBuffer buf = new StringBuffer();
 
     public GpxReaderBase(final IGeoInfoHandler onGotNewWaypoint, final GeoPointDto reuse) {
@@ -62,10 +68,10 @@ public class GpxReaderBase extends DefaultHandler {
             SAXParser parser = factory.newSAXParser();
             parser.parse(in, this);
         } catch (ParserConfigurationException e) {
-            logger.error("Error parsing gpx", e);
+            logger.error("Error parsing gpx or kml", e);
             throw new IOException(e.getMessage());
         } catch (SAXException e) {
-            logger.error("Error parsing gpx", e);
+            logger.error("Error parsing gpx or kml", e);
             throw new IOException(e.getMessage());
         }
     }
@@ -77,37 +83,52 @@ public class GpxReaderBase extends DefaultHandler {
     }
 
     @Override
-    public void startElement(String uri, String localName2, String qName,
+    public void startElement(String uri, String localName, String qName,
             Attributes attributes) throws SAXException {
-        String localName = (localName2.length() > 0) ? localName2 : qName;
-        buf.setLength(0);
+        String name = (localName.length() > 0) ? localName : qName;
+        
         // logger.debug("startElement {}-{}", localName, qName);
-        if (localName.equals("trkpt")) {
+        if (name.equals(GpxDef_11.TRKPT) || name.equals(GpxDef_10.WPT)) {
             current = this.newInstance();
-            current.setLatitude(Double.parseDouble(attributes.getValue("lat")));
-            current.setLongitude(Double.parseDouble(attributes.getValue("lon")));
+            current.setLatitude(Double.parseDouble(attributes.getValue(GpxDef_11.ATTR_LAT)));
+            current.setLongitude(Double.parseDouble(attributes.getValue(GpxDef_11.ATTR_LON)));
+        } else if (name.equals(KmlDef_22.PLACEMARK)) {
+            current = this.newInstance();
         }
+		if (current != null) {
+			buf.setLength(0);
+		}
     }
 
-    // gpx//trkpt/time|name|desc|@lat|@lon
     @Override
     public void endElement(String uri, String localName2, String qName)
             throws SAXException {
-        String localName = (localName2.length() > 0) ? localName2 : qName;
-        // logger.debug("endElement {} {}", localName, qName);
-        if (localName.equals("trkpt")) {
+        String name = (localName2.length() > 0) ? localName2 : qName;
+        // logger.debug("endElement {} {}", localName2, qName);
+        if (name.equals(GpxDef_11.TRKPT) || name.equals(GpxDef_10.WPT) || name.equals(KmlDef_22.PLACEMARK)) {
             this.onGotNewWaypoint.onGeoInfo(current);
             current = null;
         } else if (current != null) {
-            if (localName.equals("name")) {
+            if (name.equals(GpxDef_11.NAME)) {
                 current.setName(buf.toString());
-            } else if (localName.equals("desc")) {
+            } else if (name.equals(GpxDef_11.DESC) || name.equals(KmlDef_22.DESCRIPTION)) {
                 current.setDescription(buf.toString());
-            } else if (localName.equals("time")) {
+            } else if (name.equals(GpxDef_11.LINK) || name.equals(GpxDef_10.URL)) {
+                current.setUri(buf.toString());
+            } else if (name.equals(GpxDef_11.TIME) || name.equals(KmlDef_22.TIMESTAMP_WHEN) || name.equals(KmlDef_22.TIMESPAN_BEGIN)) {
                 try {
                     current.setTimeOfMeasurement(GpxFormatter.TIME_FORMAT.parse(buf.toString()));
                 } catch (ParseException e) {
-                    throw new SAXException("Invalid time " + buf.toString());
+                    throw new SAXException("/gpx//time or /kml//when or /kml//begin: invalid time " + buf.toString());
+                }
+            } else if (name.equals(KmlDef_22.COORDINATES)) {
+                // <coordinates>lon,lat,height blank lon,lat,height ...</coordinates>
+                try {
+                    String parts[] = buf.toString().split("[,\\s]");
+                    current.setLatitude(Double.parseDouble(parts[1]));
+                    current.setLongitude(Double.parseDouble(parts[0]));
+                } catch (NumberFormatException e) {
+                    throw new SAXException("/kml//Placemark/Point/coordinates>Expected: 'lon,lat,...' but got " + buf.toString());
                 }
             }
         }
@@ -116,6 +137,8 @@ public class GpxReaderBase extends DefaultHandler {
     @Override
     public void characters(char[] chars, int start, int length)
             throws SAXException {
-        buf.append(chars, start, length);
+		if (current != null) {
+			buf.append(chars, start, length);
+		}
     }
 }

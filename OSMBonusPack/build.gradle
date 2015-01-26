@@ -10,13 +10,15 @@ android {
     compileSdkVersion 19
     buildToolsVersion '20.0.0'
 
+    /* use values from manifest
     defaultConfig {
-        // minSdkVersion 7 // without "osmdroid-third-party" api >= 7
-        minSdkVersion 8  // unfortunately "osmdroid-third-party" require api >= 8
+        minSdkVersion 7 // without "osmdroid-third-party" api >= 7
+        // minSdkVersion 8  // unfortunately "osmdroid-third-party" require api >= 8
         targetSdkVersion 19
         versionCode 14
         versionName "4.2"
     }
+    */
 
     sourceSets {
         main {
@@ -44,8 +46,8 @@ dependencies {
 
     // compile 'eu.lp0.slf4j:slf4j-android:1.7.7-1@jar' // include if you want to see debug/trace logmessages
 
-    compile project(':osmdroid-android') // local copy
-    // compile 'org.osmdroid:osmdroid-android:4.2+' // non local copy from repositories
+    // compile project(':osmdroid-android') // local copy
+    compile 'org.osmdroid:osmdroid-android:4.2' // non local copy from repositories
 
 // 	compile project(':osmdroid-third-party') // local copy
     // compile 'org.osmdroid:osmdroid-third-party:4.2' // non local copy from repositories

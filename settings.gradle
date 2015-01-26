@@ -4,4 +4,4 @@ startParameter.offline=true
 // boolean isReachable = java.net.InetAddress.getByName("www.google.com").isReachable(1500)
 // print "has internet " + isReachable
 
-include ':LocationMapViewer', ':k3b-geoHelper', ':geoIntentDemo'
+include ':LocationMapViewer', ':k3b-geoHelper', ':geoIntentDemo', ':OSMBonusPack',

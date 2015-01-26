@@ -8,12 +8,16 @@ onTapMarker, onLongTapMarker
 v done (implemented and tested)
 v? needs to be testet
 
+--- todo
+-   OSMBonusPack
+-?      is there a maven build?
+
 --- history
 v	uri geo: marker+ZoomTo(if &z=...)
 v	gpx-xml-format
 v		uri file:*.gpx-v1.1
 v?			gpx-1.0
->			allow namespaces
+v			allow namespaces
 v?		mime:application/xml+gpx
 v?	kml-xml-format
 v?		mime:application/xml+kml

@@ -1,6 +1,7 @@
 #LocationMapViewer
 
-An app that can display geografic info in a map. It can work offline (without internet/wifi)
+An app that can display geografic info in a map. It has support for gpx and kml files and geo-ruis
+and can work offline (without internet/wifi)
 once geodata is downloaded and cached.
 
 <br/>
@@ -39,10 +40,11 @@ Examples:
         * displays a pin at the location using zoomlevel "6"
 * uri=file:/path/to/waypoints.gpx
     * displays a xml+gpx waypointfile
+* uri=file:/path/to/waypoints.kml
+    * displays a vnd.google-earth.kml+xml waypointfile
 
 In Terms of [GPLv3](http://www.gnu.org/licenses/gpl-3.0) this means that your app
 that uses the Intent-Iterface [is not considered a Derived Work.](https://en.wikipedia.org/wiki/GPL_v3#Point_of_view:_linking_is_irrelevant)
 because LocationMapViewer is designed to be used by other apps.
 
 In other words: you can used LocationMapViewer as a [driver for your non gpl/non opensource app.](http://www.rosenlaw.com/lj19.htm)
- 

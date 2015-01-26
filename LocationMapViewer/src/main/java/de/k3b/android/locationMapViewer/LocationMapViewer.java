@@ -198,9 +198,11 @@ public class LocationMapViewer extends Activity implements Constants {
      */
     private void loadDemoItemsIfEmpty(final List<OverlayItem> items) {
         if (items.size() == 0) {
-            items.add(new OverlayItem("Hannover", "SampleDescription", new GeoPoint(52370816, 9735936)));
-            items.add(new OverlayItem("Berlin", "SampleDescription", new GeoPoint(52518333, 13408333)));
-            items.add(new OverlayItem("Washington", "SampleDescription", new GeoPoint(38895000, -77036667)));
+            items.add(new OverlayItem("Hannover", "Tiny SampleDescription", new GeoPoint(52370816, 9735936)));
+            items.add(new OverlayItem("Berlin", "This is a relatively short SampleDescription.", new GeoPoint(52518333, 13408333)));
+            items.add(new OverlayItem("Washington",
+                    "This SampleDescription is a pretty long one. Almost as long as a the great wall in china.",
+                    new GeoPoint(38895000, -77036667)));
             items.add(new OverlayItem("San Francisco", "SampleDescription", new GeoPoint(37779300, -122419200)));
             items.add(new OverlayItem("Tolaga Bay", "SampleDescription", new GeoPoint(-38371000, 178298000)));
         }

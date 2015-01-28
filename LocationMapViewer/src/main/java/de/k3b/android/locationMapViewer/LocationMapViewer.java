@@ -22,22 +22,31 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.clustering.MarkerClusterer;
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
+import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.bonuspack.overlays.MarkerInfoWindow;
+import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.tileprovider.MapTileProviderBase;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.util.ResourceProxyImpl;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.MinimapOverlay;
 import org.osmdroid.views.overlay.Overlay;
@@ -103,6 +112,9 @@ public class LocationMapViewer extends Activity implements Constants {
      */
     private DelayedLatLonZoom mDelayedLatLonZoom;
 
+    /** used to visualize item-cluster in the map */
+    private Drawable mAtomicPoiIcon;
+
     // ===========================================================
     // Constructors
     // ===========================================================
@@ -115,6 +127,8 @@ public class LocationMapViewer extends Activity implements Constants {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
+        mAtomicPoiIcon = getResources().getDrawable(R.drawable.marker_default);
 
         mResourceProxy = new ResourceProxyImpl(getApplicationContext());
 
@@ -124,28 +138,34 @@ public class LocationMapViewer extends Activity implements Constants {
 
         final List<Overlay> overlays = this.mMapView.getOverlays();
 
-        final ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+        Intent intent = this.getIntent();
+        GeoPointDto geoPointFromIntent = getGeoPointDto(intent);
+        // from com.example.osmbonuspacktuto.MainActivity
+
+        final String title = (geoPointFromIntent != null) ? geoPointFromIntent.getName()  : "Start point";
+        createMarkerOverlayForCurrentPosition(overlays, mMapView, title, toOsmGeoPoint(geoPointFromIntent));
+
+        final RadiusMarkerClusterer poiOverlay = createPointOfInterestOverlay(overlays);
+
         final IGeoInfoHandler pointCollector = new IGeoInfoHandler() {
             @Override
             public void onGeoInfo(IGeoPointInfo aGeoPoint) {
                 if (aGeoPoint != null) {
-                    final OverlayItem overlayItem = new OverlayItem(aGeoPoint.getId(), aGeoPoint.getName(), aGeoPoint.getDescription(), new GeoPoint(aGeoPoint.getLatitude(), aGeoPoint.getLongitude()));
-                    items.add(overlayItem);
+                    poiOverlay.add(createMarker(mMapView, aGeoPoint, mAtomicPoiIcon));
                 }
             }
         };
 
-        Intent intent = this.getIntent();
-        GeoPointDto geoPointFromIntent = getGeoPointDto(intent);
         pointCollector.onGeoInfo(geoPointFromIntent);
 
         loadGeoPointDtosFromFile(intent, pointCollector);
 
+        ArrayList<Marker> items = poiOverlay.getItems();
         final int zoom = (geoPointFromIntent != null) ? geoPointFromIntent.getZoomMin() : GeoPointDto.NO_ZOOM;
         this.mDelayedLatLonZoom = (items.size() > 0) ? new DelayedLatLonZoom(items, zoom) : null;
-        loadDemoItemsIfEmpty(items);
-
-        createPointOfInterestOverlay(overlays, items);
+        if (items.size() == 0) {
+            loadDemoItems(pointCollector);
+        }
 
         createMyLocationOverlay(overlays);
 
@@ -162,6 +182,67 @@ public class LocationMapViewer extends Activity implements Constants {
 //        }
 
 
+    }
+
+    private Marker createMarker(MapView map, IGeoPointInfo aGeoPoint, Drawable defaultIcon) {
+        // final OverlayItem overlayItem = new OverlayItem(aGeoPoint.getId(), aGeoPoint.getName(), aGeoPoint.getDescription(), toOsmGeoPoint(aGeoPoint));
+        // items.add(overlayItem);
+
+        Marker poiMarker = new Marker(map);
+        poiMarker.setTitle(aGeoPoint.getName());
+        poiMarker.setSnippet(aGeoPoint.getDescription());
+        poiMarker.setPosition(toOsmGeoPoint(aGeoPoint));
+        poiMarker.setIcon(defaultIcon);
+
+        /*
+        if (poi.mThumbnail != null){
+            poiMarker.setImage(new BitmapDrawable(poi.mThumbnail));
+        }*/
+
+        // 7.
+        poiMarker.setInfoWindow(new CustomInfoWindow(map));
+        poiMarker.setRelatedObject(aGeoPoint);
+
+        return poiMarker;
+    }
+
+    private RadiusMarkerClusterer createPointOfInterestOverlay(List<Overlay> overlays) {
+        //10. Marker Clustering
+        RadiusMarkerClusterer poiMarkers = new RadiusMarkerClusterer(this);
+
+        Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_red);
+        poiMarkers.setIcon(((BitmapDrawable)clusterIconD).getBitmap());
+
+        //end of 10.
+        //11. Customizing the clusters design
+        poiMarkers.getTextPaint().setTextSize(12.0f);
+        poiMarkers.mAnchorV = Marker.ANCHOR_BOTTOM;
+        poiMarkers.mTextAnchorU = 0.70f;
+        poiMarkers.mTextAnchorV = 0.27f;
+        //end of 11.
+        overlays.add(poiMarkers);
+        return poiMarkers;
+    }
+
+    private void createMarkerOverlayForCurrentPosition(List<Overlay> overlays, MapView map, String title, GeoPoint geoPoint) {
+        // from com.example.osmbonuspacktuto.MainActivity
+        //0. Using the Marker overlay
+        Marker startMarker = new Marker(map);
+        startMarker.setPosition((geoPoint != null) ? geoPoint : new GeoPoint(0,0));
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        startMarker.setTitle(title);
+        //startMarker.setIcon(getResources().getDrawable(R.drawable.marker_kml_point).mutate());
+        //startMarker.setImage(getResources().getDrawable(R.drawable.ic_launcher));
+        //startMarker.setInfoWindow(new MarkerInfoWindow(R.layout.bonuspack_bubble_black, map));
+        startMarker.setDraggable(true);
+        startMarker.setOnMarkerDragListener(new OnMarkerDragListenerDrawer());
+        overlays.add(startMarker);
+    }
+
+    private GeoPoint toOsmGeoPoint(IGeoPointInfo aGeoPoint) {
+        if (aGeoPoint == null) return null;
+
+        return new GeoPoint(aGeoPoint.getLatitude(), aGeoPoint.getLongitude());
     }
 
     private void loadGeoPointDtosFromFile(Intent intent, IGeoInfoHandler pointCollector) {
@@ -194,43 +275,13 @@ public class LocationMapViewer extends Activity implements Constants {
 
     /**
      * Create some Hardcoded Markers on some cities.
-     *
      */
-    private void loadDemoItemsIfEmpty(final List<OverlayItem> items) {
-        if (items.size() == 0) {
-            items.add(new OverlayItem("Hannover", "Tiny SampleDescription", new GeoPoint(52370816, 9735936)));
-            items.add(new OverlayItem("Berlin", "This is a relatively short SampleDescription.", new GeoPoint(52518333, 13408333)));
-            items.add(new OverlayItem("Washington",
-                    "This SampleDescription is a pretty long one. Almost as long as a the great wall in china.",
-                    new GeoPoint(38895000, -77036667)));
-            items.add(new OverlayItem("San Francisco", "SampleDescription", new GeoPoint(37779300, -122419200)));
-            items.add(new OverlayItem("Tolaga Bay", "SampleDescription", new GeoPoint(-38371000, 178298000)));
-        }
-    }
-
-    private void createPointOfInterestOverlay(List<Overlay> overlays, ArrayList<OverlayItem> items) {
-    /* OnTapListener for the Markers, shows a simple Toast. */
-        this.mPointOfInterestOverlay = new ItemizedIconOverlay<OverlayItem>(items,
-                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-                    @Override
-                    public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
-                        Toast.makeText(
-                                LocationMapViewer.this,
-                                "Item '" + item.getTitle() + "' (index=" + index
-                                        + ") got single tapped up", Toast.LENGTH_LONG).show();
-                        return true; // We 'handled' this event.
-                    }
-
-                    @Override
-                    public boolean onItemLongPress(final int index, final OverlayItem item) {
-                        Toast.makeText(
-                                LocationMapViewer.this,
-                                "Item '" + item.getTitle() + "' (index=" + index
-                                        + ") got long pressed", Toast.LENGTH_LONG).show();
-                        return false;
-                    }
-                }, mResourceProxy);
-        overlays.add(this.mPointOfInterestOverlay);
+    private void loadDemoItems(final IGeoInfoHandler handler) {
+        handler.onGeoInfo(new GeoPointDto(52.370816,   9.735936,"Hannover", "Tiny SampleDescription"));
+        handler.onGeoInfo(new GeoPointDto(52.518333,  13.408333,"Berlin", "This is a relatively short SampleDescription."));
+        handler.onGeoInfo(new GeoPointDto(38.895000, -77.036667,"Washington",
+                "This SampleDescription is a pretty long one. Almost as long as a the great wall in china."));
+        handler.onGeoInfo(new GeoPointDto( 37.779300, -122.419200, "San Francisco", "SampleDescription"));
     }
 
     private void createMyLocationOverlay(List<Overlay> overlays) {
@@ -393,6 +444,24 @@ public class LocationMapViewer extends Activity implements Constants {
             mZoom = zoom;
         }
 
+        // MarkerClusterer
+        public DelayedLatLonZoom (List<Marker> items, int zoom) {
+            if (items.size() > 0) {
+                Marker first = items.get(0);
+                GeoPoint min = new GeoPoint(first.getPosition().clone());
+                GeoPoint max = null;
+                if (items.size() > 1) {
+                    max = min.clone();
+                    for (Marker item : items) {
+                        getMinMax(min, max, item.getPosition());
+                    }
+                }
+                mMin = min;
+                mMax = max;
+            }
+            mZoom = zoom;
+        }
+
         public DelayedLatLonZoom (ArrayList<OverlayItem> items, int zoom) {
             if (items.size() > 0) {
                 OverlayItem first = items.get(0);
@@ -459,4 +528,64 @@ public class LocationMapViewer extends Activity implements Constants {
             return GeoPointDto.NO_ZOOM;
         }
     }
+
+    // from com.example.osmbonuspacktuto.MainActivity
+    //0. Using the Marker and Polyline overlays - advanced options
+    class OnMarkerDragListenerDrawer implements Marker.OnMarkerDragListener {
+        ArrayList<GeoPoint> mTrace;
+        Polyline mPolyline;
+        OnMarkerDragListenerDrawer() {
+            mTrace = new ArrayList<GeoPoint>(100);
+            mPolyline = new Polyline(mMapView.getContext());
+            mPolyline.setColor(0xAA0000FF);
+            mPolyline.setWidth(2.0f);
+            mPolyline.setGeodesic(true);
+            mMapView.getOverlays().add(mPolyline);
+        }
+        @Override public void onMarkerDrag(Marker marker) {
+            //mTrace.add(marker.getPosition());
+        }
+        @Override public void onMarkerDragEnd(Marker marker) {
+            mTrace.add(marker.getPosition());
+            mPolyline.setPoints(mTrace);
+            mMapView.invalidate();
+        }
+        @Override public void onMarkerDragStart(Marker marker) {
+            //mTrace.add(marker.getPosition());
+        }
+    }
+
+    //7. Customizing the bubble behaviour
+    class CustomInfoWindow extends MarkerInfoWindow {
+        GeoPointDto mSelectedPoi;
+        public CustomInfoWindow(MapView mapView) {
+            super(R.layout.bubble_geo_point_dto, mapView);
+            Button btn = (Button)(mView.findViewById(R.id.bubble_moreinfo));
+            btn.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View view) {
+                    if (mSelectedPoi.getUri() != null){
+                        Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mSelectedPoi.getUri()));
+                        view.getContext().startActivity(myIntent);
+                    } else {
+                        Toast.makeText(view.getContext(), "Button clicked", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+        @Override public void onOpen(Object item){
+            super.onOpen(item);
+            mView.findViewById(R.id.bubble_moreinfo).setVisibility(View.VISIBLE);
+            Marker marker = (Marker)item;
+            mSelectedPoi = (GeoPointDto)marker.getRelatedObject();
+/* !!!
+            //8. put thumbnail image in bubble, fetching the thumbnail in background:
+            if (mSelectedPoi.mThumbnailPath != null){
+                ImageView imageView = (ImageView)mView.findViewById(R.id.bubble_image);
+                mSelectedPoi.fetchThumbnailOnThread(imageView);
+            }
+            */
+        }
+    }
+
+
 }

@@ -9,8 +9,14 @@ v done (implemented and tested)
 v? needs to be testet
 
 --- todo
--   OSMBonusPack
+>   OSMBonusPack
+>		LocationMapViewer crash in RadiusMarkerClusterer-draw
+-			copy tut-example to LocationMapViewer
+-			modify until error or until LocationMapViewer ok
 -?      is there a maven build?
+-	Mail an dev OSMBonusPack
+		- merge gradle
+		- update to recent map-provider from 0.3 to 0.5
 
 --- history
 v	uri geo: marker+ZoomTo(if &z=...)

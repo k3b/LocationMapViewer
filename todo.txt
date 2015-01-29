@@ -9,6 +9,10 @@ v done (implemented and tested)
 v? needs to be testet
 
 --- todo
+-	do without dynamic icon generation 
+-	rollback test-impl
+
+
 >   OSMBonusPack
 >		LocationMapViewer crash in RadiusMarkerClusterer-draw
 -			copy tut-example to LocationMapViewer

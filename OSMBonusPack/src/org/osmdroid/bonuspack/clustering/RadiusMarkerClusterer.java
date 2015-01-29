@@ -116,6 +116,14 @@ public class RadiusMarkerClusterer extends MarkerClusterer {
         m.setInfoWindow(null);
         m.setAnchor(mAnchorU, mAnchorV);
 
+        final BitmapDrawable icon = getClusterMarkerIcon(cluster, mapView);
+        m.setIcon(icon);
+
+        return m;
+    }
+
+    /** calculates the ico for the clusterMarker (with text = number of items) */
+    protected BitmapDrawable getClusterMarkerIcon(StaticCluster cluster, MapView mapView) {
         Bitmap finalIcon = Bitmap.createBitmap(mClusterIcon.getWidth(), mClusterIcon.getHeight(), mClusterIcon.getConfig());
         Canvas iconCanvas = new Canvas(finalIcon);
         iconCanvas.drawBitmap(mClusterIcon, 0, 0, null);
@@ -125,9 +133,7 @@ public class RadiusMarkerClusterer extends MarkerClusterer {
                 mTextAnchorU * finalIcon.getWidth(),
                 mTextAnchorV * finalIcon.getHeight() - textHeight / 2,
                 mTextPaint);
-        m.setIcon(new BitmapDrawable(mapView.getContext().getResources(), finalIcon));
-
-        return m;
+        return new BitmapDrawable(mapView.getContext().getResources(), finalIcon);
     }
 
     @Override public void renderer(ArrayList<StaticCluster> clusters, Canvas canvas, MapView mapView) {

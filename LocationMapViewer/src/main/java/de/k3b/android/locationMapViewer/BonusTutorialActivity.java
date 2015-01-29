@@ -69,11 +69,8 @@ public class BonusTutorialActivity extends Activity implements MapEventsReceiver
 		mapController.setZoom(10);
 		mapController.setCenter(startPoint);
 
-		//0. Using the Marker overlay
-		Marker startMarker = new Marker(map);
-		startMarker.setPosition(startPoint);
-		startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-		startMarker.setTitle("Start point");
+        Marker startMarker = createMarker(startPoint, "Start point");
+        // startMarker.setImage(getResources().getDrawable(R.drawable.marker_yellow));
 		//startMarker.setIcon(getResources().getDrawable(R.drawable.marker_kml_point).mutate());
 		//startMarker.setImage(getResources().getDrawable(R.drawable.ic_launcher));
 		//startMarker.setInfoWindow(new MarkerInfoWindow(R.layout.bonuspack_bubble_black, map));
@@ -81,16 +78,10 @@ public class BonusTutorialActivity extends Activity implements MapEventsReceiver
 		startMarker.setOnMarkerDragListener(new OnMarkerDragListenerDrawer());
 		map.getOverlays().add(startMarker);
 		
-		//1. "Hello, Routing World"
-		RoadManager roadManager = new OSRMRoadManager();
-
 		//FolderOverlay poiMarkers = new FolderOverlay(this);
 		//10. Marker Clustering
-		RadiusMarkerClusterer poiMarkers = new RadiusMarkerClusterer(this);
-		//Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
-		Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_red);
-		Bitmap clusterIcon = ((BitmapDrawable)clusterIconD).getBitmap();
-		poiMarkers.setIcon(clusterIcon);
+        Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_red);
+		RadiusMarkerClusterer poiMarkers = new SimpleRadiusMarkerClusterer(this, (BitmapDrawable) clusterIconD);
 		//end of 10.
 		//11. Customizing the clusters design
 		poiMarkers.getTextPaint().setTextSize(12.0f);
@@ -100,14 +91,30 @@ public class BonusTutorialActivity extends Activity implements MapEventsReceiver
 		//end of 11.
 		map.getOverlays().add(poiMarkers);
 
+        poiMarkers.add(createMarker(new GeoPoint(48.131, -1.631), "point 1"));
+        poiMarkers.add(createMarker(new GeoPoint(48.132, -1.632), "point 2"));
+        poiMarkers.add(createMarker(new GeoPoint(48.133, -1.633), "point 3"));
+        poiMarkers.add(createMarker(new GeoPoint(48.134, -1.634), "point 4"));
+
         Drawable poiIcon = getResources().getDrawable(R.drawable.marker_yellow);
 
 		//16. Handling Map events
 		MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
 		map.getOverlays().add(0, mapEventsOverlay); //inserted at the "bottom" of all overlays
 	}
-	
-	//0. Using the Marker and Polyline overlays - advanced options
+
+    private Marker createMarker(GeoPoint startPoint, String title) {
+        //0. Using the Marker overlay
+        Marker startMarker = new Marker(map);
+
+        startMarker.setPosition(startPoint);
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        startMarker.setTitle(title);
+        return startMarker;
+    }
+
+
+    //0. Using the Marker and Polyline overlays - advanced options
 	class OnMarkerDragListenerDrawer implements OnMarkerDragListener {
 		ArrayList<GeoPoint> mTrace;
 		Polyline mPolyline;
@@ -140,28 +147,8 @@ public class BonusTutorialActivity extends Activity implements MapEventsReceiver
 	}
 	float mGroundOverlayBearing = 0.0f;
 	@Override public boolean longPressHelper(GeoPoint p) {
-		//Toast.makeText(this, "Long press", Toast.LENGTH_SHORT).show();
-		//17. Using Polygon, defined as a circle:
-		Polygon circle = new Polygon(this);
-		circle.setPoints(Polygon.pointsAsCircle(p, 2000.0));
-		circle.setFillColor(0x12121212);
-		circle.setStrokeColor(Color.RED);
-		circle.setStrokeWidth(2);
-		map.getOverlays().add(circle);
-		circle.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, map));
-		circle.setTitle("Centered on "+p.getLatitude()+","+p.getLongitude());
-		
-		//18. Using GroundOverlay
-		GroundOverlay myGroundOverlay = new GroundOverlay(this);
-		myGroundOverlay.setPosition(p);
-		myGroundOverlay.setImage(getResources().getDrawable(R.drawable.ic_launcher).mutate());
-		myGroundOverlay.setDimensions(2000.0f);
-		//myGroundOverlay.setTransparency(0.25f);
-		myGroundOverlay.setBearing(mGroundOverlayBearing);
-		mGroundOverlayBearing += 20.0f;
-		map.getOverlays().add(myGroundOverlay);
-		
-		map.invalidate();
-		return true;
+		Toast.makeText(this, "Long press", Toast.LENGTH_SHORT).show();
+
+		return false;
 	}
 }

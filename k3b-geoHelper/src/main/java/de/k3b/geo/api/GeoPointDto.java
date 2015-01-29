@@ -76,6 +76,11 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
     }
 
     public GeoPointDto(double latitude, double longitude,
+                       String name, String description) {
+        this(latitude, longitude,name, null, null, description, NO_ZOOM, NO_ZOOM, null);
+    }
+
+    public GeoPointDto(double latitude, double longitude,
                        String name, String uri,
                        String id,
                        String description, int zoomMin, int zoomMax, Date timeOfMeasurement) {

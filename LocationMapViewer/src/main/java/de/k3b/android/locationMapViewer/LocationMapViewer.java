@@ -174,14 +174,12 @@ public class LocationMapViewer extends Activity implements Constants {
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
 
-        // setCenterZoom does not work in onCreate() because getHeight() and getWidth() return 0;
+        // setCenterZoom does not work in Android2.1-onCreate() because getHeight() and getWidth() return 0;
         // initial center must be set later
         // see http://stackoverflow.com/questions/10411975/how-to-get-the-width-and-height-of-an-image-view-in-android/10412209#10412209
 //        if (initalMapCenterZoom != null) {
 //            setCenterZoom(initalMapCenterZoom);
 //        }
-
-
     }
 
     private Marker createMarker(MapView map, IGeoPointInfo aGeoPoint, Drawable defaultIcon) {
@@ -208,9 +206,9 @@ public class LocationMapViewer extends Activity implements Constants {
 
     private RadiusMarkerClusterer createPointOfInterestOverlay(List<Overlay> overlays) {
         //10. Marker Clustering
-        RadiusMarkerClusterer poiMarkers = new RadiusMarkerClusterer(this);
+        RadiusMarkerClusterer poiMarkers = new RadiusMarkerClustererWithInfo(this);
 
-        Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_red);
+        Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_red_empty);
         poiMarkers.setIcon(((BitmapDrawable)clusterIconD).getBitmap());
 
         //end of 10.

@@ -74,7 +74,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".BonusTutorialActivity"
-            android:label="@string/app_name" >
+            android:label="BonusTutorialActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

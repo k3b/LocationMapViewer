@@ -22,7 +22,6 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -36,8 +35,8 @@ import android.widget.Toast;
 
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IMapController;
-import org.osmdroid.bonuspack.clustering.MarkerClusterer;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
+import org.osmdroid.bonuspack.overlays.FolderOverlay;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.MarkerInfoWindow;
 import org.osmdroid.bonuspack.overlays.Polyline;
@@ -59,6 +58,7 @@ import org.xml.sax.InputSource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,14 +106,18 @@ public class LocationMapViewer extends Activity implements Constants {
     /**
      * setCenterZoom does not work in onCreate() because getHeight() and getWidth() are not calculated yet and return 0;
      * setCenterZoom must be set later when getHeight() and getWith() are known (i.e. in onWindowFocusChanged()).
-     *
+     * <p/>
      * see http://stackoverflow.com/questions/10411975/how-to-get-the-width-and-height-of-an-image-view-in-android/10412209#10412209
-     *
      */
     private DelayedLatLonZoom mDelayedLatLonZoom;
 
-    /** used to visualize item-cluster in the map */
+    /**
+     * used to visualize item-cluster in the map
+     */
     private Drawable mAtomicPoiIcon;
+    private boolean mUseClusterPoints = true;
+    private FolderOverlay mPOIOverlayNonCluster;
+    private RadiusMarkerClusterer mPOIOverlayCluster;
 
     // ===========================================================
     // Constructors
@@ -142,25 +146,37 @@ public class LocationMapViewer extends Activity implements Constants {
         GeoPointDto geoPointFromIntent = getGeoPointDto(intent);
         // from com.example.osmbonuspacktuto.MainActivity
 
-        final String title = (geoPointFromIntent != null) ? geoPointFromIntent.getName()  : "Start point";
+        final String title = (geoPointFromIntent != null) ? geoPointFromIntent.getName() : "Start point";
         createMarkerOverlayForCurrentPosition(overlays, mMapView, title, toOsmGeoPoint(geoPointFromIntent));
 
-        final RadiusMarkerClusterer poiOverlay = createPointOfInterestOverlay(overlays);
+        mUseClusterPoints = mPrefs.getBoolean(PREFS_CLUSTER_POINTS, true);
 
-        final IGeoInfoHandler pointCollector = new IGeoInfoHandler() {
-            @Override
-            public void onGeoInfo(IGeoPointInfo aGeoPoint) {
-                if (aGeoPoint != null) {
-                    poiOverlay.add(createMarker(mMapView, aGeoPoint, mAtomicPoiIcon));
+        mPOIOverlayNonCluster = (mUseClusterPoints) ? null : new FolderOverlay(this);
+        mPOIOverlayCluster = (mUseClusterPoints) ? createPointOfInterestOverlay(overlays) : null;
+
+        final IGeoInfoHandler pointCollector = (mUseClusterPoints)
+            ? new IGeoInfoHandler() {
+                @Override
+                public void onGeoInfo(IGeoPointInfo aGeoPoint) {
+                    if (aGeoPoint != null) {
+                        mPOIOverlayCluster.add(createMarker(mMapView, aGeoPoint, mAtomicPoiIcon));
+                    }
                 }
             }
-        };
+            : new IGeoInfoHandler() {
+                @Override
+                public void onGeoInfo(IGeoPointInfo aGeoPoint) {
+                    if (aGeoPoint != null) {
+                        mPOIOverlayNonCluster.add(createMarker(mMapView, aGeoPoint, mAtomicPoiIcon));
+                    }
+                }
+            };
 
         pointCollector.onGeoInfo(geoPointFromIntent);
 
         loadGeoPointDtosFromFile(intent, pointCollector);
 
-        ArrayList<Marker> items = poiOverlay.getItems();
+        AbstractList<? extends Overlay> items = (mUseClusterPoints) ? mPOIOverlayCluster.getItems() : mPOIOverlayNonCluster.getItems();
         final int zoom = (geoPointFromIntent != null) ? geoPointFromIntent.getZoomMin() : GeoPointDto.NO_ZOOM;
         this.mDelayedLatLonZoom = (items.size() > 0) ? new DelayedLatLonZoom(items, zoom) : null;
         if (items.size() == 0) {
@@ -174,6 +190,7 @@ public class LocationMapViewer extends Activity implements Constants {
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
 
+        loadFromSettings();
         // setCenterZoom does not work in Android2.1-onCreate() because getHeight() and getWidth() return 0;
         // initial center must be set later
         // see http://stackoverflow.com/questions/10411975/how-to-get-the-width-and-height-of-an-image-view-in-android/10412209#10412209
@@ -209,7 +226,7 @@ public class LocationMapViewer extends Activity implements Constants {
         RadiusMarkerClusterer poiMarkers = new RadiusMarkerClustererWithInfo(this);
 
         Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_red_empty);
-        poiMarkers.setIcon(((BitmapDrawable)clusterIconD).getBitmap());
+        poiMarkers.setIcon(((BitmapDrawable) clusterIconD).getBitmap());
 
         //end of 10.
         //11. Customizing the clusters design
@@ -226,7 +243,7 @@ public class LocationMapViewer extends Activity implements Constants {
         // from com.example.osmbonuspacktuto.MainActivity
         //0. Using the Marker overlay
         Marker startMarker = new Marker(map);
-        startMarker.setPosition((geoPoint != null) ? geoPoint : new GeoPoint(0,0));
+        startMarker.setPosition((geoPoint != null) ? geoPoint : new GeoPoint(0, 0));
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         startMarker.setTitle(title);
         //startMarker.setIcon(getResources().getDrawable(R.drawable.marker_kml_point).mutate());
@@ -275,11 +292,11 @@ public class LocationMapViewer extends Activity implements Constants {
      * Create some Hardcoded Markers on some cities.
      */
     private void loadDemoItems(final IGeoInfoHandler handler) {
-        handler.onGeoInfo(new GeoPointDto(52.370816,   9.735936,"Hannover", "Tiny SampleDescription"));
-        handler.onGeoInfo(new GeoPointDto(52.518333,  13.408333,"Berlin", "This is a relatively short SampleDescription."));
-        handler.onGeoInfo(new GeoPointDto(38.895000, -77.036667,"Washington",
+        handler.onGeoInfo(new GeoPointDto(52.370816, 9.735936, "Hannover", "Tiny SampleDescription"));
+        handler.onGeoInfo(new GeoPointDto(52.518333, 13.408333, "Berlin", "This is a relatively short SampleDescription."));
+        handler.onGeoInfo(new GeoPointDto(38.895000, -77.036667, "Washington",
                 "This SampleDescription is a pretty long one. Almost as long as a the great wall in china."));
-        handler.onGeoInfo(new GeoPointDto( 37.779300, -122.419200, "San Francisco", "SampleDescription"));
+        handler.onGeoInfo(new GeoPointDto(37.779300, -122.419200, "San Francisco", "SampleDescription"));
     }
 
     private void createMyLocationOverlay(List<Overlay> overlays) {
@@ -301,6 +318,10 @@ public class LocationMapViewer extends Activity implements Constants {
         edit.putString(PREFS_TILE_SOURCE, mMapView.getTileProvider().getTileSource().name());
         edit.putBoolean(PREFS_SHOW_LOCATION, mLocationOverlay.isMyLocationEnabled());
         edit.putBoolean(PREFS_SHOW_MINIMAP, mMiniMapOverlay.isEnabled());
+        edit.putBoolean(PREFS_CLUSTER_POINTS, this.mUseClusterPoints);
+        final boolean useDataConnection = mMapView.useDataConnection();
+        edit.putBoolean(PREFS_USE_DATA_CONNECTION, useDataConnection);
+
         edit.commit();
 
         saveLastXYZ();
@@ -342,19 +363,38 @@ public class LocationMapViewer extends Activity implements Constants {
     @Override
     public void onResume() {
         super.onResume();
-        final String tileSourceName = mPrefs.getString(PREFS_TILE_SOURCE,
-                TileSourceFactory.DEFAULT_TILE_SOURCE.name());
-        try {
-            final ITileSource tileSource = TileSourceFactory.getTileSource(tileSourceName);
-            mMapView.setTileSource(tileSource);
-        } catch (final IllegalArgumentException e) {
-            mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
-        }
-        if (mPrefs.getBoolean(PREFS_SHOW_LOCATION, false)) {
-            this.mLocationOverlay.enableMyLocation();
-        }
 
-        this.mMiniMapOverlay.setEnabled(mPrefs.getBoolean(PREFS_SHOW_MINIMAP, true));
+        loadFromSettings();
+
+        boolean useClusterPoints = mPrefs.getBoolean(PREFS_CLUSTER_POINTS, true);
+        if (useClusterPoints != this.mUseClusterPoints) {
+            List<Overlay> overlays = mMapView.getOverlays();
+            if (useClusterPoints) {
+                mPOIOverlayNonCluster.closeAllInfoWindows();
+                mPOIOverlayCluster = new RadiusMarkerClustererWithInfo(this);
+                for (Overlay item : mPOIOverlayNonCluster.getItems()) {
+                    mPOIOverlayCluster.add((Marker) item);
+                }
+                int oldPos = overlays.indexOf(mPOIOverlayNonCluster);
+                overlays.remove(oldPos);
+                overlays.add(oldPos, mPOIOverlayCluster);
+                mPOIOverlayNonCluster.getItems().clear();;
+                mPOIOverlayNonCluster = null;
+            } else {
+                // !useClusterPoints
+                mPOIOverlayNonCluster = new FolderOverlay(this);
+                for (Marker item : mPOIOverlayCluster.getItems()) {
+                    mPOIOverlayNonCluster.add((Marker) item);
+                }
+                int oldPos = overlays.indexOf(mPOIOverlayCluster);
+                overlays.remove(oldPos);
+                overlays.add(oldPos, mPOIOverlayNonCluster);
+                mPOIOverlayCluster.getItems().clear();;
+                mPOIOverlayCluster = null;
+            }
+            this.mUseClusterPoints = useClusterPoints;
+            this.mMapView.invalidate();
+        }
 
         final int zoom = mPrefs.getInt(PREFS_ZOOM_LEVEL, 3);
         final int scrollX = mPrefs.getInt(PREFS_SCROLL_X, 0);
@@ -370,8 +410,27 @@ public class LocationMapViewer extends Activity implements Constants {
         }
     }
 
+    private void loadFromSettings() {
+        final boolean useDataConnection = mPrefs.getBoolean(PREFS_USE_DATA_CONNECTION, true);
+        this.mMapView.setUseDataConnection(useDataConnection);
+
+        final String tileSourceName = mPrefs.getString(PREFS_TILE_SOURCE,
+                TileSourceFactory.DEFAULT_TILE_SOURCE.name());
+        try {
+            final ITileSource tileSource = TileSourceFactory.getTileSource(tileSourceName);
+            mMapView.setTileSource(tileSource);
+        } catch (final IllegalArgumentException e) {
+            mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
+        }
+        if (mPrefs.getBoolean(PREFS_SHOW_LOCATION, false)) {
+            this.mLocationOverlay.enableMyLocation();
+        }
+
+        this.mMiniMapOverlay.setEnabled(mPrefs.getBoolean(PREFS_SHOW_MINIMAP, true));
+    }
+
     @Override
-    public void onWindowFocusChanged(boolean hasFocus){
+    public void onWindowFocusChanged(boolean hasFocus) {
         if (this.mDelayedLatLonZoom != null) {
             // setCenterZoom does not work in onCreate() because getHeight() and getWidth() return 0;
             // initial center must be set later when getHeight() and getWith() are set (i.e. in onWindowFocusChanged()).
@@ -424,12 +483,12 @@ public class LocationMapViewer extends Activity implements Constants {
     // ===========================================================
     // Inner and Anonymous Classes
     // ===========================================================
+
     /**
      * setCenterZoom does not work in onCreate() because getHeight() and getWidth() are not calculated yet and return 0;
      * setCenterZoom must be set later when getHeight() and getWith() are known (i.e. in onWindowFocusChanged()).
-     *
+     * <p/>
      * see http://stackoverflow.com/questions/10411975/how-to-get-the-width-and-height-of-an-image-view-in-android/10412209#10412209
-     *
      */
     private class DelayedLatLonZoom {
         private GeoPoint mMin = null;
@@ -443,15 +502,15 @@ public class LocationMapViewer extends Activity implements Constants {
         }
 
         // MarkerClusterer
-        public DelayedLatLonZoom (List<Marker> items, int zoom) {
+        public DelayedLatLonZoom(AbstractList<? extends Overlay> items, int zoom) {
             if (items.size() > 0) {
-                Marker first = items.get(0);
+                Marker first = (Marker) items.get(0);
                 GeoPoint min = new GeoPoint(first.getPosition().clone());
                 GeoPoint max = null;
                 if (items.size() > 1) {
                     max = min.clone();
-                    for (Marker item : items) {
-                        getMinMax(min, max, item.getPosition());
+                    for (Overlay item : items) {
+                        getMinMax(min, max, ((Marker) item).getPosition());
                     }
                 }
                 mMin = min;
@@ -460,7 +519,7 @@ public class LocationMapViewer extends Activity implements Constants {
             mZoom = zoom;
         }
 
-        public DelayedLatLonZoom (ArrayList<OverlayItem> items, int zoom) {
+        public DelayedLatLonZoom(ArrayList<OverlayItem> items, int zoom) {
             if (items.size() > 0) {
                 OverlayItem first = items.get(0);
                 GeoPoint min = new GeoPoint(first.getPoint().clone());
@@ -503,7 +562,7 @@ public class LocationMapViewer extends Activity implements Constants {
 
                 if (zoom == GeoPointDto.NO_ZOOM) {
                     final double requiredMinimalGroundResolutionInMetersPerPixel = ((double) mMin.distanceTo(mMax)) / Math.min(mapView.getWidth(), mapView.getHeight());
-                    zoom = calculateZoom(center.getLatitude(), requiredMinimalGroundResolutionInMetersPerPixel, tileProvider.getMaximumZoomLevel(), tileProvider.getMinimumZoomLevel() );
+                    zoom = calculateZoom(center.getLatitude(), requiredMinimalGroundResolutionInMetersPerPixel, tileProvider.getMaximumZoomLevel(), tileProvider.getMinimumZoomLevel());
                 }
             }
             if (zoom != GeoPointDto.NO_ZOOM) {
@@ -514,13 +573,14 @@ public class LocationMapViewer extends Activity implements Constants {
 
             if (logger.isDebugEnabled()) {
                 logger.debug("DelayedLatLonZoom.setCenterZoom(({}) .. ({}),z={}) => ({}), z={} => {}",
-                        mMin, mMax, mZoom,center,zoom , getStatusForDebug());
+                        mMin, mMax, mZoom, center, zoom, getStatusForDebug());
             }
         }
 
         private int calculateZoom(double latitude, double requiredMinimalGroundResolutionInMetersPerPixel, int maximumZoomLevel, int minimumZoomLevel) {
             for (int zoom = maximumZoomLevel; zoom >= minimumZoomLevel; zoom--) {
-                if (TileSystem.GroundResolution(latitude, zoom) > requiredMinimalGroundResolutionInMetersPerPixel) return zoom;
+                if (TileSystem.GroundResolution(latitude, zoom) > requiredMinimalGroundResolutionInMetersPerPixel)
+                    return zoom;
             }
 
             return GeoPointDto.NO_ZOOM;
@@ -532,6 +592,7 @@ public class LocationMapViewer extends Activity implements Constants {
     class OnMarkerDragListenerDrawer implements Marker.OnMarkerDragListener {
         ArrayList<GeoPoint> mTrace;
         Polyline mPolyline;
+
         OnMarkerDragListenerDrawer() {
             mTrace = new ArrayList<GeoPoint>(100);
             mPolyline = new Polyline(mMapView.getContext());
@@ -540,15 +601,21 @@ public class LocationMapViewer extends Activity implements Constants {
             mPolyline.setGeodesic(true);
             mMapView.getOverlays().add(mPolyline);
         }
-        @Override public void onMarkerDrag(Marker marker) {
+
+        @Override
+        public void onMarkerDrag(Marker marker) {
             //mTrace.add(marker.getPosition());
         }
-        @Override public void onMarkerDragEnd(Marker marker) {
+
+        @Override
+        public void onMarkerDragEnd(Marker marker) {
             mTrace.add(marker.getPosition());
             mPolyline.setPoints(mTrace);
             mMapView.invalidate();
         }
-        @Override public void onMarkerDragStart(Marker marker) {
+
+        @Override
+        public void onMarkerDragStart(Marker marker) {
             //mTrace.add(marker.getPosition());
         }
     }
@@ -556,12 +623,13 @@ public class LocationMapViewer extends Activity implements Constants {
     //7. Customizing the bubble behaviour
     class CustomInfoWindow extends MarkerInfoWindow {
         GeoPointDto mSelectedPoi;
+
         public CustomInfoWindow(MapView mapView) {
             super(R.layout.bubble_geo_point_dto, mapView);
-            Button btn = (Button)(mView.findViewById(R.id.bubble_moreinfo));
+            Button btn = (Button) (mView.findViewById(R.id.bubble_moreinfo));
             btn.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View view) {
-                    if (mSelectedPoi.getUri() != null){
+                    if (mSelectedPoi.getUri() != null) {
                         Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mSelectedPoi.getUri()));
                         view.getContext().startActivity(myIntent);
                     } else {
@@ -570,11 +638,13 @@ public class LocationMapViewer extends Activity implements Constants {
                 }
             });
         }
-        @Override public void onOpen(Object item){
+
+        @Override
+        public void onOpen(Object item) {
             super.onOpen(item);
             mView.findViewById(R.id.bubble_moreinfo).setVisibility(View.VISIBLE);
-            Marker marker = (Marker)item;
-            mSelectedPoi = (GeoPointDto)marker.getRelatedObject();
+            Marker marker = (Marker) item;
+            mSelectedPoi = (GeoPointDto) marker.getRelatedObject();
 /* !!!
             //8. put thumbnail image in bubble, fetching the thumbnail in background:
             if (mSelectedPoi.mThumbnailPath != null){

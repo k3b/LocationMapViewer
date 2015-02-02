@@ -1,6 +1,3 @@
-order geopoints by zoomlevel??22??
-different map-markers if there are many in certain zoomlevel 
-
 onTapMarker, onLongTapMarker
 
 - possible feature
@@ -9,8 +6,13 @@ v done (implemented and tested)
 v? needs to be testet
 
 --- todo
--	do without dynamic icon generation 
--	rollback test-impl
+
+> convert cluser <-> nonCluster from settings
+
+- doku settings
+
+? cluster-detail via fragment
+? settings via fragment
 
 
 >   OSMBonusPack

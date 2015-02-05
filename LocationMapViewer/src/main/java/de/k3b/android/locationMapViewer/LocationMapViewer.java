@@ -34,6 +34,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import org.osmdroid.ResourceProxy;
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.overlays.FolderOverlay;
@@ -319,8 +320,6 @@ public class LocationMapViewer extends Activity implements Constants {
         edit.putBoolean(PREFS_SHOW_LOCATION, mLocationOverlay.isMyLocationEnabled());
         edit.putBoolean(PREFS_SHOW_MINIMAP, mMiniMapOverlay.isEnabled());
         edit.putBoolean(PREFS_CLUSTER_POINTS, this.mUseClusterPoints);
-        final boolean useDataConnection = mMapView.useDataConnection();
-        edit.putBoolean(PREFS_USE_DATA_CONNECTION, useDataConnection);
 
         edit.commit();
 
@@ -411,9 +410,6 @@ public class LocationMapViewer extends Activity implements Constants {
     }
 
     private void loadFromSettings() {
-        final boolean useDataConnection = mPrefs.getBoolean(PREFS_USE_DATA_CONNECTION, true);
-        this.mMapView.setUseDataConnection(useDataConnection);
-
         final String tileSourceName = mPrefs.getString(PREFS_TILE_SOURCE,
                 TileSourceFactory.DEFAULT_TILE_SOURCE.name());
         try {
@@ -522,7 +518,8 @@ public class LocationMapViewer extends Activity implements Constants {
         public DelayedLatLonZoom(ArrayList<OverlayItem> items, int zoom) {
             if (items.size() > 0) {
                 OverlayItem first = items.get(0);
-                GeoPoint min = new GeoPoint(first.getPoint().clone());
+                final IGeoPoint firstPoint = first.getPoint();
+                GeoPoint min = new GeoPoint(firstPoint.getLatitudeE6(), firstPoint.getLongitudeE6());
                 GeoPoint max = null;
                 if (items.size() > 1) {
                     max = min.clone();
@@ -536,7 +533,7 @@ public class LocationMapViewer extends Activity implements Constants {
             mZoom = zoom;
         }
 
-        private void getMinMax(GeoPoint resultMin, GeoPoint resultMax, GeoPoint candidate) {
+        private void getMinMax(GeoPoint resultMin, GeoPoint resultMax, IGeoPoint candidate) {
             if (resultMin.getLatitudeE6() > candidate.getLatitudeE6()) {
                 resultMin.setLatitudeE6(candidate.getLatitudeE6());
             }

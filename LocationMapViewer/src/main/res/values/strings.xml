@@ -8,8 +8,4 @@
     <string name="prefs_showMiniMap_summary">Show Minimap</string>
     <string name="prefs_cluster_points">Cluster Points</string>
     <string name="prefs_cluster_points_description">checked neighbour point shown as one red point</string>
-
-    <string name="prefs_online">Online</string>
-    <string name="prefs_online_description">Use Internet/WLAN to download map-fragments</string>
-
 </resources>

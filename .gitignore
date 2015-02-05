@@ -39,4 +39,6 @@ build/
 *.swp
 *.swo
 /gradle-app.setting
+
 /osmdroid-third-party/libs/maps.jar
+/osmdroid-android

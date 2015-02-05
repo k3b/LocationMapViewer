@@ -47,12 +47,5 @@ this program. If not, see <http://www.gnu.org/licenses/>
             android:summary="@string/prefs_cluster_points"
             android:contentDescription="@string/prefs_cluster_points_description"
             />
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="useDataConnection"
-            android:summary="@string/prefs_online"
-            android:contentDescription="@string/prefs_online_description"
-            />
     </PreferenceCategory>
 </PreferenceScreen>

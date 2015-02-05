@@ -7,7 +7,8 @@ v? needs to be testet
 
 --- todo
 
-> convert cluser <-> nonCluster from settings
+? warum funktioniert der offline-schalter nicht?
+v convert cluser <-> nonCluster from settings
 
 - doku settings
 

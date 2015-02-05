@@ -37,7 +37,7 @@ public class GeoIntentDemoActivity extends Activity {
     }
 
     protected void startDemo() {
-        String uriString = editUri.getText().toString(); // "geo:53.2,8.8?(name)&z=5";
+        String uriString = editUri.getText().toString(); // "geo:53.2,8.8?q=(name)&z=1";
         String mimeString = editMime.getText().toString(); // null or */*
         if ((mimeString != null) && (mimeString.length() == 0)) mimeString = null;
 

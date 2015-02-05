@@ -144,11 +144,7 @@ public class LocationMapViewer extends Activity implements Constants {
         final List<Overlay> overlays = this.mMapView.getOverlays();
 
         Intent intent = this.getIntent();
-        GeoPointDto geoPointFromIntent = getGeoPointDto(intent);
-        // from com.example.osmbonuspacktuto.MainActivity
-
-        final String title = (geoPointFromIntent != null) ? geoPointFromIntent.getName() : "Start point";
-        createMarkerOverlayForCurrentPosition(overlays, mMapView, title, toOsmGeoPoint(geoPointFromIntent));
+        GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
 
         mUseClusterPoints = mPrefs.getBoolean(PREFS_CLUSTER_POINTS, true);
 
@@ -188,6 +184,12 @@ public class LocationMapViewer extends Activity implements Constants {
 
         createMiniMapOverlay(overlays);
 
+        // interactive overlay last=on top
+        if (geoPointFromIntent != null) {
+            final String title = geoPointFromIntent.getName();
+            createMarkerOverlayForMovablePosition(overlays, mMapView, title, toOsmGeoPoint(geoPointFromIntent));
+        }
+
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
 
@@ -207,9 +209,12 @@ public class LocationMapViewer extends Activity implements Constants {
         Marker poiMarker = new Marker(map);
         poiMarker.setTitle(aGeoPoint.getName());
         poiMarker.setSnippet(aGeoPoint.getDescription());
+        poiMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         poiMarker.setPosition(toOsmGeoPoint(aGeoPoint));
-        poiMarker.setIcon(defaultIcon);
 
+        if (defaultIcon != null) {
+            poiMarker.setIcon(defaultIcon);
+        }
         /*
         if (poi.mThumbnail != null){
             poiMarker.setImage(new BitmapDrawable(poi.mThumbnail));
@@ -240,18 +245,17 @@ public class LocationMapViewer extends Activity implements Constants {
         return poiMarkers;
     }
 
-    private void createMarkerOverlayForCurrentPosition(List<Overlay> overlays, MapView map, String title, GeoPoint geoPoint) {
+    private void createMarkerOverlayForMovablePosition(List<Overlay> overlays, MapView map, String title, GeoPoint geoPoint) {
         // from com.example.osmbonuspacktuto.MainActivity
         //0. Using the Marker overlay
         Marker startMarker = new Marker(map);
         startMarker.setPosition((geoPoint != null) ? geoPoint : new GeoPoint(0, 0));
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         startMarker.setTitle(title);
-        //startMarker.setIcon(getResources().getDrawable(R.drawable.marker_kml_point).mutate());
+        startMarker.setIcon(getResources().getDrawable(R.drawable.marker_yellow));
         //startMarker.setImage(getResources().getDrawable(R.drawable.ic_launcher));
         //startMarker.setInfoWindow(new MarkerInfoWindow(R.layout.bonuspack_bubble_black, map));
         startMarker.setDraggable(true);
-        startMarker.setOnMarkerDragListener(new OnMarkerDragListenerDrawer());
         overlays.add(startMarker);
     }
 
@@ -277,16 +281,16 @@ public class LocationMapViewer extends Activity implements Constants {
         }
     }
 
-    private GeoPointDto getGeoPointDto(Intent intent) {
+    private GeoPointDto getGeoPointDtoFromIntent(Intent intent) {
         final Uri uri = (intent != null) ? intent.getData() : null;
         String uriAsString = (uri != null) ? uri.toString() : null;
-        GeoPointDto initalMapCenterZoom = null;
+        GeoPointDto pointFromIntent = null;
         if (uriAsString != null) {
             Toast.makeText(this, getString(R.string.app_name) + ": received  " + uriAsString, Toast.LENGTH_LONG).show();
             GeoUri parser = new GeoUri(GeoUri.OPT_PARSE_INFER_MISSING);
-            initalMapCenterZoom = (GeoPointDto) parser.fromUri(uriAsString, new GeoPointDto());
+            pointFromIntent = (GeoPointDto) parser.fromUri(uriAsString, new GeoPointDto());
         }
-        return initalMapCenterZoom;
+        return pointFromIntent;
     }
 
     /**
@@ -581,39 +585,6 @@ public class LocationMapViewer extends Activity implements Constants {
             }
 
             return GeoPointDto.NO_ZOOM;
-        }
-    }
-
-    // from com.example.osmbonuspacktuto.MainActivity
-    //0. Using the Marker and Polyline overlays - advanced options
-    class OnMarkerDragListenerDrawer implements Marker.OnMarkerDragListener {
-        ArrayList<GeoPoint> mTrace;
-        Polyline mPolyline;
-
-        OnMarkerDragListenerDrawer() {
-            mTrace = new ArrayList<GeoPoint>(100);
-            mPolyline = new Polyline(mMapView.getContext());
-            mPolyline.setColor(0xAA0000FF);
-            mPolyline.setWidth(2.0f);
-            mPolyline.setGeodesic(true);
-            mMapView.getOverlays().add(mPolyline);
-        }
-
-        @Override
-        public void onMarkerDrag(Marker marker) {
-            //mTrace.add(marker.getPosition());
-        }
-
-        @Override
-        public void onMarkerDragEnd(Marker marker) {
-            mTrace.add(marker.getPosition());
-            mPolyline.setPoints(mTrace);
-            mMapView.invalidate();
-        }
-
-        @Override
-        public void onMarkerDragStart(Marker marker) {
-            //mTrace.add(marker.getPosition());
         }
     }
 

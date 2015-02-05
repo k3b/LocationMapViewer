@@ -33,7 +33,7 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="geo:53.2,8.8?(name)&amp;z=5"
+        android:text="geo:53.2,8.8?q=(name)&amp;z=11"
         android:id="@+id/editUri"
         android:layout_below="@id/labelUri"
         android:layout_alignParentLeft="true"

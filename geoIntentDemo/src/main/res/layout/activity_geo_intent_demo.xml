@@ -8,30 +8,11 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mime (empty means null) :"
-        android:id="@+id/labelMime"
+        android:text="Uri:"
+        android:id="@+id/labelUri"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/editUri"
-        android:layout_alignEnd="@+id/editUri" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:id="@+id/editMime"
-        android:layout_below="@id/labelMime"
-        android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/labelMime"
-        android:layout_alignEnd="@+id/labelMime" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Uri:"
-        android:id="@+id/labelUri"
-        android:layout_below="@id/editMime"
-        android:layout_alignParentLeft="true"
         android:layout_alignRight="@+id/editMime"
         android:layout_alignEnd="@+id/editMime" />
     <EditText
@@ -47,9 +28,29 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Mime (empty means null) :"
+        android:id="@+id/labelMime"
+        android:layout_below="@id/editUri"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/editUri"
+        android:layout_alignEnd="@+id/editUri" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:id="@+id/editMime"
+        android:layout_below="@id/labelMime"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/labelMime"
+        android:layout_alignEnd="@+id/labelMime" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Title (empty means none) :"
         android:id="@+id/labelTitle"
-        android:layout_below="@id/editUri"
+        android:layout_below="@id/editMime"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignRight="@+id/editUri"
@@ -84,6 +85,8 @@
         android:text="result"
         android:layout_below="@+id/runDemo"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/editTitle"
+        android:layout_alignEnd="@+id/editTitle" />
 
 </RelativeLayout>

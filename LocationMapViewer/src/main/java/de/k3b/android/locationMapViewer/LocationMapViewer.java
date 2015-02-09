@@ -146,6 +146,11 @@ public class LocationMapViewer extends Activity implements Constants {
         final List<Overlay> overlays = this.mMapView.getOverlays();
 
         Intent intent = this.getIntent();
+        String extraTitle = intent.getStringExtra(Intent.EXTRA_TITLE);
+        if (extraTitle != null) {
+            this.setTitle(extraTitle);
+        }
+
         GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
 
         mUseClusterPoints = mPrefs.getBoolean(PREFS_CLUSTER_POINTS, true);

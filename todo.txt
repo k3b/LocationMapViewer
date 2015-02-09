@@ -8,6 +8,10 @@ v? needs to be testet
 --- todo
 - mit/ohne title je nach intent
 - ok nur wenn activity-picker
+- onLongPress => set current pos
+- icon/detailview nur wenn detail data available
+- guesture long-drag: move&zoom.
+    - visual feedback
 
 v convert cluser <-> nonCluster from settings
 

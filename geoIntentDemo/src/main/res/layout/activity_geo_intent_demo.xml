@@ -12,7 +12,9 @@
         android:id="@+id/labelMime"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/editUri"
+        android:layout_alignEnd="@+id/editUri" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -21,7 +23,8 @@
         android:id="@+id/editMime"
         android:layout_below="@id/labelMime"
         android:layout_alignParentLeft="true"
-        />
+        android:layout_alignRight="@+id/labelMime"
+        android:layout_alignEnd="@+id/labelMime" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,7 +32,8 @@
         android:id="@+id/labelUri"
         android:layout_below="@id/editMime"
         android:layout_alignParentLeft="true"
-        />
+        android:layout_alignRight="@+id/editMime"
+        android:layout_alignEnd="@+id/editMime" />
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,12 +41,49 @@
         android:id="@+id/editUri"
         android:layout_below="@id/labelUri"
         android:layout_alignParentLeft="true"
-        />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
-    <Button android:text="Execute Demo" android:id="@+id/runDemo"
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        android:text="Title (empty means none) :"
+        android:id="@+id/labelTitle"
         android:layout_below="@id/editUri"
-        />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/editUri"
+        android:layout_alignEnd="@+id/editUri" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:id="@+id/editTitle"
+        android:layout_below="@id/labelTitle"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/labelTitle"
+        android:layout_alignEnd="@+id/labelTitle" />
+    <Button android:text="Demo" android:id="@+id/runDemo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTitle"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+    <Button android:text="Pick" android:id="@+id/runDemoPick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/runDemo"
+        android:layout_alignRight="@+id/labelTitle"
+        android:layout_alignEnd="@+id/labelTitle" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/labelLastResult"
+        android:text="result"
+        android:layout_below="@+id/runDemo"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>

@@ -8,4 +8,5 @@
     <string name="prefs_showMiniMap_summary">Show Minimap</string>
     <string name="prefs_cluster_points">Cluster Points</string>
     <string name="prefs_cluster_points_description">checked neighbour point shown as one red point</string>
+    <string name="label_select">OK</string>
 </resources>

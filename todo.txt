@@ -6,8 +6,9 @@ v done (implemented and tested)
 v? needs to be testet
 
 --- todo
+- mit/ohne title je nach intent
+- ok nur wenn activity-picker
 
-? warum funktioniert der offline-schalter nicht?
 v convert cluser <-> nonCluster from settings
 
 - doku settings

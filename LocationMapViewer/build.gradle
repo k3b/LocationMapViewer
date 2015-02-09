@@ -31,8 +31,8 @@ dependencies {
     compile 'com.android.support:support-v4:21.0.2'
 
     // this is osmdroid
-    // compile project(':osmdroid-android') // local copy
-    compile 'org.osmdroid:osmdroid-android:4.2' // non local copy from repositories
+    compile project(':osmdroid-android') // local copy
+    // compile 'org.osmdroid:osmdroid-android:4.2' // non local copy from repositories
 
     compile project(':OSMBonusPack') // local copy
 

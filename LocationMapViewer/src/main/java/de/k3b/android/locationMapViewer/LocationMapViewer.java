@@ -120,6 +120,8 @@ public class LocationMapViewer extends Activity implements Constants {
     private FolderOverlay mPOIOverlayNonCluster;
     private RadiusMarkerClusterer mPOIOverlayCluster;
 
+    private Marker currentSelectedPosition = null;
+
     // ===========================================================
     // Constructors
     // ===========================================================
@@ -248,15 +250,31 @@ public class LocationMapViewer extends Activity implements Constants {
     private void createMarkerOverlayForMovablePosition(List<Overlay> overlays, MapView map, String title, GeoPoint geoPoint) {
         // from com.example.osmbonuspacktuto.MainActivity
         //0. Using the Marker overlay
-        Marker startMarker = new Marker(map);
-        startMarker.setPosition((geoPoint != null) ? geoPoint : new GeoPoint(0, 0));
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        startMarker.setTitle(title);
-        startMarker.setIcon(getResources().getDrawable(R.drawable.marker_yellow));
+        currentSelectedPosition = new Marker(map);
+        currentSelectedPosition.setPosition((geoPoint != null) ? geoPoint : new GeoPoint(0, 0));
+        currentSelectedPosition.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        currentSelectedPosition.setTitle(title);
+        currentSelectedPosition.setIcon(getResources().getDrawable(R.drawable.marker_yellow));
         //startMarker.setImage(getResources().getDrawable(R.drawable.ic_launcher));
         //startMarker.setInfoWindow(new MarkerInfoWindow(R.layout.bonuspack_bubble_black, map));
-        startMarker.setDraggable(true);
-        overlays.add(startMarker);
+        currentSelectedPosition.setDraggable(true);
+        overlays.add(currentSelectedPosition);
+
+        Button cmdOk = (Button) findViewById(R.id.ok);
+        cmdOk.setVisibility(View.VISIBLE);
+        cmdOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentSelectedPosition != null) {
+
+                    GeoPointDto geoPoint = new GeoPointDto().setLatitude(currentSelectedPosition.getPosition().getLatitude()).setLongitude(currentSelectedPosition.getPosition().getLongitude());
+                    String uri = new GeoUri(GeoUri.OPT_DEFAULT).toUriString(geoPoint);
+                    setResult(0, new Intent(Intent.ACTION_PICK, Uri.parse(uri)));
+                }
+
+                finish();
+            }
+        });
     }
 
     private GeoPoint toOsmGeoPoint(IGeoPointInfo aGeoPoint) {

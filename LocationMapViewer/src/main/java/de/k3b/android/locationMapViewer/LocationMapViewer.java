@@ -31,6 +31,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.osmdroid.ResourceProxy;
@@ -40,7 +41,6 @@ import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.overlays.FolderOverlay;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.MarkerInfoWindow;
-import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.tileprovider.MapTileProviderBase;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -115,12 +115,14 @@ public class LocationMapViewer extends Activity implements Constants {
     /**
      * used to visualize item-cluster in the map
      */
-    private Drawable mAtomicPoiIcon;
+    private Drawable mPoiIconWithData;
+    private Drawable mPoiIconWithoutData;
     private boolean mUseClusterPoints = true;
     private FolderOverlay mPOIOverlayNonCluster;
     private RadiusMarkerClusterer mPOIOverlayCluster;
 
     private Marker currentSelectedPosition = null;
+    private boolean mUsePicker;
 
     // ===========================================================
     // Constructors
@@ -135,7 +137,8 @@ public class LocationMapViewer extends Activity implements Constants {
         super.onCreate(savedInstanceState);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
-        mAtomicPoiIcon = getResources().getDrawable(R.drawable.marker_default);
+        mPoiIconWithData = getResources().getDrawable(R.drawable.marker_green);
+        mPoiIconWithoutData = getResources().getDrawable(R.drawable.marker_no_data);
 
         mResourceProxy = new ResourceProxyImpl(getApplicationContext());
 
@@ -151,6 +154,7 @@ public class LocationMapViewer extends Activity implements Constants {
             this.setTitle(extraTitle);
         }
 
+        mUsePicker = (Intent.ACTION_PICK.equals(intent.getAction()));
         GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
 
         mUseClusterPoints = mPrefs.getBoolean(PREFS_CLUSTER_POINTS, true);
@@ -163,7 +167,7 @@ public class LocationMapViewer extends Activity implements Constants {
                 @Override
                 public void onGeoInfo(IGeoPointInfo aGeoPoint) {
                     if (aGeoPoint != null) {
-                        mPOIOverlayCluster.add(createMarker(mMapView, aGeoPoint, mAtomicPoiIcon));
+                        mPOIOverlayCluster.add(createMarker(mMapView, aGeoPoint));
                     }
                 }
             }
@@ -171,7 +175,7 @@ public class LocationMapViewer extends Activity implements Constants {
                 @Override
                 public void onGeoInfo(IGeoPointInfo aGeoPoint) {
                     if (aGeoPoint != null) {
-                        mPOIOverlayNonCluster.add(createMarker(mMapView, aGeoPoint, mAtomicPoiIcon));
+                        mPOIOverlayNonCluster.add(createMarker(mMapView, aGeoPoint));
                     }
                 }
             };
@@ -209,29 +213,37 @@ public class LocationMapViewer extends Activity implements Constants {
 //        }
     }
 
-    private Marker createMarker(MapView map, IGeoPointInfo aGeoPoint, Drawable defaultIcon) {
+    private Marker createMarker(MapView map, IGeoPointInfo aGeoPoint) {
         // final OverlayItem overlayItem = new OverlayItem(aGeoPoint.getId(), aGeoPoint.getName(), aGeoPoint.getDescription(), toOsmGeoPoint(aGeoPoint));
         // items.add(overlayItem);
 
         Marker poiMarker = new Marker(map);
         poiMarker.setTitle(aGeoPoint.getName());
-        poiMarker.setSnippet(aGeoPoint.getDescription());
+        final String description = aGeoPoint.getDescription();
+        poiMarker.setSnippet(description);
         poiMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         poiMarker.setPosition(toOsmGeoPoint(aGeoPoint));
 
-        if (defaultIcon != null) {
-            poiMarker.setIcon(defaultIcon);
+        if (notEmpty(description) || notEmpty(aGeoPoint.getUri())) {
+            poiMarker.setIcon(mPoiIconWithData);
+            // 7.
+            poiMarker.setInfoWindow(new CustomInfoWindow(map));
+        } else {
+            poiMarker.setIcon(mPoiIconWithoutData);
+            poiMarker.setInfoWindow(null);
         }
         /*
         if (poi.mThumbnail != null){
             poiMarker.setImage(new BitmapDrawable(poi.mThumbnail));
         }*/
 
-        // 7.
-        poiMarker.setInfoWindow(new CustomInfoWindow(map));
         poiMarker.setRelatedObject(aGeoPoint);
 
         return poiMarker;
+    }
+
+    private boolean notEmpty(String aString) {
+        return (aString != null) && (aString.length() > 0);
     }
 
     private RadiusMarkerClusterer createPointOfInterestOverlay(List<Overlay> overlays) {
@@ -265,21 +277,23 @@ public class LocationMapViewer extends Activity implements Constants {
         currentSelectedPosition.setDraggable(true);
         overlays.add(currentSelectedPosition);
 
-        Button cmdOk = (Button) findViewById(R.id.ok);
-        cmdOk.setVisibility(View.VISIBLE);
-        cmdOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (currentSelectedPosition != null) {
+        if (mUsePicker) {
+            Button cmdOk = (Button) findViewById(R.id.ok);
+            cmdOk.setVisibility(View.VISIBLE);
+            cmdOk.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (currentSelectedPosition != null) {
 
-                    GeoPointDto geoPoint = new GeoPointDto().setLatitude(currentSelectedPosition.getPosition().getLatitude()).setLongitude(currentSelectedPosition.getPosition().getLongitude());
-                    String uri = new GeoUri(GeoUri.OPT_DEFAULT).toUriString(geoPoint);
-                    setResult(0, new Intent(Intent.ACTION_PICK, Uri.parse(uri)));
+                        GeoPointDto geoPoint = new GeoPointDto().setLatitude(currentSelectedPosition.getPosition().getLatitude()).setLongitude(currentSelectedPosition.getPosition().getLongitude());
+                        String uri = new GeoUri(GeoUri.OPT_DEFAULT).toUriString(geoPoint);
+                        setResult(0, new Intent(Intent.ACTION_PICK, Uri.parse(uri)));
+                    }
+
+                    finish();
                 }
-
-                finish();
-            }
-        });
+            });
+        }
     }
 
     private GeoPoint toOsmGeoPoint(IGeoPointInfo aGeoPoint) {
@@ -636,6 +650,9 @@ public class LocationMapViewer extends Activity implements Constants {
             mView.findViewById(R.id.bubble_moreinfo).setVisibility(View.VISIBLE);
             Marker marker = (Marker) item;
             mSelectedPoi = (GeoPointDto) marker.getRelatedObject();
+            TextView description = (TextView) mView.findViewById(R.id.bubble_description);
+            if (mSelectedPoi != null) {
+                description.setText(mSelectedPoi.getDescription());
 /* !!!
             //8. put thumbnail image in bubble, fetching the thumbnail in background:
             if (mSelectedPoi.mThumbnailPath != null){
@@ -643,6 +660,7 @@ public class LocationMapViewer extends Activity implements Constants {
                 mSelectedPoi.fetchThumbnailOnThread(imageView);
             }
             */
+            }
         }
     }
 

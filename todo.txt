@@ -1,15 +1,31 @@
 onTapMarker, onLongTapMarker
 
+
+D/onDownd			MotionEvent { action=ACTION_DOWN, 	id[0]=0, x[0]=62.0, y[0]=121.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=534877, downTime=534877, deviceId=0, source=0x1002 }
+D/onSingleTapUp		MotionEvent { action=ACTION_UP, 	id[0]=0, x[0]=62.0, y[0]=121.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=535005, downTime=534877, deviceId=0, source=0x1002 }
+D/onDoubleTap﹕ 	MotionEvent { action=ACTION_DOWN, 	id[0]=0, x[0]=62.0, y[0]=121.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=534877, downTime=534877, deviceId=0, source=0x1002 }
+D/onDoubleTapEvent﹕MotionEvent { action=ACTION_DOWN, 	id[0]=0, x[0]=62.0, y[0]=121.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=535069, downTime=535069, deviceId=0, source=0x1002 }
+D/onDownd﹕ 		MotionEvent { action=ACTION_DOWN, 	id[0]=0, x[0]=62.0, y[0]=121.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=535069, downTime=535069, deviceId=0, source=0x1002 }
+D/onShowPress﹕ 	MotionEvent { action=ACTION_DOWN, 	id[0]=0, x[0]=62.0, y[0]=121.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=535069, downTime=535069, deviceId=0, source=0x1002 }
+D/onDoubleTapEvent﹕MotionEvent { action=ACTION_MOVE, 	id[0]=0, x[0]=94.17,y[0]=154.17,toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=6, eventTime=535629, downTime=535069, deviceId=0, source=0x1002 }
+D/onDoubleTapEvent﹕MotionEvent { action=ACTION_MOVE, 	id[0]=0, x[0]=145.0,y[0]=186.49,toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=16,eventTime=535927, downTime=535069, deviceId=0, source=0x1002 }
+D/onDoubleTapEvent﹕MotionEvent { action=ACTION_UP, 	id[0]=0, x[0]=145.0,y[0]=186.49,toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=536271, downTime=535069, deviceId=0, source=0x1002 }
+
+"D:\prj\eve\android\prj\GuestureTest\app\src\main\java\test\android\k3b\de\guesturetest\GuestureTestActivity.java"
+
+--------------------------
+
+
 - possible feature
 > work in progress
 v done (implemented and tested)
 v? needs to be testet
 
 --- todo
-- mit/ohne title je nach intent
-- ok nur wenn activity-picker
+v mit/ohne title je nachdem, ob Intent.EXTRA_TITLE`gesetzt ist oder nicht
+v ok nur wenn activity-picker
 - onLongPress => set current pos
-- icon/detailview nur wenn detail data available
+? icon/detailview nur wenn detail data available
 - guesture long-drag: move&zoom.
     - visual feedback
 

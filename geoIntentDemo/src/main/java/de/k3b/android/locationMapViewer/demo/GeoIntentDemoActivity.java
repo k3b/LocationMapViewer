@@ -12,7 +12,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
+/**
+ * This is a demo app for the LocationMapViewer intent interface.
+ */
 public class GeoIntentDemoActivity extends Activity {
     private static final int ACTION_ID = 4711;
     private String appName;
@@ -20,6 +22,7 @@ public class GeoIntentDemoActivity extends Activity {
     private EditText editUri;
     private EditText editTitle;
 
+    /** Greate the gui to enter the parameters for LocationMapViewer. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,20 +49,32 @@ public class GeoIntentDemoActivity extends Activity {
         });
     }
 
+    /** Gui dependant code */
     protected void startDemo(String action) {
         String uriString = editUri.getText().toString(); // "geo:53.2,8.8?q=(name)&z=1";
         String mimeString = editMime.getText().toString(); // null or */*
         if ((mimeString != null) && (mimeString.length() == 0)) mimeString = null;
+        String title = editTitle.getText().toString(); // Example "where did you take the photo"
 
+        startDemo(uriString, mimeString, action, title);
+    }
+
+    /**
+     * Gui independant code: Shows how the LocationMapViewer (or other compatible apps) can be called.
+     * @param uriString i.e. "geo:54.0,8.0?q=(Hello)"
+     * @param mimeString i.e. null
+     * @param action i.e. "android.intent.action.VIEW" or "android.intent.action.PICK"
+     * @param title i.e. "where did you take the photo" or null
+     */
+    private void startDemo(String uriString, String mimeString, String action, String title) {
         Uri uri = Uri.parse(uriString);
         Intent demo = new Intent();
         if (action != null) {
             demo.setAction(action);
         }
 
-        String extraTitle = editTitle.getText().toString(); // Example "where did you make the photo"
-        if ((extraTitle != null) && (extraTitle.length() > 0)) {
-            demo.putExtra(Intent.EXTRA_TITLE, extraTitle);
+        if ((title != null) && (title.length() > 0)) {
+            demo.putExtra(Intent.EXTRA_TITLE, title);
         }
         demo.setDataAndType(uri, mimeString);
         Toast.makeText(this, appName + "Starting " + uriString + "-" + demo.getType(), Toast.LENGTH_SHORT).show();
@@ -71,6 +86,7 @@ public class GeoIntentDemoActivity extends Activity {
         }
     }
 
+    /** Optional: Process the result location of the geo-picker  */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         String resultIntent = getUri(data);

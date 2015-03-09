@@ -30,6 +30,7 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -135,6 +136,15 @@ public class LocationMapViewer extends Activity implements Constants {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = this.getIntent();
+        mUsePicker = (Intent.ACTION_PICK.equals(intent.getAction()));
+
+        String extraTitle = intent.getStringExtra(Intent.EXTRA_TITLE);
+        if (extraTitle == null) {
+            // must be called before this.setContentView(...) else crash
+            this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
         mPoiIconWithData = getResources().getDrawable(R.drawable.marker_green);
@@ -148,13 +158,10 @@ public class LocationMapViewer extends Activity implements Constants {
 
         final List<Overlay> overlays = this.mMapView.getOverlays();
 
-        Intent intent = this.getIntent();
-        String extraTitle = intent.getStringExtra(Intent.EXTRA_TITLE);
         if (extraTitle != null) {
             this.setTitle(extraTitle);
         }
 
-        mUsePicker = (Intent.ACTION_PICK.equals(intent.getAction()));
         GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
 
         mUseClusterPoints = mPrefs.getBoolean(PREFS_CLUSTER_POINTS, true);
@@ -200,6 +207,8 @@ public class LocationMapViewer extends Activity implements Constants {
             final String title = geoPointFromIntent.getName();
             createMarkerOverlayForMovablePosition(overlays, mMapView, title, toOsmGeoPoint(geoPointFromIntent));
         }
+
+        //!!!overlays.add(new GuestureOverlay(this));
 
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);

@@ -28,6 +28,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -35,6 +36,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
+import de.k3b.util.IsoDateTimeParser;
 
 /**
  * Parser for http://www.topografix.com/GPX/1/1/ and http://www.topografix.com/GPX/1/0/
@@ -118,11 +120,14 @@ public class GpxReaderBase extends DefaultHandler {
             } else if (name.equals(GpxDef_11.LINK) || name.equals(GpxDef_10.URL)) {
                 current.setUri(buf.toString());
             } else if (name.equals(GpxDef_11.TIME) || name.equals(KmlDef_22.TIMESTAMP_WHEN) || name.equals(KmlDef_22.TIMESPAN_BEGIN)) {
-                try {
-                    current.setTimeOfMeasurement(GpxFormatter.TIME_FORMAT.parse(buf.toString()));
-                } catch (ParseException e) {
-                    throw new SAXException("/gpx//time or /kml//when or /kml//begin: invalid time " + buf.toString());
+                final Date dateTime = IsoDateTimeParser.parse(buf.toString());
+                if (dateTime != null) {
+                    current.setTimeOfMeasurement(dateTime);
+                } else {
+                    saxError("/gpx//time or /kml//when or /kml//begin: invalid time "
+                            + name +"=" + buf.toString());
                 }
+
             } else if (name.equals(KmlDef_22.COORDINATES)) {
                 // <coordinates>lon,lat,height blank lon,lat,height ...</coordinates>
                 try {
@@ -130,12 +135,16 @@ public class GpxReaderBase extends DefaultHandler {
                     current.setLatitude(Double.parseDouble(parts[1]));
                     current.setLongitude(Double.parseDouble(parts[0]));
                 } catch (NumberFormatException e) {
-                    throw new SAXException("/kml//Placemark/Point/coordinates>Expected: 'lon,lat,...' but got " + buf.toString());
+                    saxError("/kml//Placemark/Point/coordinates>Expected: 'lon,lat,...' but got "
+                            + name +"=" + buf.toString());
                 }
             }
         }
     }
 
+    private void saxError(String message) throws SAXException {
+        throw new SAXException(message);
+    }
     private String getElementName(String localName, String qName) {
         if ((localName != null) && (localName.length() > 0))
             return localName;

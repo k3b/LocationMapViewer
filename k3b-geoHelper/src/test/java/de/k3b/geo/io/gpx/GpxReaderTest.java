@@ -22,8 +22,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xml.sax.InputSource;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.List;
 
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoPointInfo;
@@ -84,7 +86,6 @@ public class GpxReaderTest {
         Assert.assertEquals(xmlMinimal_gpx_v11, formatted);
     }
 
-
     @Test
     public void parseFormatKmlShortTest() throws IOException {
         GpxReader reader = new GpxReader(new GeoPointDto());
@@ -97,4 +98,25 @@ public class GpxReaderTest {
 
         Assert.assertEquals(xmlMinimal_gpx_v11, formatted);
     }
+
+    // used to test files that do not work
+    // @Test
+    public void parseFormatFileTest() throws IOException {
+        // from android-s MyTracks
+        final String fullPathToParserInputFile = "D:\\prj\\eve\\android\\prj\\LocationMapViewer.wrk\\download\\Hotel-Conrad-10_02_2015 09_01.kml";
+
+        if (fullPathToParserInputFile != null) {
+            GpxReader reader = new GpxReader(null);
+
+            List<IGeoPointInfo> locations = reader.getTracks(new InputSource(new FileReader(fullPathToParserInputFile)));
+
+            final StringBuffer result = new StringBuffer();
+            for (IGeoPointInfo location : locations) {
+                GpxFormatter.toGpx(result, location, location.getDescription(), location.getUri());
+            }
+            System.out.print(result.toString());
+        }
+    }
+
+
 }

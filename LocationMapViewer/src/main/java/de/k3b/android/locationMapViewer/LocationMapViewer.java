@@ -208,7 +208,7 @@ public class LocationMapViewer extends Activity implements Constants {
             createMarkerOverlayForMovablePosition(overlays, mMapView, title, toOsmGeoPoint(geoPointFromIntent));
         }
 
-        //!!!overlays.add(new GuestureOverlay(this));
+        overlays.add(new GuestureOverlay(this));
 
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);

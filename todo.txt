@@ -1,3 +1,9 @@
+Offen: how visual feedback
+
+next: woher kommt bei double-click das zoomIn ??
+    aus 	MapController.zoomInFixing(final int xPixel, final int yPixel)
+    ==> disabled via GuestureOverlay.onDoubleTap(MotionEvent ev, MapView mapView): return true
+
 onTapMarker, onLongTapMarker
 
 

@@ -35,7 +35,8 @@ import org.osmdroid.views.MapView;
  */
 public class GuestureOverlay extends GuestureOverlayDebug {
     private Point mStart = null;
-    private Rect mRect = null;
+    private Point mEnd = null;
+    // private Rect mRect = null;
     private boolean mRectVisible = false;
     private Paint mPaint;
 
@@ -54,19 +55,19 @@ public class GuestureOverlay extends GuestureOverlayDebug {
 
         switch(ev.getAction() & MotionEvent.ACTION_MASK)
         {
-
             case MotionEvent.ACTION_DOWN:
                 this.mStart = new Point((int)ev.getX(),(int)ev.getY());
-                this.mRect = new Rect();
+                this.mEnd = new Point();
                 this.mPaint = new Paint();
                 this.mPaint.setColor(Color.BLUE);
+                this.mPaint.setStrokeWidth(3);
                 setRect((int) ev.getX(), (int) ev.getY(), mapView);
-                Log.d("onDoubleTapEvent-ACTION_DOWN-setRect",this.mRect + "-" + ev.toString());
-                return true; // i have handled it. else action zoom in
-                // break;
+                Log.d("onDoubleTapEvent-ACTION_DOWN-setRect",this.toString() + "-" + ev.toString());
+                break;
             case MotionEvent.ACTION_MOVE:
                 if (setRect((int)ev.getX(),(int)ev.getY(), mapView)) {
-                    Log.d("onDoubleTapEvent-ACTION_MOVE-setRect",this.mRect + "-" + ev.toString());
+                    Log.d("onDoubleTapEvent-ACTION_MOVE-setRect",this.toString() + "-" + ev.toString());
+                    mapView.invalidate();
 
                     return true; // i have handled it
                 }
@@ -74,23 +75,24 @@ public class GuestureOverlay extends GuestureOverlayDebug {
             case MotionEvent.ACTION_UP: {
                     boolean visible = setRect((int) ev.getX(), (int) ev.getY(), mapView);
                     if (visible) {
-                        Log.d("onDoubleTapEvent-ACTION_UP-setRect",this.mRect + "-" + ev.toString());
-                        zoom(this.mRect, mapView);
+                        Log.d("onDoubleTapEvent-ACTION_UP-setRect",this.toString() + "-" + ev.toString());
+                        zoom(mapView);
+                        mapView.invalidate();
                     }
-                    this.mStart = null;
-                    this.mRect = null;
-                    this.mPaint = null;
-                    this.mRectVisible = false;
+                    // this.mStart = null;
+                    // this.mRect = null;
+                    // this.mPaint = null;
+                    // this.mRectVisible = false;
                     if (visible) return true; // processed
                 }
                 break;
         }
-        Log.d("onDoubleTapEvent", this.mRect + "-" + ev.toString());
+        Log.d("onDoubleTapEvent", this.toString() + "-" + ev.toString());
         return super.onDoubleTapEvent(ev, mapView); // false: not handled yet
     }
 
-    private void zoom(Rect rect, MapView mapView) {
-        Log.d("zoom",rect.toString());
+    private void zoom(MapView mapView) {
+        Log.d("zoom",this.toString());
         // mapView.setC .zoomToBoundingBox(rect);
 
 // !!!!!! todo
@@ -99,14 +101,17 @@ public class GuestureOverlay extends GuestureOverlayDebug {
     private boolean setRect(int x, int y, MapView mapView) {
         int dx = Math.abs(mStart.x - x);
         int dy = Math.abs(mStart.y - y);
-        this.mRect.set(mStart.x - dx,mStart.y - dy,mStart.x + dx,mStart.y + dy);
+        /*
+        final int minX = Math.min(mStart.x, x);
+        final int minY = Math.min(mStart.y, y);
+        this.mRect.set(minX, minY,minX + dx,minY + dy);
+        */
         this.mRectVisible = (dx > 10) || (dy > 10);
-
-        drawRectangle(mapView);
-        // mapView.invalidate(this.mRect);
+        this.mEnd.set(x,y);
         return mRectVisible;
     }
 
+    /*
     private void drawRectangle(MapView mapView) {
         if (this.mRectVisible) {
             Canvas c = new Canvas();
@@ -114,14 +119,26 @@ public class GuestureOverlay extends GuestureOverlayDebug {
             c.drawRect(this.mRect, this.mPaint);
         }
     }
+    */
 
     @Override
     protected void draw(Canvas c, MapView mapView, boolean shadow) {
         super.draw(c, mapView, shadow);
         if ((!shadow) && (this.mRectVisible)) {
-            c.drawRect(this.mRect, this.mPaint);
-            Log.d("zoom", this.mRect.toString());
+            drawBorder(c , this.mStart.x, this.mStart.y, this.mEnd.x, mEnd.y);
+            Log.d("zoom", this.toString());
         }
     }
 
+    private void drawBorder(Canvas c, int x1, int y1, int x2, int y2) {
+        c.drawLine(x1, y1, x2, y1, this.mPaint);
+        c.drawLine(x2, y1, x2, y2, this.mPaint);
+        c.drawLine(x2, y2, x1, y2, this.mPaint);
+        c.drawLine(x1, y2, x1, y1, this.mPaint);
+    }
+
+    public String toString() {
+        if (!mRectVisible) return "";
+        return "(" + this.mStart.x+"," + this.mStart.y + ".."  + this.mEnd.x+"," + this.mEnd.y + ")";
+    }
 }

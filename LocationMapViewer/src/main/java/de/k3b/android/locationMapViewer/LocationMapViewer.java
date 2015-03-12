@@ -124,6 +124,7 @@ public class LocationMapViewer extends Activity implements Constants {
 
     private Marker currentSelectedPosition = null;
     private boolean mUsePicker;
+    private GuestureOverlay mGuesturesOverlay;
 
     // ===========================================================
     // Constructors
@@ -208,7 +209,8 @@ public class LocationMapViewer extends Activity implements Constants {
             createMarkerOverlayForMovablePosition(overlays, mMapView, title, toOsmGeoPoint(geoPointFromIntent));
         }
 
-        overlays.add(new GuestureOverlay(this));
+        mGuesturesOverlay = new GuestureOverlay(this);
+        overlays.add(mGuesturesOverlay);
 
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
@@ -370,6 +372,8 @@ public class LocationMapViewer extends Activity implements Constants {
         edit.putBoolean(PREFS_SHOW_LOCATION, mLocationOverlay.isMyLocationEnabled());
         edit.putBoolean(PREFS_SHOW_MINIMAP, mMiniMapOverlay.isEnabled());
         edit.putBoolean(PREFS_CLUSTER_POINTS, this.mUseClusterPoints);
+        edit.putBoolean(PREFS_SHOW_GUESTURES, this.mGuesturesOverlay.isEnabled());
+        edit.putBoolean(PREFS_DEBUG_GUESTURES, this.mGuesturesOverlay.isDebugEnabled());
 
         edit.commit();
 
@@ -473,6 +477,8 @@ public class LocationMapViewer extends Activity implements Constants {
         }
 
         this.mMiniMapOverlay.setEnabled(mPrefs.getBoolean(PREFS_SHOW_MINIMAP, true));
+        this.mGuesturesOverlay.setEnabled(mPrefs.getBoolean(PREFS_SHOW_GUESTURES, false));
+        this.mGuesturesOverlay.setDebugEnabled(mPrefs.getBoolean(PREFS_DEBUG_GUESTURES, false));
     }
 
     @Override

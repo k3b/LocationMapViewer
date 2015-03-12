@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Location Map Viewer</string>
+    <string name="label_select">OK</string>
+
     <string name="title_activity_settings">Settings</string>
     <string name="prefs_cat_overlays_title">Map Overlays</string>
 
@@ -8,5 +9,24 @@
     <string name="prefs_showMiniMap_summary">Show Minimap</string>
     <string name="prefs_cluster_points">Cluster Points</string>
     <string name="prefs_cluster_points_description">checked neighbour point shown as one red point</string>
-    <string name="label_select">OK</string>
+
+    <string name="prefs_guestures_enable">Enable experimental Guestures</string>
+    <string name="prefs_guestures_enable_description">Support for DoubleTapDrag-ZoomToFit and DoubleTap-ZoomInCenter.</string>
+    <string name="prefs_guestures_debug_enable" >Enable Guestures Debug</string>
+    <string name="prefs_guestures_debug_enable_description">Guestures Debug Messages copied to clipboard and added to LogCat.</string>
+
+    <string name="about_summary">About LocationMapViewer</string>
+
+
+<string name="about_content_about">"<![CDATA[
+<h1> LocationMapViewer </h1>
+<p> An app that can display geografic info in a map. It has
+support for <strong>gpx</strong> and <strong>kml</strong>
+files and <strong>geo-uri-s</strong> and can work offline
+(without internet/wifi) once geodata is downloaded and cached. </p>
+<p> Other Android apps can use LocationMapViewer through an
+Intent interface. (See GeoIntentDemo)<br />
+</p>
+]]>"</string>
+
 </resources>

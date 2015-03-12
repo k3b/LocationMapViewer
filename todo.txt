@@ -1,8 +1,62 @@
-Offen: how visual feedback
+LocationMapViewer-Todo.txt
 
-next: woher kommt bei double-click das zoomIn ??
-    aus 	MapController.zoomInFixing(final int xPixel, final int yPixel)
-    ==> disabled via GuestureOverlay.onDoubleTap(MotionEvent ev, MapView mapView): return true
+D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
+
+next translate resources about
+check if "?v" works
+
+LocationMapViewer-Todo
+v   icon
+	Settings
+		anzeige/edit current center,current zoomlevel.
+		Text-summary anzeige der aktuellen einstellung (android 2.2. ok aber nicht android 4.4)
+		Button add to favorites
+v		checkbox: enable guesture-debug
+v       about-box
+v           resourcen anpassen von toGoZip
+		
+	Guesture ddrag
+>		wie funktioniert drag-MapMove in MapViewer wo die karte sich sofort verschiebt?
+			als vorbild für ddrag-move
+			??  v.setBackgroundResource(null); v.setBackgroundResource(...my drawable...); aus http://stackoverflow.com/questions/4748336/how-to-force-android-view-to-redraw-its-background-drawable-probably-an-anim
+			oder view.setWillNotDraw(false) aus http://stackoverflow.com/questions/17595546/why-ondraw-is-not-called-after-invalidate
+			
+			
+>		Guesture-Overlay-Debug-Output schaltbar über bool variable
+v			über zentrale debug-methode
+v			ggf debugausgabe in clipboard anstatt in log
+		implement zoomTo(point1, point2)
+			where zoomlevel aus distance between Points und zoom mittelpunkt mitte zwischen punkten
+				
+	Guesture double-tap
+v		woher kommt bei double-click das zoomIn ??
+v			aus 	MapController.zoomInFixing(final int xPixel, final int yPixel)
+v			==> disabled via GuestureOverlay.onDoubleTap(MotionEvent ev, MapView mapView): return true
+		todo in guestre-detector (wenn drag dist kleiner als 10) zoom mit center=tap-point
+		?? Tripple tap to zoom in 2 stufen, quad-tap 3 stufen .....
+		
+	Favoriten-liste mit name, geocenter, zoomlevel 
+		fileformat: zeilen von geo-uri-s mit datei-Endung "*.lmv.fav"
+		Favorite-Marker der den Ausschnitt als blaues quadrat anzeigt
+		dialog zum auswählen des favoriten
+			- bei select (vor OK) entweder drunterligende karte sofort zoomen
+			- oder in darunterligender karte Favorite-Marker (mit ausschnitt) anzeigen markieren
+		? Edit
+	
+	Zoom-level slider in map?
+	
+	Menue
+		Favorites (add/select)
+		Settings
+		about
+		
+v	Ok in map für picker
+
+----------------------
+
+
+
+
 
 onTapMarker, onLongTapMarker
 

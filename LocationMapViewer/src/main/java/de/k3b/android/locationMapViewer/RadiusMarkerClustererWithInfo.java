@@ -49,6 +49,8 @@ public class RadiusMarkerClustererWithInfo extends RadiusMarkerClusterer {
         final BitmapDrawable icon = getClusterMarkerIcon("" + cluster.getSize(), mapView);
         m.setIcon(icon);
 
+        setRadius(48);
+
         return m;
     }
 

@@ -21,6 +21,7 @@ package de.k3b.geo.io.gpx;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import de.k3b.geo.api.ILocation;
 
@@ -33,6 +34,9 @@ public class GpxFormatter {
     static final DateFormat TIME_FORMAT
             = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
+    static {
+        TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
     public static StringBuffer toGpx(StringBuffer result, ILocation location,
                                      String description, String uri) {
         return toGpx(result, location.getLatitude(), location.getLongitude(),

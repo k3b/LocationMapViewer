@@ -25,12 +25,6 @@ this program. If not, see <http://www.gnu.org/licenses/>
         android:key="first_category"
         android:title="@string/prefs_cat_overlays_title">
 
-        <!--
-            </PreferenceCategory>
-            <PreferenceCategory
-                android:title="Diagnostics"
-                android:key="second_category">
-        -->
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="showLocation"
@@ -41,5 +35,45 @@ this program. If not, see <http://www.gnu.org/licenses/>
             android:key="showMiniMap"
             android:summary="@string/prefs_showMiniMap_summary" />
 
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="clusterPoints"
+            android:summary="@string/prefs_cluster_points"
+            android:contentDescription="@string/prefs_cluster_points_description"
+            />
+
+        <de.k3b.android.widgets.AboutDialogPreference
+            android:key="about"
+            android:title="@string/about_summary" />
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/prefs_current_header"
+        android:key="third_category">
+        <de.k3b.android.widgets.EditTextPreferenceWithSummary
+            android:key="currentZoom"
+            android:title="@string/prefs_current_zoom" />
+        <de.k3b.android.widgets.EditTextPreferenceWithSummary
+            android:key="currentNorth"
+            android:title="@string/prefs_current_north" />
+        <de.k3b.android.widgets.EditTextPreferenceWithSummary
+            android:key="currentEast"
+            android:title="@string/prefs_current_east" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/prefs_header_development"
+        android:key="second_category">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="guesturesEnable"
+            android:summary="@string/prefs_guestures_enable"
+            android:contentDescription="@string/prefs_guestures_enable_description"
+            />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="guesturesDebug"
+            android:summary="@string/prefs_guestures_debug_enable"
+            android:contentDescription="@string/prefs_guestures_debug_enable_description"
+            />
     </PreferenceCategory>
 </PreferenceScreen>

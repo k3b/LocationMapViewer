@@ -4,4 +4,8 @@ startParameter.offline=true
 // boolean isReachable = java.net.InetAddress.getByName("www.google.com").isReachable(1500)
 // print "has internet " + isReachable
 
+// use official maven version of osmdroid-android
 include ':LocationMapViewer', ':k3b-geoHelper', ':geoIntentDemo', ':OSMBonusPack'
+
+// for debug use local osmdroid-android
+// include ':LocationMapViewer', ':k3b-geoHelper', ':geoIntentDemo', ':OSMBonusPack', ':osmdroid-android'

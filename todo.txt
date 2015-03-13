@@ -1,7 +1,75 @@
-order geopoints by zoomlevel??22??
-different map-markers if there are many in certain zoomlevel 
+D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
+
+LocationMapViewer-Todo
+v   icon
+	Settings
+V		anzeige/edit current center,current zoomlevel.
+V		Text-summary anzeige der aktuellen einstellung (android 2.2. ok aber nicht android 4.4)
+		Button add to favorites
+v		checkbox: enable guesture-debug
+v       about-box
+v           resourcen anpassen von toGoZip
+		
+	Guesture ddrag
+>		wie funktioniert drag-MapMove in MapViewer wo die karte sich sofort verschiebt?
+			als vorbild für ddrag-move
+			??  v.setBackgroundResource(null); v.setBackgroundResource(...my drawable...); aus http://stackoverflow.com/questions/4748336/how-to-force-android-view-to-redraw-its-background-drawable-probably-an-anim
+			oder view.setWillNotDraw(false) aus http://stackoverflow.com/questions/17595546/why-ondraw-is-not-called-after-invalidate
+			
+			
+V		Guesture-Overlay-Debug-Output schaltbar über bool variable
+v			über zentrale debug-methode
+v			debugausgabe zusätzlich zum log ins clipboard
+		implement zoomTo(point1, point2)
+			where zoomlevel aus distance between Points und zoom mittelpunkt mitte zwischen punkten
+				
+	Guesture double-tap
+v		woher kommt bei double-click das zoomIn ??
+v			aus 	MapController.zoomInFixing(final int xPixel, final int yPixel)
+v			==> disabled via GuestureOverlay.onDoubleTap(MotionEvent ev, MapView mapView): return true
+		todo in guestre-detector (wenn drag dist kleiner als 10) zoom mit center=tap-point
+		?? Tripple tap to zoom in 2 stufen, quad-tap 3 stufen .....
+		
+	Favoriten-liste mit name, geocenter, zoomlevel 
+		fileformat: zeilen von geo-uri-s mit datei-Endung "*.lmv.fav"
+		Favorite-Marker der den Ausschnitt als blaues quadrat anzeigt
+		dialog zum auswählen des favoriten
+			- bei select (vor OK) entweder drunterligende karte sofort zoomen
+			- oder in darunterligender karte Favorite-Marker (mit ausschnitt) anzeigen markieren
+		? Edit
+	
+	Zoom-level slider in map?
+	
+	Menue
+		Favorites (add/select)
+		Settings
+		about
+		
+v	Ok in map für picker
+
+----------------------
+
+
+
+
 
 onTapMarker, onLongTapMarker
+
+
+D/onDownd			MotionEvent { action=ACTION_DOWN, 	id[0]=0, x[0]=62.0, y[0]=121.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=534877, downTime=534877, deviceId=0, source=0x1002 }
+D/onSingleTapUp		MotionEvent { action=ACTION_UP, 	id[0]=0, x[0]=62.0, y[0]=121.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=535005, downTime=534877, deviceId=0, source=0x1002 }
+D/onDoubleTap﹕ 	MotionEvent { action=ACTION_DOWN, 	id[0]=0, x[0]=62.0, y[0]=121.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=534877, downTime=534877, deviceId=0, source=0x1002 }
+D/onDoubleTapEvent﹕MotionEvent { action=ACTION_DOWN, 	id[0]=0, x[0]=62.0, y[0]=121.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=535069, downTime=535069, deviceId=0, source=0x1002 }
+D/onDownd﹕ 		MotionEvent { action=ACTION_DOWN, 	id[0]=0, x[0]=62.0, y[0]=121.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=535069, downTime=535069, deviceId=0, source=0x1002 }
+D/onShowPress﹕ 	MotionEvent { action=ACTION_DOWN, 	id[0]=0, x[0]=62.0, y[0]=121.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=535069, downTime=535069, deviceId=0, source=0x1002 }
+D/onDoubleTapEvent﹕MotionEvent { action=ACTION_MOVE, 	id[0]=0, x[0]=94.17,y[0]=154.17,toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=6, eventTime=535629, downTime=535069, deviceId=0, source=0x1002 }
+D/onDoubleTapEvent﹕MotionEvent { action=ACTION_MOVE, 	id[0]=0, x[0]=145.0,y[0]=186.49,toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=16,eventTime=535927, downTime=535069, deviceId=0, source=0x1002 }
+D/onDoubleTapEvent﹕MotionEvent { action=ACTION_UP, 	id[0]=0, x[0]=145.0,y[0]=186.49,toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=536271, downTime=535069, deviceId=0, source=0x1002 }
+
+"D:\prj\eve\android\prj\GuestureTest\app\src\main\java\test\android\k3b\de\guesturetest\GuestureTestActivity.java"
+
+--------------------------
+
 
 - possible feature
 > work in progress
@@ -9,8 +77,19 @@ v done (implemented and tested)
 v? needs to be testet
 
 --- todo
--	do without dynamic icon generation 
--	rollback test-impl
+v mit/ohne title je nachdem, ob Intent.EXTRA_TITLE`gesetzt ist oder nicht
+v ok nur wenn activity-picker
+- onLongPress => set current pos
+? icon/detailview nur wenn detail data available
+- guesture long-drag: move&zoom.
+    - visual feedback
+
+v convert cluser <-> nonCluster from settings
+
+- doku settings
+
+? cluster-detail via fragment
+? settings via fragment
 
 
 >   OSMBonusPack

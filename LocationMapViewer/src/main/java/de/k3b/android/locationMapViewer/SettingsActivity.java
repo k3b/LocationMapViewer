@@ -18,10 +18,17 @@
  */
 package de.k3b.android.locationMapViewer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+
+import org.osmdroid.api.IGeoPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.k3b.android.locationMapViewer.constants.Constants;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
@@ -31,14 +38,16 @@ import android.preference.PreferenceActivity;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends PreferenceActivity implements Constants {
+    private static final Logger logger = LoggerFactory.getLogger(SettingsActivity.class);
     /**
      * public api to start settings-activity
      */
-    public static void show(Context context) {
+    public static void show(Activity context, int resultID) {
         final Intent i = new Intent(context, SettingsActivity.class);
+        if (logger.isDebugEnabled()) logger.debug("show(resultID"+resultID+")");
 
-        context.startActivity(i);
+        context.startActivityForResult(i, resultID);
     }
 
     @Override

@@ -10,6 +10,12 @@
     <string name="prefs_cluster_points">Cluster Points</string>
     <string name="prefs_cluster_points_description">checked neighbour point shown as one red point</string>
 
+    <string name="prefs_current_header">Current Position</string>
+    <string name="prefs_current_north">North</string>
+    <string name="prefs_current_east">East</string>
+    <string name="prefs_current_zoom">Zoom</string>
+
+    <string name="prefs_header_development">Development</string>
     <string name="prefs_guestures_enable">Enable experimental Guestures</string>
     <string name="prefs_guestures_enable_description">Support for DoubleTapDrag-ZoomToFit and DoubleTap-ZoomInCenter.</string>
     <string name="prefs_guestures_debug_enable" >Enable Guestures Debug</string>
@@ -28,5 +34,4 @@ files and <strong>geo-uri-s</strong> and can work offline
 Intent interface. (See GeoIntentDemo)<br />
 </p>
 ]]>"</string>
-
 </resources>

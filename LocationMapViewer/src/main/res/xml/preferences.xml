@@ -54,7 +54,20 @@ this program. If not, see <http://www.gnu.org/licenses/>
 
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="Development"
+        android:title="@string/prefs_current_header"
+        android:key="third_category">
+        <de.k3b.android.widgets.EditTextPreferenceWithSummary
+            android:key="currentZoom"
+            android:title="@string/prefs_current_zoom" />
+        <de.k3b.android.widgets.EditTextPreferenceWithSummary
+            android:key="currentNorth"
+            android:title="@string/prefs_current_north" />
+        <de.k3b.android.widgets.EditTextPreferenceWithSummary
+            android:key="currentEast"
+            android:title="@string/prefs_current_east" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/prefs_header_development"
         android:key="second_category">
         <CheckBoxPreference
             android:defaultValue="false"

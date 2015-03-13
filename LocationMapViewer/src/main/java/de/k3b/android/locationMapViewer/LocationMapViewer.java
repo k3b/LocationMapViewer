@@ -60,6 +60,7 @@ import org.xml.sax.InputSource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +89,8 @@ public class LocationMapViewer extends Activity implements Constants {
     private static final int MENU_ZOOMIN_ID = Menu.FIRST + 1;
     private static final int MENU_ZOOMOUT_ID = MENU_ZOOMIN_ID + 2;
 
+    private static final DecimalFormat LAT_LON2TEXT = new DecimalFormat("#.#########");
+
     // ===========================================================
     // Fields
     // ===========================================================
@@ -111,7 +114,7 @@ public class LocationMapViewer extends Activity implements Constants {
      * <p/>
      * see http://stackoverflow.com/questions/10411975/how-to-get-the-width-and-height-of-an-image-view-in-android/10412209#10412209
      */
-    private DelayedLatLonZoom mDelayedLatLonZoom;
+    private DelayedSetCenterZoom mDelayedSetCenterZoom;
 
     /**
      * used to visualize item-cluster in the map
@@ -194,7 +197,7 @@ public class LocationMapViewer extends Activity implements Constants {
 
         AbstractList<? extends Overlay> items = (mUseClusterPoints) ? mPOIOverlayCluster.getItems() : mPOIOverlayNonCluster.getItems();
         final int zoom = (geoPointFromIntent != null) ? geoPointFromIntent.getZoomMin() : GeoPointDto.NO_ZOOM;
-        this.mDelayedLatLonZoom = (items.size() > 0) ? new DelayedLatLonZoom(items, zoom) : null;
+        this.mDelayedSetCenterZoom = (items.size() > 0) ? new DelayedSetCenterZoom(items, zoom) : null;
         if (items.size() == 0) {
             loadDemoItems(pointCollector);
         }
@@ -449,6 +452,10 @@ public class LocationMapViewer extends Activity implements Constants {
             this.mMapView.invalidate();
         }
 
+        RestoreXYZ();
+    }
+
+    private void RestoreXYZ() {
         final int zoom = mPrefs.getInt(PREFS_ZOOM_LEVEL, 3);
         final int scrollX = mPrefs.getInt(PREFS_SCROLL_X, 0);
         final int scrollY = mPrefs.getInt(PREFS_SCROLL_Y, 0);
@@ -483,12 +490,12 @@ public class LocationMapViewer extends Activity implements Constants {
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-        if (this.mDelayedLatLonZoom != null) {
+        if (this.mDelayedSetCenterZoom != null) {
             // setCenterZoom does not work in onCreate() because getHeight() and getWidth() return 0;
             // initial center must be set later when getHeight() and getWith() are set (i.e. in onWindowFocusChanged()).
             // see http://stackoverflow.com/questions/10411975/how-to-get-the-width-and-height-of-an-image-view-in-android/10412209#10412209
-            this.mDelayedLatLonZoom.setCenterZoom(mMapView);
-            this.mDelayedLatLonZoom = null; // donot call it again
+            this.mDelayedSetCenterZoom.execute("onWindowFocusChanged()", mMapView);
+            this.mDelayedSetCenterZoom = null; // donot call it again
         }
     }
 
@@ -521,74 +528,199 @@ public class LocationMapViewer extends Activity implements Constants {
                 this.mMapView.getController().zoomOut();
                 return true;
 
-            case MENU_SETTINGS_ID:
-                SettingsActivity.show(this);
+            case MENU_SETTINGS_ID: {
+                // set current xyz to prefs so they can be displayed/modified in the settings
+                final IGeoPoint mapCenter = mMapView.getMapCenter();
+
+                final SharedPreferences.Editor edit = mPrefs.edit();
+                edit.putString(PREFS_CURRENT_ZOOMLEVEL, "" + mMapView.getZoomLevel());
+                edit.putString(PREFS_CURRENT_NORTH, LAT_LON2TEXT.format(mapCenter.getLatitude()));
+                edit.putString(PREFS_CURRENT_EAST, LAT_LON2TEXT.format(mapCenter.getLongitude()));
+                edit.commit();
+                SettingsActivity.show(this, MENU_SETTINGS_ID);
                 return true;
+            }
         }
         return false;
+    }
+
+    /** called if a sub-activity finishes */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
+        if (logger.isDebugEnabled()) logger.debug("onActivityResult(requestCode="+requestCode+", resultCode="+resultCode+", data="+data+")");
+        if (requestCode == MENU_SETTINGS_ID) {
+            RestoreXYZ(); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
+
+            // apply xyz changes from settings back to view
+            int changes = setZoom(mPrefs.getString(PREFS_CURRENT_ZOOMLEVEL, "").trim())
+                   + setCenter(mPrefs.getString(PREFS_CURRENT_NORTH, "").trim(), mPrefs.getString(PREFS_CURRENT_EAST, "").trim());
+
+           if (changes > 0) {
+               saveLastXYZ(); // otherwhise onResume() would overwrite the new values
+           }
+        }
+    }
+
+    private int setCenter(String newNorthString, String newEastString) {
+        if ((newNorthString.length() > 0) && (newEastString.length() > 0)) {
+            try {
+                final Number east = LAT_LON2TEXT.parse(newEastString);
+                final Number north = LAT_LON2TEXT.parse(newNorthString);
+                final IGeoPoint newCenter = new GeoPoint(north.doubleValue(),east.doubleValue());
+                final IGeoPoint oldCenter = mMapView.getMapCenter();
+
+                if ((newCenter.getLatitudeE6() != oldCenter.getLatitudeE6()) || (newCenter.getLongitudeE6() != oldCenter.getLongitudeE6())) {
+                    setDelayedCenter(newCenter);
+                    return 1;
+                }
+            } catch (Exception ex) {
+                if (logger.isDebugEnabled()) {
+                    if (logger.isWarnEnabled()) {
+                        logger.warn("Cannot set setCenter(n={},e={}) => {}",
+                                newNorthString, newEastString, ex.getMessage());
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    private int setZoom(String newZoomString) {
+        if (newZoomString.length() > 0) {
+            try {
+                int newZoom = Integer.parseInt(mPrefs.getString(PREFS_CURRENT_ZOOMLEVEL, "-1"));
+                if ((newZoom != -1) && (newZoom != mMapView.getZoomLevel())) {
+                    setDelayedZoom(newZoom);
+                    return 1;
+                }
+            } catch (Exception ex) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("Cannot set setZoom({}) => {}",
+                            newZoomString, ex.getMessage());
+                }
+            }
+        }
+        return 0;
     }
 
     // ===========================================================
     // Methods
     // ===========================================================
 
+    /** Move viewport to newCenter. */
+    public void setDelayedCenter(final IGeoPoint newCenter) {
+        setDelayedCenterZoom("setDelayedCenter", newCenter, null, null);
+    }
+
+    /** Zoom as much as possible so that min an max are both visible. zoomLevel is calculate from mMin,mMax */
+    public void setDelayedCenter(final IGeoPoint min, final IGeoPoint max) {
+        setDelayedCenterZoom("setDelayedCenterMinMax", min, max, GeoPointDto.NO_ZOOM);
+    }
+
+    /** Zoom to zoomLevel. */
+    public void setDelayedZoom(final int zoomLevel) {
+        setDelayedCenterZoom("setDelayedZoom", null, null, zoomLevel);
+    }
+
+    /** impelementation of setDelayedXXXX() */
+    private void setDelayedCenterZoom(String debugContext, final IGeoPoint min, final IGeoPoint max, final Integer zoomLevel) {
+        DelayedSetCenterZoom delayedSetCenterZoom = this.mDelayedSetCenterZoom;
+        this.mDelayedSetCenterZoom = null;
+
+        if (delayedSetCenterZoom == null) delayedSetCenterZoom = new DelayedSetCenterZoom();
+
+        if (min != null) delayedSetCenterZoom.setMin(min).setMax(max);
+        if (zoomLevel != null) delayedSetCenterZoom.setZoom(zoomLevel.intValue());
+
+        // can execute immediately
+        if (this.mMapView.getWidth() > 0) {
+            delayedSetCenterZoom.execute(debugContext, this.mMapView);
+        } else {
+            // this.mMapView not fully initialized. do it later
+            this.mDelayedSetCenterZoom = delayedSetCenterZoom;
+        }
+    }
+
     // ===========================================================
     // Inner and Anonymous Classes
     // ===========================================================
 
     /**
-     * setCenterZoom does not work in onCreate() because getHeight() and getWidth() are not calculated yet and return 0;
-     * setCenterZoom must be set later when getHeight() and getWith() are known (i.e. in onWindowFocusChanged()).
+     * execute does not work in onCreate() because getHeight() and getWidth() are not calculated yet and return 0;
+     * execute must be set later when getHeight() and getWith() are known (i.e. in onWindowFocusChanged()).
      * <p/>
      * see http://stackoverflow.com/questions/10411975/how-to-get-the-width-and-height-of-an-image-view-in-android/10412209#10412209
      */
-    private class DelayedLatLonZoom {
-        private GeoPoint mMin = null;
-        private GeoPoint mMax = null;
-        private int mZoom;
+    private class DelayedSetCenterZoom {
+        /** Coordinate, where the delayed setCenter schould go. null: no setCenter */
+        private IGeoPoint mMin = null;
 
-        public DelayedLatLonZoom(final GeoPoint min, final GeoPoint max, final int zoom) {
-            mMin = min;
-            mMax = max;
-            mZoom = zoom;
+        /** Coordinate, where the delayed setCenter schould go. Not null: set center in the middle between mMin and mMax. null: set center to mMin */
+        private IGeoPoint mMax = null; //
+
+        /** zoomLevel, where the delayed setZoom schould go.  GeoPointDto.NO_ZOOM with set mMin and mMax: calculate from mMin,mMax.
+         * GeoPointDto.NO_ZOOM without mMax: do not zoom. */
+        private int mZoomLevel = GeoPointDto.NO_ZOOM;
+
+        DelayedSetCenterZoom() {}
+
+        DelayedSetCenterZoom(final GeoPoint min, final GeoPoint max, final int zoomLevel) {
+            setMin(min).setMax(max).setZoom(zoomLevel);
         }
 
-        // MarkerClusterer
-        public DelayedLatLonZoom(AbstractList<? extends Overlay> items, int zoom) {
-            if (items.size() > 0) {
-                Marker first = (Marker) items.get(0);
+        public DelayedSetCenterZoom setZoom(int zoomLevel) {
+            mZoomLevel = zoomLevel;
+            return this;
+        }
+
+        public DelayedSetCenterZoom setMin(IGeoPoint min) {
+            mMin = min;
+            return this;
+        }
+
+        public DelayedSetCenterZoom setMax(IGeoPoint max) {
+            mMax = max;
+            return this;
+        }
+
+        /** calculate min/max from all Markers in all overlaysWithMarkers */
+        public DelayedSetCenterZoom(AbstractList<? extends Overlay> overlaysWithMarkers, int zoomLevel) {
+            if (overlaysWithMarkers.size() > 0) {
+                Marker first = (Marker) overlaysWithMarkers.get(0);
                 GeoPoint min = new GeoPoint(first.getPosition().clone());
                 GeoPoint max = null;
-                if (items.size() > 1) {
+                if (overlaysWithMarkers.size() > 1) {
                     max = min.clone();
-                    for (Overlay item : items) {
+                    for (Overlay item : overlaysWithMarkers) {
                         getMinMax(min, max, ((Marker) item).getPosition());
                     }
                 }
                 mMin = min;
                 mMax = max;
             }
-            mZoom = zoom;
+            mZoomLevel = zoomLevel;
         }
 
-        public DelayedLatLonZoom(ArrayList<OverlayItem> items, int zoom) {
-            if (items.size() > 0) {
-                OverlayItem first = items.get(0);
+        /** calculate min/max from all Markers in all overlaysWithMarkers */
+        public DelayedSetCenterZoom(ArrayList<OverlayItem> overlaysWithMarkers, int zoomLevel) {
+            if (overlaysWithMarkers.size() > 0) {
+                OverlayItem first = overlaysWithMarkers.get(0);
                 final IGeoPoint firstPoint = first.getPoint();
                 GeoPoint min = new GeoPoint(firstPoint.getLatitudeE6(), firstPoint.getLongitudeE6());
                 GeoPoint max = null;
-                if (items.size() > 1) {
+                if (overlaysWithMarkers.size() > 1) {
                     max = min.clone();
-                    for (OverlayItem item : items) {
+                    for (OverlayItem item : overlaysWithMarkers) {
                         getMinMax(min, max, item.getPoint());
                     }
                 }
                 mMin = min;
                 mMax = max;
             }
-            mZoom = zoom;
+            mZoomLevel = zoomLevel;
         }
 
+        /** Helper to find min/max in a range */
         private void getMinMax(GeoPoint resultMin, GeoPoint resultMax, IGeoPoint candidate) {
             if (resultMin.getLatitudeE6() > candidate.getLatitudeE6()) {
                 resultMin.setLatitudeE6(candidate.getLatitudeE6());
@@ -604,17 +736,18 @@ public class LocationMapViewer extends Activity implements Constants {
             }
         }
 
-        public void setCenterZoom(MapView mapView) {
-            int zoom = mZoom;
+        /** the delayed execute */
+        public void execute(String debugContext, MapView mapView) {
+            int zoom = mZoomLevel;
 
             MapTileProviderBase tileProvider = mapView.getTileProvider();
             IMapController controller = mapView.getController();
-            GeoPoint center = mMin;
+            IGeoPoint center = mMin;
             if (mMax != null) {
                 center = new GeoPoint((mMax.getLatitudeE6() + mMin.getLatitudeE6()) / 2, (mMax.getLongitudeE6() + mMin.getLongitudeE6()) / 2);
 
                 if (zoom == GeoPointDto.NO_ZOOM) {
-                    final double requiredMinimalGroundResolutionInMetersPerPixel = ((double) mMin.distanceTo(mMax)) / Math.min(mapView.getWidth(), mapView.getHeight());
+                    final double requiredMinimalGroundResolutionInMetersPerPixel = ((double) new GeoPoint(mMin.getLatitudeE6(), mMin.getLongitudeE6()).distanceTo(mMax)) / Math.min(mapView.getWidth(), mapView.getHeight());
                     zoom = calculateZoom(center.getLatitude(), requiredMinimalGroundResolutionInMetersPerPixel, tileProvider.getMaximumZoomLevel(), tileProvider.getMinimumZoomLevel());
                 }
             }
@@ -622,11 +755,14 @@ public class LocationMapViewer extends Activity implements Constants {
                 controller.setZoom(zoom);
             }
 
-            controller.setCenter(center);
+            if (center != null) {
+                controller.setCenter(center);
+            }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("DelayedLatLonZoom.setCenterZoom(({}) .. ({}),z={}) => ({}), z={} => {}",
-                        mMin, mMax, mZoom, center, zoom, getStatusForDebug());
+                logger.debug("DelayedSetCenterZoom.execute({}: ({}) .. ({}),z={}) => ({}), z={} => {}",
+                        debugContext,
+                        mMin, mMax, mZoomLevel, center, zoom, getStatusForDebug());
             }
         }
 

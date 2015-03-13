@@ -16,6 +16,10 @@ public interface Constants {
     public static final String PREFS_SHOW_MINIMAP = "showMiniMap";
     public static final String PREFS_CLUSTER_POINTS = "clusterPoints";
 
+    public static final String PREFS_CURRENT_ZOOMLEVEL = "currentZoom";
+    public static final String PREFS_CURRENT_NORTH = "currentNorth";
+    public static final String PREFS_CURRENT_EAST = "currentEast";
+
     public static final String PREFS_SHOW_GUESTURES = "guesturesEnable";
     public static final String PREFS_DEBUG_GUESTURES = "guesturesDebug";
 

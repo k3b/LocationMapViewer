@@ -35,6 +35,11 @@ public class EditTextPreferenceWithSummary extends EditTextPreference {
     private final static String TAG = EditTextPreferenceWithSummary.class
             .getName();
 
+    public EditTextPreferenceWithSummary(android.content.Context context, android.util.AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        this.init();
+    }
+
     public EditTextPreferenceWithSummary(final Context context,
                                          final AttributeSet attrs) {
         super(context, attrs);

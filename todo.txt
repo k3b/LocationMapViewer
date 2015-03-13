@@ -1,15 +1,10 @@
-LocationMapViewer-Todo.txt
-
 D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
-
-next translate resources about
-check if "?v" works
 
 LocationMapViewer-Todo
 v   icon
 	Settings
-		anzeige/edit current center,current zoomlevel.
-		Text-summary anzeige der aktuellen einstellung (android 2.2. ok aber nicht android 4.4)
+V		anzeige/edit current center,current zoomlevel.
+V		Text-summary anzeige der aktuellen einstellung (android 2.2. ok aber nicht android 4.4)
 		Button add to favorites
 v		checkbox: enable guesture-debug
 v       about-box
@@ -22,9 +17,9 @@ v           resourcen anpassen von toGoZip
 			oder view.setWillNotDraw(false) aus http://stackoverflow.com/questions/17595546/why-ondraw-is-not-called-after-invalidate
 			
 			
->		Guesture-Overlay-Debug-Output schaltbar über bool variable
+V		Guesture-Overlay-Debug-Output schaltbar über bool variable
 v			über zentrale debug-methode
-v			ggf debugausgabe in clipboard anstatt in log
+v			debugausgabe zusätzlich zum log ins clipboard
 		implement zoomTo(point1, point2)
 			where zoomlevel aus distance between Points und zoom mittelpunkt mitte zwischen punkten
 				

@@ -38,7 +38,7 @@ v		todo in guestre-detector (wenn drag dist kleiner als 10) zoom mit center=tap-
 			- oder in darunterligender karte Favorite-Marker (mit ausschnitt) anzeigen markieren
 		? Edit
 	
-v	Zoom-level slider in map?
+v	Zoom-level slider in map
 	
 	Menue
 		Favorites (add/select)

@@ -4,11 +4,14 @@ An app that can display geografic info in a map. It has support for **gpx** and 
 and can work offline (without internet/wifi)
 once geodata is downloaded and cached.
 
-Other Android apps can use LocationMapViewer through an Intent interface.
-(See GeoIntentDemo)<br/>
+Other Android apps can use LocationMapViewer through an Intent interface
+(see [GeoIntentDemo.java](https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/main/java/de/k3b/android/locationMapViewer/demo/GeoIntentDemoActivity.java) )
+or through html links like &lt;a href=&quot;geo:0,0?q=53.0,8.0(Hello)&quot;&gt;geo:0,0?q=53.0,8.0(Hello)&lt;/a&gt;<br/>
 
 Minimal requirements: Android 2.1 (Eclair, API 7), internet/wifi-connection to download geodata and a SD-Card to cache geodata<br/>
+
 Licence: [GPLv3](http://www.gnu.org/licenses/gpl-3.0)<br/>
+
 Requred permissions:
 
 * INTERNET: to download map data from Open Streetmap Server
@@ -18,23 +21,26 @@ Requred permissions:
     * to load gpx/kml-Files to be displayed in the map
 * ACCESS_FINE_LOCATION and ACCESS_COARSE_LOCATION: to display my own location in the map, too
 
-The code uses [osmdroid library](https://github.com/osmdroid/osmdroid) to
-display maps from [Open Street Map](http://www.openstreetmap.org)
-
-LocationMapViewer is based on "org.osmdroid.samples.SampleWithMinimapItemizedoverlay"
-from DemoApp "OsmDroid-OpenStreetMapViewer"
+The code uses [osmdroid library](https://github.com/osmdroid/osmdroid)
+with [osmbonuspack library](http://code.google.com/p/osmbonuspack/)
+to display maps from [Open Street Map](http://www.openstreetmap.org).
 
 ##Intent Interface
 
-Other Android apps can use LocationMapViewer as plug-in/device-driver through an Intent interface.
+Other Android apps can use LocationMapViewer as plug-in/device-driver through an Intent interface
+or through html-a-href-links.
+
 Examples:
 
 * uri=geo:...  displays (and zomms to) a [geo uri](http://tools.ietf.org/html/draft-mayrhofer-geo-uri-00)
-    * geo:54.0,8.0?q=(Hello)
-        * displays "hello" at the location lat=54.0 north and lon= 8.0 east
-    * geo:0,0?q=54.0,8.0(Hello)
-        * displays "hello" at the location lat=54.0 north and lon= 8.0 east
-    * geo:54.0,8.0?z=6
+    * geo:0,0?q=53.0,8.0(Hello)
+        * displays "hello" at the location lat=53.0 north and lon= 8.0 east.
+        * in html you can use &lt;a href=&quot;geo:0,0?q=53.0,8.0(Hello)&quot;&gt;geo:0,0?q=53.0,8.0(Hello)&lt;/a&gt;
+        * this format is compatible with google-maps for android
+    * geo:53.0,8.0?q=(Hello)
+        * displays "hello" at the location lat=53.0 north and lon= 8.0 east
+        * this format is **not** compatible with google-maps for android
+    * geo:53.0,8.0?z=6
         * displays a pin at the location using zoomlevel "6"
 * uri=file:/path/to/waypoints.gpx
     * displays a xml+gpx waypointfile

@@ -63,17 +63,19 @@ plug-in/device-driver through an Intent interface or through html-a-href-links. 
  href="http://tools.ietf.org/html/draft-mayrhofer-geo-uri-00">geo
 uri</a>
     <ul>
-      <li> <a href="geo:53.0,8.0?q=(Hello)">geo:53.0,8.0?q=(Hello)</a>
-        <ul>
-          <li> displays "hello" at the location lat=53.0 north
-and lon= 8.0 east </li>
-		  <li>in html you can use &lt;a href=&quot;geo:53.0,8.0?q=(Hello)&quot;&gt;geo:53.0,8.0?q=(Hello)&lt;/a&gt;</li>
-        </ul>
-      </li>
       <li> <a href="geo:0,0?q=53.0,8.0(Hello)">geo:0,0?q=53.0,8.0(Hello)</a>
         <ul>
           <li> displays "hello" at the location lat=53.0 north
 and lon= 8.0 east </li>
+		  <li>in html you can use &lt;a href=&quot;geo:0,0?q=53.0,8.0(Hello)&quot;&gt;geo:0,0?q=53.0,8.0(Hello)&lt;/a&gt;</li>
+          <li>This format is compatible with google-maps for android.</li>
+        </ul>
+      </li>
+      <li> <a href="geo:53.0,8.0?q=(Hello)">geo:53.0,8.0?q=(Hello)</a>
+        <ul>
+          <li> displays "hello" at the location lat=53.0 north
+and lon= 8.0 east </li>
+          <li>This format is <b>not</b> compatible with google-maps for android.</li>
         </ul>
       </li>
       <li> <a href="geo:53.0,8.0?z=6">geo:53.0,8.0?z=6</a>

@@ -32,6 +32,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +44,9 @@ import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.overlays.FolderOverlay;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.MarkerInfoWindow;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -127,6 +132,7 @@ public class LocationMapViewer extends Activity implements Constants {
     private Marker currentSelectedPosition = null;
     private boolean mUsePicker;
     private GuestureOverlay mGuesturesOverlay;
+    private SeekBar mZoomBar;
 
     // ===========================================================
     // Constructors
@@ -205,6 +211,8 @@ public class LocationMapViewer extends Activity implements Constants {
 
         createMiniMapOverlay(overlays);
 
+        createZoomBar();
+
         // interactive overlay last=on top
         if (geoPointFromIntent != null) {
             final String title = geoPointFromIntent.getName();
@@ -214,7 +222,6 @@ public class LocationMapViewer extends Activity implements Constants {
         mGuesturesOverlay = new GuestureOverlay(this);
         overlays.add(mGuesturesOverlay);
 
-        mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
 
         loadFromSettings();
@@ -224,6 +231,43 @@ public class LocationMapViewer extends Activity implements Constants {
 //        if (initalMapCenterZoom != null) {
 //            setCenterZoom(initalMapCenterZoom);
 //        }
+    }
+
+    private void createZoomBar() {
+        mMapView.setBuiltInZoomControls(true);
+
+        mZoomBar = (SeekBar) findViewById(R.id.zoomBar);
+
+        mZoomBar.setMax(mMapView.getMaxZoomLevel() - mMapView.getMinZoomLevel());
+        mZoomBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) mMapView.getController().setZoom(progress - mMapView.getMinZoomLevel());
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        mMapView.setMapListener(new MapListener() {
+            @Override
+            public boolean onScroll(ScrollEvent event) {
+                return false;
+            }
+
+            @Override
+            public boolean onZoom(ZoomEvent event) {
+                mZoomBar.setProgress(mMapView.getZoomLevel());
+                return false;
+            }
+        });
     }
 
     private Marker createMarker(MapView map, IGeoPointInfo aGeoPoint) {

@@ -15,9 +15,11 @@
     <string name="prefs_current_east">East</string>
     <string name="prefs_current_zoom">Zoom</string>
 
-    <string name="prefs_header_development">Development</string>
+    <string name="prefs_header_development">Debug/Development</string>
+    <!--
     <string name="prefs_guestures_enable">Enable experimental Guestures</string>
     <string name="prefs_guestures_enable_description">Support for DoubleTapDrag-ZoomToFit and DoubleTap-ZoomInCenter.</string>
+    -->
     <string name="prefs_guestures_debug_enable" >Enable Guestures Debug</string>
     <string name="prefs_guestures_debug_enable_description">Guestures Debug Messages copied to clipboard and added to LogCat.</string>
 

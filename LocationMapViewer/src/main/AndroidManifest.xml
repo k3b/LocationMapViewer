@@ -107,7 +107,7 @@
             </intent-filter>
 
             <intent-filter>
-                <!-- trigger if there is uri=geo:.... without mime -->
+                <!-- trigger if there is uri=geo:.... without mime. Same settings as google maps -->
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.PICK" />
                 <action android:name="android.intent.action.SEND" />
@@ -121,15 +121,19 @@
             </intent-filter>
 
             <intent-filter>
+                <!-- file: *.gpx or *.kml -->
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="*/*" />
                 <data android:scheme="file" />
                 <data android:pathPattern=".*\\.gpx" />
                 <data android:pathPattern=".*\\.kml" />
+                <data android:pathPattern=".*\\..*\\.gpx" />
+                <data android:pathPattern=".*\\..*\\.kml" />
+                <data android:host="*" />
             </intent-filter>
 
-            <!-- version with host and without host -->
+            <!-- mime version with host and without host -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

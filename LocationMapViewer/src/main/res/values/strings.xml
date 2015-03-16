@@ -28,12 +28,12 @@
 
 <string name="about_content_about">"<![CDATA[
 <h1> LocationMapViewer </h1>
-<p> An app that can display geografic info in a map. It has
-support for <strong>gpx</strong> and <strong>kml</strong>
-files and <strong>geo-uri-s</strong> and can work offline
+<p> An app that can display geografic info in a map. It has 
+support for <strong>gpx</strong> and <strong>kml</strong> 
+files and <strong>geo-uri-s</strong> and can work offline 
 (without internet/wifi) once geodata is downloaded and cached. </p>
-<p> Other Android apps can use LocationMapViewer through an
-Intent interface. (See GeoIntentDemo)<br />
-</p>
+<p> Other Android apps can use LocationMapViewer through an 
+Intent interface. (See GeoIntentDemo)<br /> 
+</p> 
 ]]>"</string>
 </resources>

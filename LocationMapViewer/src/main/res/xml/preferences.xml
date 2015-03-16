@@ -63,12 +63,13 @@ this program. If not, see <http://www.gnu.org/licenses/>
     <PreferenceCategory
         android:title="@string/prefs_header_development"
         android:key="second_category">
+        <!--
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="guesturesEnable"
             android:summary="@string/prefs_guestures_enable"
             android:contentDescription="@string/prefs_guestures_enable_description"
-            />
+            />-->
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="guesturesDebug"

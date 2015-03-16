@@ -26,7 +26,12 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.view.MotionEvent;
 
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.api.IMapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.Projection;
+
+import de.k3b.geo.api.GeoPointDto;
 
 /**
  * Additional Guestures for {@see org.osmdroid.views.MapView}:<br/>
@@ -51,7 +56,7 @@ public class GuestureOverlay extends OverlayDebug {
     @Override public boolean 	onDoubleTap(MotionEvent ev, MapView mapView) {
         super.onDoubleTap(ev, mapView);
 
-        return this.isEnabled(); // true: prevent original onDoubleTap: zoom-in
+        return this.isEnabled(); // true: prevent original onDoubleTap: zoom-in. My own zoomIn is better ;-)
     }
 
     @Override public boolean 	onDoubleTapEvent(MotionEvent ev, MapView mapView) {
@@ -75,29 +80,42 @@ public class GuestureOverlay extends OverlayDebug {
                     break;
                 case MotionEvent.ACTION_UP: {
                     boolean visible = setEndPoint("onDoubleTapEvent-ACTION_UP", ev, mapView);
-                    if (visible) {
-                        zoom(mapView);
-                        mapView.invalidate();
-                    }
+                    zoom(mapView, visible);
                     // this.mStart = null;
                     // this.mRect = null;
                     // this.mPaint = null;
                     // this.mRectVisible = false;
-                    if (isDebugEnabled()) this.copyDebugToClipboard(mapView.getContext());
-                    if (visible) return true; // processed
+                    if (isDebugEnabled()) {
+                        this.copyDebugToClipboard(mapView.getContext());
+                    }
+                    this.mRectVisible = false;
+                    return true; // processed
                 }
-                break;
             }
             if (isDebugEnabled()) debug("onDoubleTapEvent", this, ev);
         }
         return super.onDoubleTapEvent(ev, mapView); // false: not handled yet
     }
 
-    private void zoom(MapView mapView) {
+    private void zoom(MapView mapView, boolean ddragMode) {
         if (isDebugEnabled())  debug("zoom",this);
         // mapView.setC .zoomToBoundingBox(rect);
 
-// !!!!!! todo
+        final Projection projection = mapView.getProjection();
+        IMapController controller = mapView.getController();
+        if (ddragMode) {
+            IGeoPoint start = projection.fromPixels(this.mStart.x, this.mStart.y);
+            IGeoPoint end = projection.fromPixels(this.mEnd.x, this.mEnd.y);
+            ZoomUtil.zoomTo(mapView, GeoPointDto.NO_ZOOM, start, end);
+            if (isDebugEnabled()) debug("zoom(ddrag mode)", start, "..", end,
+                    "=>", mapView.getMapCenter(), "z=", mapView.getZoomLevel());
+        } else {
+            IGeoPoint center = projection.fromPixels(this.mStart.x, this.mStart.y);
+            controller.setCenter(center);
+            controller.zoomIn();
+            if (isDebugEnabled()) debug("zoom(to center of)", center,
+                    "=>", mapView.getMapCenter(), "z=", mapView.getZoomLevel());
+        }
     }
 
     private boolean setEndPoint(String context, MotionEvent ev, MapView mapView) {
@@ -133,7 +151,7 @@ public class GuestureOverlay extends OverlayDebug {
         super.draw(c, mapView, shadow);
         if ((!shadow) && (this.mRectVisible)) {
             drawBorder(c , this.mStart.x, this.mStart.y, this.mEnd.x, mEnd.y);
-            if (isDebugEnabled())  debug("zoom", this);
+            if (isDebugEnabled())  debug("draw", this);
         }
     }
 

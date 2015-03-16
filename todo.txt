@@ -20,14 +20,14 @@ v           resourcen anpassen von toGoZip
 V		Guesture-Overlay-Debug-Output schaltbar über bool variable
 v			über zentrale debug-methode
 v			debugausgabe zusätzlich zum log ins clipboard
-		implement zoomTo(point1, point2)
-			where zoomlevel aus distance between Points und zoom mittelpunkt mitte zwischen punkten
+v		implement zoomTo(point1, point2)
+v			where zoomlevel aus distance between Points und zoom mittelpunkt mitte zwischen punkten
 				
 	Guesture double-tap
 v		woher kommt bei double-click das zoomIn ??
 v			aus 	MapController.zoomInFixing(final int xPixel, final int yPixel)
 v			==> disabled via GuestureOverlay.onDoubleTap(MotionEvent ev, MapView mapView): return true
-		todo in guestre-detector (wenn drag dist kleiner als 10) zoom mit center=tap-point
+v		todo in guestre-detector (wenn drag dist kleiner als 10) zoom mit center=tap-point
 		?? Tripple tap to zoom in 2 stufen, quad-tap 3 stufen .....
 		
 	Favoriten-liste mit name, geocenter, zoomlevel 
@@ -38,7 +38,7 @@ v			==> disabled via GuestureOverlay.onDoubleTap(MotionEvent ev, MapView mapView
 			- oder in darunterligender karte Favorite-Marker (mit ausschnitt) anzeigen markieren
 		? Edit
 	
-	Zoom-level slider in map?
+v	Zoom-level slider in map
 	
 	Menue
 		Favorites (add/select)

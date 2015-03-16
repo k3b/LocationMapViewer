@@ -32,6 +32,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,7 +44,9 @@ import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.overlays.FolderOverlay;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.MarkerInfoWindow;
-import org.osmdroid.tileprovider.MapTileProviderBase;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -128,6 +132,7 @@ public class LocationMapViewer extends Activity implements Constants {
     private Marker currentSelectedPosition = null;
     private boolean mUsePicker;
     private GuestureOverlay mGuesturesOverlay;
+    private SeekBar mZoomBar;
 
     // ===========================================================
     // Constructors
@@ -206,6 +211,8 @@ public class LocationMapViewer extends Activity implements Constants {
 
         createMiniMapOverlay(overlays);
 
+        createZoomBar();
+
         // interactive overlay last=on top
         if (geoPointFromIntent != null) {
             final String title = geoPointFromIntent.getName();
@@ -215,7 +222,6 @@ public class LocationMapViewer extends Activity implements Constants {
         mGuesturesOverlay = new GuestureOverlay(this);
         overlays.add(mGuesturesOverlay);
 
-        mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
 
         loadFromSettings();
@@ -225,6 +231,43 @@ public class LocationMapViewer extends Activity implements Constants {
 //        if (initalMapCenterZoom != null) {
 //            setCenterZoom(initalMapCenterZoom);
 //        }
+    }
+
+    private void createZoomBar() {
+        mMapView.setBuiltInZoomControls(true);
+
+        mZoomBar = (SeekBar) findViewById(R.id.zoomBar);
+
+        mZoomBar.setMax(mMapView.getMaxZoomLevel() - mMapView.getMinZoomLevel());
+        mZoomBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) mMapView.getController().setZoom(progress - mMapView.getMinZoomLevel());
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        mMapView.setMapListener(new MapListener() {
+            @Override
+            public boolean onScroll(ScrollEvent event) {
+                return false;
+            }
+
+            @Override
+            public boolean onZoom(ZoomEvent event) {
+                mZoomBar.setProgress(mMapView.getZoomLevel());
+                return false;
+            }
+        });
     }
 
     private Marker createMarker(MapView map, IGeoPointInfo aGeoPoint) {
@@ -375,7 +418,7 @@ public class LocationMapViewer extends Activity implements Constants {
         edit.putBoolean(PREFS_SHOW_LOCATION, mLocationOverlay.isMyLocationEnabled());
         edit.putBoolean(PREFS_SHOW_MINIMAP, mMiniMapOverlay.isEnabled());
         edit.putBoolean(PREFS_CLUSTER_POINTS, this.mUseClusterPoints);
-        edit.putBoolean(PREFS_SHOW_GUESTURES, this.mGuesturesOverlay.isEnabled());
+        //edit.putBoolean(PREFS_SHOW_GUESTURES, this.mGuesturesOverlay.isEnabled());
         edit.putBoolean(PREFS_DEBUG_GUESTURES, this.mGuesturesOverlay.isDebugEnabled());
 
         edit.commit();
@@ -484,7 +527,7 @@ public class LocationMapViewer extends Activity implements Constants {
         }
 
         this.mMiniMapOverlay.setEnabled(mPrefs.getBoolean(PREFS_SHOW_MINIMAP, true));
-        this.mGuesturesOverlay.setEnabled(mPrefs.getBoolean(PREFS_SHOW_GUESTURES, false));
+        // this.mGuesturesOverlay.setEnabled(mPrefs.getBoolean(PREFS_SHOW_GUESTURES, false));
         this.mGuesturesOverlay.setDebugEnabled(mPrefs.getBoolean(PREFS_DEBUG_GUESTURES, false));
     }
 
@@ -738,43 +781,16 @@ public class LocationMapViewer extends Activity implements Constants {
 
         /** the delayed execute */
         public void execute(String debugContext, MapView mapView) {
-            int zoom = mZoomLevel;
-
-            MapTileProviderBase tileProvider = mapView.getTileProvider();
-            IMapController controller = mapView.getController();
-            IGeoPoint center = mMin;
-            if (mMax != null) {
-                center = new GeoPoint((mMax.getLatitudeE6() + mMin.getLatitudeE6()) / 2, (mMax.getLongitudeE6() + mMin.getLongitudeE6()) / 2);
-
-                if (zoom == GeoPointDto.NO_ZOOM) {
-                    final double requiredMinimalGroundResolutionInMetersPerPixel = ((double) new GeoPoint(mMin.getLatitudeE6(), mMin.getLongitudeE6()).distanceTo(mMax)) / Math.min(mapView.getWidth(), mapView.getHeight());
-                    zoom = calculateZoom(center.getLatitude(), requiredMinimalGroundResolutionInMetersPerPixel, tileProvider.getMaximumZoomLevel(), tileProvider.getMinimumZoomLevel());
-                }
-            }
-            if (zoom != GeoPointDto.NO_ZOOM) {
-                controller.setZoom(zoom);
-            }
-
-            if (center != null) {
-                controller.setCenter(center);
-            }
+            ZoomUtil.zoomTo(mapView, mZoomLevel, mMin, mMax);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("DelayedSetCenterZoom.execute({}: ({}) .. ({}),z={}) => ({}), z={} => {}",
                         debugContext,
-                        mMin, mMax, mZoomLevel, center, zoom, getStatusForDebug());
+                        mMin, mMax, mZoomLevel, mapView.getMapCenter(), mapView.getZoomLevel(), getStatusForDebug());
             }
         }
 
-        private int calculateZoom(double latitude, double requiredMinimalGroundResolutionInMetersPerPixel, int maximumZoomLevel, int minimumZoomLevel) {
-            for (int zoom = maximumZoomLevel; zoom >= minimumZoomLevel; zoom--) {
-                if (TileSystem.GroundResolution(latitude, zoom) > requiredMinimalGroundResolutionInMetersPerPixel)
-                    return zoom;
-            }
-
-            return GeoPointDto.NO_ZOOM;
-        }
-    }
+     }
 
     //7. Customizing the bubble behaviour
     class CustomInfoWindow extends MarkerInfoWindow {

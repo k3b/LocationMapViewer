@@ -30,52 +30,53 @@ this program. If not, see <http://www.gnu.org/licenses/>
 <hr />
 $about$
 <hr />
-<p> Minimal requirements: Android 2.1 (Eclair, API 7),
-internet/wifi-connection to download geodata and a SD-Card to cache
+<p> Minimal requirements: Android 2.1 (Eclair, API 7), 
+internet/wifi-connection to download geodata and a SD-Card to cache 
 geodata<br />
-Licence: <a href="http://www.gnu.org/licenses/gpl-3.0">GPLv3</a><br />
+<br />
+Licence: <a href="http://www.gnu.org/licenses/gpl-3.0">GPLv3</a><br /><br />
+
 Requred permissions: </p>
 <ul>
   <li> INTERNET: to download map data from Open Streetmap Server </li>
   <li> ACCESS_NETWORK_STATE and ACCESS_WIFI_STATE: to find out if
-wifi/internet is online to start downloaded geodata </li>
+wifi/internet is online to start downloading geodata if neccessary</li>
   <li> WRITE_EXTERNAL_STORAGE
     <ul>
       <li> to cache downloaded map data in local file system </li>
       <li> to load gpx/kml-Files to be displayed in the map </li>
     </ul>
   </li>
-  <li> ACCESS_FINE_LOCATION and ACCESS_COARSE_LOCATION: to
+  <li> ACCESS_FINE_LOCATION and ACCESS_COARSE_LOCATION: to 
 display my own location in the map, too </li>
 </ul>
 <p> The code uses <a
  href="https://github.com/osmdroid/osmdroid">osmdroid library</a>
-to display maps from <a href="http://www.openstreetmap.org">Open
+ with <a href="http://code.google.com/p/osmbonuspack/">osmbonuspack library</a>
+to display maps from <a href="http://www.openstreetmap.org">Open 
 Street Map</a> </p>
-<p> LocationMapViewer is based on
-"org.osmdroid.samples.SampleWithMinimapItemizedoverlay" from DemoApp
-"OsmDroid-OpenStreetMapViewer" </p>
 <h2> Intent Interface </h2>
-<p> Other Android apps can use LocationMapViewer as
-plug-in/device-driver through an Intent interface. Examples: </p>
+<p> Other Android apps can use LocationMapViewer as 
+plug-in/device-driver through an Intent interface or through html-a-href-links. Examples: </p>
 <ul>
   <li> uri=geo:... displays (and zomms to) a <a
  href="http://tools.ietf.org/html/draft-mayrhofer-geo-uri-00">geo
 uri</a>
     <ul>
-      <li> geo:54.0,8.0?q=(Hello)
+      <li> <a href="geo:53.0,8.0?q=(Hello)">geo:53.0,8.0?q=(Hello)</a>
         <ul>
-          <li> displays "hello" at the location lat=54.0 north
+          <li> displays "hello" at the location lat=53.0 north
+and lon= 8.0 east </li>
+		  <li>in html you can use &lt;a href=&quot;geo:53.0,8.0?q=(Hello)&quot;&gt;geo:53.0,8.0?q=(Hello)&lt;/a&gt;</li>
+        </ul>
+      </li>
+      <li> <a href="geo:0,0?q=53.0,8.0(Hello)">geo:0,0?q=53.0,8.0(Hello)</a>
+        <ul>
+          <li> displays "hello" at the location lat=53.0 north
 and lon= 8.0 east </li>
         </ul>
       </li>
-      <li> geo:0,0?q=54.0,8.0(Hello)
-        <ul>
-          <li> displays "hello" at the location lat=54.0 north
-and lon= 8.0 east </li>
-        </ul>
-      </li>
-      <li> geo:54.0,8.0?z=6
+      <li> <a href="geo:53.0,8.0?z=6">geo:53.0,8.0?z=6</a>
         <ul>
           <li> displays a pin at the location using zoomlevel "6"
           </li>
@@ -94,22 +95,20 @@ and lon= 8.0 east </li>
     </ul>
   </li>
 </ul>
-<p> LocationMapViewer is designed to be used by other apps. This
-means in Terms of <a href="http://www.gnu.org/licenses/gpl-3.0">GPLv3</a>
+<p> LocationMapViewer is designed to be used by other apps. This 
+means in terms of <a href="http://www.gnu.org/licenses/gpl-3.0">GPLv3</a> 
 that your app that uses the Intent-Iterface <a
- href="https://en.wikipedia.org/wiki/GPL_v3#Point_of_view:_linking_is_irrelevant">is
+ href="https://en.wikipedia.org/wiki/GPL_v3#Point_of_view:_linking_is_irrelevant">is 
 not considered a Derived Work.</a> </p>
 <p> In other words: you can used LocationMapViewer as a <a
- href="http://www.rosenlaw.com/lj19.htm">driver for your non
+ href="http://www.rosenlaw.com/lj19.htm">driver for your non 
 gpl/non opensource app.</a>. </p>
 <hr/>
 <h2>History</h2>
-Initial Version v0.1.1.20141109<br />
+Initial Version v0.2.1.150116<br />
 <ul>
-  <li>Created share handler for Add To Zip without a gui.</li>
-  <li>Hardcoded zipfile /sdcard/copy/2go.zip.</li>
-  <li>Implemented view/send/sendto/send_multible for file and folder.</li>
-  <li>Intelligent file renaming if file with same name and different last-modified-date is added.</li>
+  <li>Intent Support for geo:, file:*.kml, file:*.gpx; VIEW and PICK</li>
+  <li>Guestures: DoubleTap ZoomToCenter; DoubleDrag: ZoomToFit dragged rectangle</li>
 </ul>
 <hr />
 <h2>Links</h2>
@@ -117,24 +116,26 @@ Initial Version v0.1.1.20141109<br />
   <li>Source code of current version of LocationMapViewer at git repository@github.com<br />
     <a href="http://github.com/k3b/LocationMapViewer/">https://github.com/k3b/LocationMapViewer/</a></li>
   <li><a href="https://github.com/k3b/LocationMapViewer/wiki/History">LocationMapViewer Changelog</a></li>
-    <li>Source code of osmdroid library at git repository@github.com<br />
-    <a href="https://github.com/osmdroid/osmdroid">https://github.com/k3b/LocationMapViewer/</a></li>
-  <li>Geograpic data come from openstreetmap<br />
-    <a href="http://www.openstreetmap.org">http://www.openstreetmap.org</a></li>
 
-  <li>slf4j logging driver for android eu.lp0.slf4j:slf4j-android<br />
-    <a href="http://github.com/lp0/slf4j-android">https://github.com/lp0/slf4j-android</a>
-  </li>
+  <li>Source code of osmdroid library at git repository@github.com<br />
+    <a href="https://github.com/osmdroid/osmdroid">https://github.com/osmdroid/osmdroid</a></li>
+  <li>Source code of osmbonuspack library for osmdroid <br />
+    <a href="http://code.google.com/p/osmbonuspack/">http://code.google.com/p/osmbonuspack/</a></li>
   <li>slf4j logging for java org.slf4j:slf4j-api<br />
     <a href="http://www.slf4j.org/">http://www.slf4j.org/</a>
+  </li>
+  <li>slf4j logging driver for android eu.lp0.slf4j:slf4j-android<br />
+    <a href="http://github.com/lp0/slf4j-android">https://github.com/lp0/slf4j-android</a>
   </li>
   <li>junit Testing support junit:junit<br />
     <a href="http://junit.org/">http://junit.org/</a>
   </li>
+
+  <li>Geograpic data come from openstreetmap<br />
+    <a href="http://www.openstreetmap.org">http://www.openstreetmap.org</a></li>
+
   <li>Geo-uri are explained at<br />
     <a href="http://tools.ietf.org/html/draft-mayrhofer-geo-uri-00">http://tools.ietf.org/html/draft-mayrhofer-geo-uri-00</a></li>
-  <li>Source code of osmdroid library at git repository@github.com<br />
-    <a href="https://github.com/osmdroid/osmdroid">https://github.com/k3b/LocationMapViewer/</a></li>
   <li>The GPLv3 license is available at<br />
     <a href="http://www.gnu.org/licenses/gpl-3.0">http://www.gnu.org/licenses/gpl-3.0</a></li>
 </ul>
@@ -143,10 +144,10 @@ Initial Version v0.1.1.20141109<br />
 <h2>Legal stuff</h2>
 <b>LocationMapViewer</b>&nbsp;<br />
 &nbsp;<br />
-Copyright (c) 2014 by k3b<br />
+Copyright (c) 2014-2015 by k3b<br />
 Licensed under GPL, Version 3.0 or later.<br />
 <br />
-Android is a trademark of Google Inc. Use of this trademark is subject
+Android is a trademark of Google Inc. Use of this trademark is subject 
 to Google Permissions.
 <br />
 <hr /><br />

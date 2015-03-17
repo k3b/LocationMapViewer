@@ -32,8 +32,8 @@ import java.util.regex.Pattern;
  */
 public class IsoDateTimeParser {
     // "(?:" start of non capturing group
-    private static final Pattern ISO8601_FRACTIONAL_PATTERN
-            = Pattern.compile("(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(?:[\\.,](\\d{1,3}))?(Z|[\\+-]\\d{2}(?::?\\d{2})?Z?)?");
+    public static final Pattern ISO8601_FRACTIONAL_PATTERN
+            = Pattern.compile("((\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(?:[\\.,](\\d{1,3}))?(Z|[\\+-]\\d{2}(?::?\\d{2})?Z?)?)");
     //                            year     month     day T  hour    minute    sec             millisec   Z or +/-  hours  :   minutes
 
     private static final int YEAR = 0;
@@ -56,21 +56,23 @@ public class IsoDateTimeParser {
             final Matcher matcher = ISO8601_FRACTIONAL_PATTERN.matcher(dateString);
             if (matcher.matches()) {
                 try {
-                    // +1: matcher.group(0) returns the whole expressein, matchingGroup starts with 1
-                    return toDate(matcher.group(YEAR + 1),
-                            matcher.group(MONTH + 1),
-                            matcher.group(DAY + 1),
-                            matcher.group(HOUR + 1),
-                            matcher.group(MINUTE + 1),
-                            matcher.group(SECOND + 1),
-                            matcher.group(FRACTIONAL_SECONDS + 1),
-                            matcher.group(TIMEZONE + 1));
+                    // +2: matcher.group(0) returns the whole expression, matcher.group(1) is overall "()"
+                    // matchingGroup starts with 2
+                    return toDate(matcher.group(YEAR + 2),
+                            matcher.group(MONTH + 2),
+                            matcher.group(DAY + 2),
+                            matcher.group(HOUR + 2),
+                            matcher.group(MINUTE + 2),
+                            matcher.group(SECOND + 2),
+                            matcher.group(FRACTIONAL_SECONDS + 2),
+                            matcher.group(TIMEZONE + 2));
                 } catch (NumberFormatException nfe) {
                 }
             }
         }
         return null;
     }
+
     /**
      * Convert the given timestamp parameters into a number of milliseconds
      * @param dateFragments year month day hour minute seconds fractionsOfASecond timezone

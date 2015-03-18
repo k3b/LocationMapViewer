@@ -19,6 +19,9 @@
 
 package de.k3b.geo.io;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -38,6 +41,8 @@ import de.k3b.geo.api.IGeoRepository;
  * Created by k3b on 17.03.2015.
  */
 public class GeoFileRepository implements IGeoRepository {
+    private static final Logger logger = LoggerFactory.getLogger(GeoFileRepository.class);
+
     private static final GeoUri converter = new GeoUri(GeoUri.OPT_DEFAULT);
 
     private final File file;
@@ -54,11 +59,18 @@ public class GeoFileRepository implements IGeoRepository {
     public List<IGeoPointInfo> load() {
         if (data == null) {
             data = new ArrayList<>();
-            try {
-                load(data, new FileReader(this.file));
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (this.file.exists()) {
+                try {
+                    load(data, new FileReader(this.file));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+            if (logger.isDebugEnabled()) {
+                logger.debug("load(): " + data.size() + " items from " + this.file);
+            }
+        } else if (logger.isDebugEnabled()) {
+            logger.debug("load() cached value : " + data.size() + " items from " + this.file);
         }
         return data;
     }
@@ -69,12 +81,21 @@ public class GeoFileRepository implements IGeoRepository {
      */
     public boolean save() {
         try {
-            if (data != null) {
-            save(data, new FileWriter(this.file, false));
+            if ((data != null) && (data.size() > 0)) {
+                if (!this.file.exists()) {
+                    this.file.getParentFile().mkdirs();
+                }
+                if (logger.isDebugEnabled()) {
+                    logger.debug("save(): " + data.size() + " items to " + this.file);
+                }
+                save(data, new FileWriter(this.file, false));
             }
             return true;
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("save(): no items for " + this.file);
         }
         return false;
     }
@@ -84,6 +105,9 @@ public class GeoFileRepository implements IGeoRepository {
         String line;
         BufferedReader br = new BufferedReader(reader);
         while ((line = br.readLine()) != null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("load(" +line + ")");
+            }
             IGeoPointInfo geo = converter.fromUri(line);
             if (geo != null) result.add(geo);
         }
@@ -92,7 +116,11 @@ public class GeoFileRepository implements IGeoRepository {
 
     static void save(List<IGeoPointInfo> source, Writer writer) throws IOException {
         for (IGeoPointInfo geo : source) {
-            writer.write(converter.toUriString(geo));
+            final String line = converter.toUriString(geo);
+            if (logger.isDebugEnabled()) {
+                logger.debug("save(" +line + ")");
+            }
+            writer.write(line);
             writer.write("\n");
         }
         writer.close();

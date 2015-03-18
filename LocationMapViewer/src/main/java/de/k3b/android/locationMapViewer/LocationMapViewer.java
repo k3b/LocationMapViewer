@@ -19,6 +19,7 @@
 package de.k3b.android.locationMapViewer;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,7 +33,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -69,10 +69,15 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.k3b.android.GeoUtil;
 import de.k3b.android.locationMapViewer.constants.Constants;
+import de.k3b.android.locationMapViewer.favorites.FavoriteListDialog;
+import de.k3b.android.widgets.AboutDialogPreference;
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
+import de.k3b.geo.api.IGeoRepository;
+import de.k3b.geo.io.GeoFileRepository;
 import de.k3b.geo.io.GeoUri;
 import de.k3b.geo.io.gpx.GpxReaderBase;
 import microsoft.mappoint.TileSystem;
@@ -90,10 +95,12 @@ public class LocationMapViewer extends Activity implements Constants {
     // ===========================================================
 
     private static final int MENU_SETTINGS_ID = Menu.FIRST;
-    private static final int MENU_ZOOMIN_ID = Menu.FIRST + 1;
-    private static final int MENU_ZOOMOUT_ID = MENU_ZOOMIN_ID + 2;
+    private static final int MENU_FAVORITE = Menu.FIRST + 1;
+    private static final int MENU_ABOUT = Menu.FIRST + 2;
+    private static final int MENU_FAVORITE_ADD = Menu.FIRST + 3;
 
     private static final DecimalFormat LAT_LON2TEXT = new DecimalFormat("#.#########");
+    private static final String FAVORITES_FILE_NAME = "favorites.txt";
 
     // ===========================================================
     // Fields
@@ -133,6 +140,7 @@ public class LocationMapViewer extends Activity implements Constants {
     private boolean mUsePicker;
     private GuestureOverlay mGuesturesOverlay;
     private SeekBar mZoomBar;
+    private IGeoRepository favoriteRespository;
 
     // ===========================================================
     // Constructors
@@ -233,6 +241,7 @@ public class LocationMapViewer extends Activity implements Constants {
 //        if (initalMapCenterZoom != null) {
 //            setCenterZoom(initalMapCenterZoom);
 //        }
+        favoriteRespository = new GeoFileRepository(this.getDatabasePath(FAVORITES_FILE_NAME));
     }
 
     private void createZoomBar() {
@@ -554,10 +563,10 @@ public class LocationMapViewer extends Activity implements Constants {
 
     @Override
     public boolean onCreateOptionsMenu(final Menu pMenu) {
-        pMenu.add(0, MENU_ZOOMIN_ID, Menu.NONE, "ZoomIn");
-        pMenu.add(0, MENU_ZOOMOUT_ID, Menu.NONE, "ZoomOut");
-
+        pMenu.add(0, MENU_FAVORITE_ADD, Menu.NONE, getString(R.string.title_favorites_add));
+        pMenu.add(0, MENU_FAVORITE, Menu.NONE, getString(R.string.title_favorites));
         pMenu.add(0, MENU_SETTINGS_ID, Menu.NONE, R.string.title_activity_settings);
+        pMenu.add(0, MENU_ABOUT, Menu.NONE, R.string.about_summary);
 
         return true;
     }
@@ -565,13 +574,22 @@ public class LocationMapViewer extends Activity implements Constants {
     @Override
     public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
         switch (item.getItemId()) {
-            case MENU_ZOOMIN_ID:
-                this.mMapView.getController().zoomIn();
+
+
+            case MENU_ABOUT:
+                this.showDialog(MENU_ABOUT);
                 return true;
 
-            case MENU_ZOOMOUT_ID:
-                this.mMapView.getController().zoomOut();
+            case MENU_FAVORITE:
+                this.showDialog(MENU_FAVORITE);
                 return true;
+
+            case MENU_FAVORITE_ADD: {
+                GeoPointDto favorite = GeoUtil.createFavorite(this.mMapView.getMapCenter(), this.mMapView.getZoomLevel(), "current");
+                this.favoriteRespository.load().add(favorite);
+                this.favoriteRespository.save();
+                return true;
+            }
 
             case MENU_SETTINGS_ID: {
                 // set current xyz to prefs so they can be displayed/modified in the settings
@@ -667,6 +685,11 @@ public class LocationMapViewer extends Activity implements Constants {
         setDelayedCenterZoom("setDelayedZoom", null, null, zoomLevel);
     }
 
+    /** Zoom to center / zoomLevel from favorite. */
+    public void setDelayedCenterZoom(IGeoPointInfo favorite) {
+        this.setDelayedCenterZoom("fromFavorite", GeoUtil.createOsmPoint(favorite), null, favorite.getZoomMin());
+    }
+
     /** impelementation of setDelayedXXXX() */
     private void setDelayedCenterZoom(String debugContext, final IGeoPoint min, final IGeoPoint max, final Integer zoomLevel) {
         DelayedSetCenterZoom delayedSetCenterZoom = this.mDelayedSetCenterZoom;
@@ -685,6 +708,26 @@ public class LocationMapViewer extends Activity implements Constants {
             this.mDelayedSetCenterZoom = delayedSetCenterZoom;
         }
     }
+
+    @Override
+    protected Dialog onCreateDialog(final int id) {
+        switch (id) {
+            case MENU_FAVORITE:
+                return new FavoriteListDialog(this, R.style.AppTheme, this.favoriteRespository).setCategoryCallback(new IGeoInfoHandler() {
+                    @Override
+                    public boolean onGeoInfo(IGeoPointInfo geoInfo) {
+                        setDelayedCenterZoom(geoInfo);
+                        return true;
+                    }
+                });
+
+            case MENU_ABOUT:
+                return AboutDialogPreference.createAboutDialog(this);
+
+        }
+        return null;
+    }
+
 
     // ===========================================================
     // Inner and Anonymous Classes
@@ -832,6 +875,5 @@ public class LocationMapViewer extends Activity implements Constants {
             }
         }
     }
-
 
 }

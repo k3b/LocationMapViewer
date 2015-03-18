@@ -18,7 +18,7 @@
  */
 
 /**
- * This Package defines Android independant code to handle *.gpx files with locations/trackpoints.
+ * This Package defines Android independant api as interfaces to handle geo infos.
  *
  * <ul>
  *     <li>{@link de.k3b.geo.api.GeoPointDto}:
@@ -30,4 +30,4 @@
  * </ul>
  *
  **/
-package de.k3b.geo.io.gpx;
+package de.k3b.geo.api;

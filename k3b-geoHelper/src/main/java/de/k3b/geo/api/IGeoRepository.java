@@ -19,14 +19,24 @@
 
 package de.k3b.geo.api;
 
+import java.util.List;
+
 /**
- * Defines callback for processing IGeoPointInfo items.
+ * Abstract Repository to load/save List<IGeoPointInfo> .
  *
- * Created by EVE on 20.01.2015.
+ * Created by k3b on 17.03.2015.
  */
-public interface IGeoInfoHandler {
-    /**
-     * @return true if item has been consumed
+public interface IGeoRepository {
+
+    /** load from repository
+     *
+     * @return data loaded
      */
-    boolean onGeoInfo(IGeoPointInfo geoInfo);
+    List<IGeoPointInfo> load();
+
+    /** save back to repository
+     *
+     * @return false: error.
+     */
+    boolean save();
 }

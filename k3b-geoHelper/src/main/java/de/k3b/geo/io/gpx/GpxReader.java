@@ -59,12 +59,13 @@ public class GpxReader extends GpxReaderBase implements IGeoInfoHandler {
 
     /** is called for every completed gpx-trackpoint */
     @Override
-    public void onGeoInfo(IGeoPointInfo geoInfo) {
+    public boolean onGeoInfo(IGeoPointInfo geoInfo) {
         if (mReuse != null) {
             track.add(mReuse.clone());
         } else {
             track.add(this.current);
         }
+        return true;
     }
 
 }

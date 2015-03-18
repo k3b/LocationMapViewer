@@ -181,18 +181,20 @@ public class LocationMapViewer extends Activity implements Constants {
         final IGeoInfoHandler pointCollector = (mUseClusterPoints)
             ? new IGeoInfoHandler() {
                 @Override
-                public void onGeoInfo(IGeoPointInfo aGeoPoint) {
+                public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
                     if (aGeoPoint != null) {
                         mPOIOverlayCluster.add(createMarker(mMapView, aGeoPoint));
                     }
+                    return true;
                 }
             }
             : new IGeoInfoHandler() {
                 @Override
-                public void onGeoInfo(IGeoPointInfo aGeoPoint) {
+                public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
                     if (aGeoPoint != null) {
                         mPOIOverlayNonCluster.add(createMarker(mMapView, aGeoPoint));
                     }
+                    return true;
                 }
             };
 

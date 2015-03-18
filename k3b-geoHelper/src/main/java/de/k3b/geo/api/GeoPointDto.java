@@ -143,11 +143,6 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         return timeOfMeasurement;
     }
 
-    @Override
-    public String toString() {
-        return (name != null) ? name : super.toString();
-    }
-
     /**
      * Short non-unique text used as marker label. Null if not set.
      */
@@ -257,5 +252,12 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public String toString() {
+        if (this.name != null) return this.name;
+        if (this.id != null) return "#" + this.id;
+        return super.toString();
     }
 }

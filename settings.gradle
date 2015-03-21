@@ -1,6 +1,6 @@
 // .../osmdroid/settings.gradle
 // else build may fail because of missing internetconnection
-startParameter.offline=true
+// startParameter.offline=true
 // boolean isReachable = java.net.InetAddress.getByName("www.google.com").isReachable(1500)
 // print "has internet " + isReachable
 

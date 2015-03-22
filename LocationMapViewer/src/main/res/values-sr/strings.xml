@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- In Serbian Cyrillic translation app_name alos must be localized (translated or, if name represents a trademark, transcribed) -->
+    <string name="app_name">Прегледач локација</string>
+
+    <string name="label_select">У реду</string>
+
+    <string name="title_activity_settings">Поставке</string>
+    <string name="prefs_cat_overlays_title">Слојеви мапе</string>
+
+    <string name="prefs_showLocation_summary">Прикажи моју локацију</string>
+    <string name="prefs_showMiniMap_summary">Прикажи малу мапу</string>
+    <string name="prefs_cluster_points">Тачке груписања</string>
+    <string name="prefs_cluster_points_description">означена оближња тачка приказана као једна црвена тачка</string>
+
+    <string name="prefs_current_header">Тренутни положај</string>
+    <string name="prefs_current_north">Северно</string>
+    <string name="prefs_current_east">Источно</string>
+    <string name="prefs_current_zoom">Увеличање</string>
+
+    <string name="prefs_header_development">Проналажење грешака/развој</string>
+    <!--
+    <string name="prefs_guestures_enable">Омогући експериментале гестуре</string>
+    <string name="prefs_guestures_enable_description">Подршка за DoubleTapDrag-ZoomToFit и DoubleTap-ZoomInCenter.</string>
+    -->
+    <string name="prefs_guestures_debug_enable" >Омогући проналажење грешака гестура</string>
+    <string name="prefs_guestures_debug_enable_description">Поруке проналаска грешака гестура копиране на клипборд и додате у Логкат.</string>
+
+    <string name="about_summary">О Прегледачу локација</string>
+
+
+<string name="about_content_about">"<![CDATA[
+<h1> Прегледач локација </h1>
+<p> Апликација која може да прикаже географске податке на мапи 
+Има подршку за <strong>gpx</strong> и <strong>kml</strong> 
+фајлове и <strong>geo-uri-s</strong> може да ради без мреже
+(без интернета) ако су геоподаци преузети и кеширани. </p>
+<p> Друге апликације могу да користе Прегледача локација преко
+Интент сучеља (погледајте <a
+href="https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/main/java/de/k3b/android/locationMapViewer/demo/GeoIntentDemoActivity.java">
+GeoIntentDemo.java</a>) или преко хтмл веза: <a href="geo:0,0?q=53.0,8.0(Hello)">geo:0,0?q=53.0,8.0(Здраво)</a>
+(&lt;a href=&quot;geo:0,0?q=53.0,8.0(Здраво)&quot;&gt;geo:0,0?q=53.0,8.0(Здраво)&lt;/a&gt;)<br />
+</p>
+]]>"</string>
+</resources>

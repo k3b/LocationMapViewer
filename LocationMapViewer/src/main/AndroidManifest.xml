@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="de.k3b.android.locationMapViewer">
-	<!--
-    * Copyright (C) 2015 k3b
-    *
-    * This file is part of de.k3b.android.LocationMapViewer (https://github.com/k3b/LocationMapViewer/) .
-    *
-    * This program is free software: you can redistribute it and/or modify it
-    * under the terms of the GNU General Public License as published by
-    * the Free Software Foundation, either version 3 of the License, or
-    * (at your option) any later version.
-    *
-    * This program is distributed in the hope that it will be useful, but WITHOUT
-    * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-    * FOR A PARTICULAR PURPOSE. See the GNU General Public License
-    * for more details.
-    *
-    * You should have received a copy of the GNU General Public License along with
-    * this program. If not, see <http://www.gnu.org/licenses/>
-    -->
+<!--
+* Copyright (C) 2015 k3b
+*
+* This file is part of de.k3b.android.LocationMapViewer (https://github.com/k3b/LocationMapViewer/) .
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License
+* for more details.
+*
+* You should have received a copy of the GNU General Public License along with
+* this program. If not, see <http://www.gnu.org/licenses/>
+-->
 
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="de.k3b.android.locationMapViewer">
 	<supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true"/>
 	<!--
          permission INTERNET and WRITE_EXTERNAL_STORAGE required by MapTileDownloader
@@ -53,7 +53,7 @@
 	<uses-feature android:name="android.hardware.location.network" android:required="false"/>
 	<uses-feature android:name="android.hardware.location.gps" android:required="false"/>
 	<application android:allowBackup="true" android:icon="@drawable/ic_launcher" android:label="@string/app_name"
-		 android:theme="@style/AppTheme">
+		 android:theme="@style/GlobalStyle">
 		<activity android:name=".LocationMapViewer" android:label="@string/app_name">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
@@ -120,5 +120,6 @@
 			</intent-filter>
 		</activity>
 		<activity android:name=".SettingsActivity" android:label="@string/title_activity_settings"/>
+        <activity android:name=".geopoint.GeoPointListActivity" android:label="@string/title_activity_geopoint_list"/>
 	</application>
 </manifest>

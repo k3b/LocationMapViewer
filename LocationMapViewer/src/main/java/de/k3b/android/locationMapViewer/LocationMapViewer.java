@@ -71,7 +71,7 @@ import java.util.List;
 
 import de.k3b.android.GeoUtil;
 import de.k3b.android.locationMapViewer.constants.Constants;
-import de.k3b.android.locationMapViewer.favorites.FavoriteListDialog;
+import de.k3b.android.locationMapViewer.geopoint.GeoPointListActivity;
 import de.k3b.android.widgets.AboutDialogPreference;
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
@@ -581,7 +581,7 @@ public class LocationMapViewer extends Activity implements Constants {
                 return true;
 
             case MENU_FAVORITE:
-                this.showDialog(MENU_FAVORITE);
+                GeoPointListActivity.show(this, this.favoriteRespository, R.string.title_favorites, 0);
                 return true;
 
             case MENU_FAVORITE_ADD: {
@@ -712,15 +712,6 @@ public class LocationMapViewer extends Activity implements Constants {
     @Override
     protected Dialog onCreateDialog(final int id) {
         switch (id) {
-            case MENU_FAVORITE:
-                return new FavoriteListDialog(this, R.style.AppTheme, this.favoriteRespository).setCategoryCallback(new IGeoInfoHandler() {
-                    @Override
-                    public boolean onGeoInfo(IGeoPointInfo geoInfo) {
-                        setDelayedCenterZoom(geoInfo);
-                        return true;
-                    }
-                });
-
             case MENU_ABOUT:
                 return AboutDialogPreference.createAboutDialog(this);
 

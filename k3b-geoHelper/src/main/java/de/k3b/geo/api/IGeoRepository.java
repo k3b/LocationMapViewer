@@ -22,7 +22,7 @@ package de.k3b.geo.api;
 import java.util.List;
 
 /**
- * Abstract Repository to load/save List<IGeoPointInfo> .
+ * Abstract Repository to load/save List<{@link de.k3b.geo.api.GeoPointDto} > .
  *
  * Created by k3b on 17.03.2015.
  */
@@ -32,11 +32,14 @@ public interface IGeoRepository {
      *
      * @return data loaded
      */
-    List<IGeoPointInfo> load();
+    List<GeoPointDto> load();
 
     /** save back to repository
      *
      * @return false: error.
      */
     boolean save();
+
+    /** generates a new id */
+    String createId();
 }

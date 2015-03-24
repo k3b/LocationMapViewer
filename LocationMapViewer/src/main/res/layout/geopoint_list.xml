@@ -18,27 +18,12 @@
   ~ this program. If not, see <http://www.gnu.org/licenses/>
   -->
 
-<resources>
-    <style name="GlobalStyle" >
-    </style>
-    <style name="GlobalStyle.TextView" >
-    </style>
-    <style name="GlobalStyle.TextView.Caption" >
-    </style>
-
-    <style name="GlobalStyle.Line" >
-        <item name="android:background">#FFffffff</item>
-    </style>
-
-    <style name="GlobalStyle.Line.Horizontal" >
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">1dip</item>
-    </style>
-
-    <style name="DialogStyle" >
-    </style>
-    <style name="DialogStyle.TextView" >
-    </style>
-    <style name="DialogStyle.TextView.Caption" >
-    </style>
-</resources>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		style="@style/GlobalStyle"
+	android:layout_width="wrap_content" android:layout_height="fill_parent">
+	<ListView android:id="@+id/android:list" android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:fastScrollEnabled="true" />
+	<TextView android:id="@+id/android:empty"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"
+		android:text="@string/no_items_found" />
+</LinearLayout>

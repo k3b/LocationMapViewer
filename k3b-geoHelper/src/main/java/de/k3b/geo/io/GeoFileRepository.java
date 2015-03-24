@@ -29,14 +29,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-import de.k3b.geo.api.IGeoPointInfo;
+import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoRepository;
 
 /**
- * Repository to load/save List<IGeoPointInfo> in a file.
+ * Repository to load/save List< {@link de.k3b.geo.api.GeoPointDto} > in a file.
  *
  * Created by k3b on 17.03.2015.
  */
@@ -46,7 +48,7 @@ public class GeoFileRepository implements IGeoRepository {
     private static final GeoUri converter = new GeoUri(GeoUri.OPT_DEFAULT);
 
     private final File file;
-    private List<IGeoPointInfo> data = null;
+    private List<GeoPointDto> data = null;
 
     public GeoFileRepository(File file) {
         this.file = file;
@@ -56,7 +58,7 @@ public class GeoFileRepository implements IGeoRepository {
      *
      * @return data loaded
      */
-    public List<IGeoPointInfo> load() {
+    public List<GeoPointDto> load() {
         if (data == null) {
             data = new ArrayList<>();
             if (this.file.exists()) {
@@ -75,6 +77,9 @@ public class GeoFileRepository implements IGeoRepository {
         return data;
     }
 
+    public String createId() {
+        return UUID.randomUUID().toString();
+    }
     /** save to repository
      *
      * @return false: error.
@@ -101,21 +106,22 @@ public class GeoFileRepository implements IGeoRepository {
     }
 
     // load(new InputStreamReader(inputStream, "UTF-8"))
-    static void load(List<IGeoPointInfo> result, Reader reader) throws IOException {
+    static void load(List<GeoPointDto> result, Reader reader) throws IOException {
         String line;
         BufferedReader br = new BufferedReader(reader);
         while ((line = br.readLine()) != null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("load(" +line + ")");
             }
-            IGeoPointInfo geo = converter.fromUri(line);
+
+            GeoPointDto geo = converter.fromUri(line, new GeoPointDto());
             if (geo != null) result.add(geo);
         }
         br.close();
     }
 
-    static void save(List<IGeoPointInfo> source, Writer writer) throws IOException {
-        for (IGeoPointInfo geo : source) {
+    static void save(List<GeoPointDto> source, Writer writer) throws IOException {
+        for (GeoPointDto geo : source) {
             final String line = converter.toUriString(geo);
             if (logger.isDebugEnabled()) {
                 logger.debug("save(" +line + ")");

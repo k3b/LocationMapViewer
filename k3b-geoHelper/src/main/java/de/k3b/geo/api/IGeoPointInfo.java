@@ -26,7 +26,7 @@ import java.util.Date;
  * <p/>
  * Created by k3b on 13.01.2015.
  */
-public interface IGeoPointInfo extends ILocation {
+public interface IGeoPointInfo extends ILocation, Cloneable  {
     public static final double NO_LAT_LON = Double.MIN_VALUE;
     public static final int NO_ZOOM = -1;
 
@@ -46,26 +46,37 @@ public interface IGeoPointInfo extends ILocation {
      * In show view: navigate map to this zoom level.<br/>
      * In geo data: filter - this item is only shown if current zoom-level is >= this value.<br/>
      * NO_LAT_LON if not set.<br/>
-     * NO_ZOOM means no lower bound. */
+     * NO_ZOOM means no lower bound.
+     * persistet in uri as ...&z=4 */
     int getZoomMin();
 
-    /** Optional in geo data as filter criteria: this item is only shown if current zoom-level is <= this value. NO_ZOOM means no upper bound. */
+    /** Optional in geo data as filter criteria: this item is only shown
+     * if current zoom-level is <= this value. NO_ZOOM means no upper bound.
+     * persistet in uri as ...&z2=6 */
     int getZoomMax();
 
     /** Optional: Date when the measurement was taken. Null if unknown.<br/>
      * This may be shown in a map as an alternative label.
-     * or used as a filter to include only geopoints of a certain date range */
+     * or used as a filter to include only geopoints of a certain date range.
+     * persistet in uri as ...&t=2015-03-24T15:39:52z  */
     Date getTimeOfMeasurement();
 
-    /** Optional: Short non-unique text used as marker label. Null if not set. */
+    /** Optional: Short non-unique text used as marker label. Null if not set.
+     * persistet in uri as ?q=...(name) */
     String getName();
 
-    /** Optional: Detailed description of the point displayed in popup on long-click . Null if not set. */
+    /** Optional: Detailed description of the point displayed in popup on long-click .
+     * Null if not set.
+     * persistet in uri as ...&d=someDescription */
     String getDescription();
 
-    /** Optional: if not null: a unique id for this item. */
+    /** Optional: if not null: a unique id for this item.
+     * persistet in uri as ...&id=4711 */
     String getId();
 
-    /** Optional: if not null: uri belonging to this item. */
+    /** Optional: if not null: uri belonging to this item.
+     * persistet in uri as ...&uri=file://path/to/file.jpg */
     String getUri();
+
+    IGeoPointInfo clone();
 }

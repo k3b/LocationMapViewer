@@ -57,7 +57,6 @@ GeoIntentDemo.java</a>) or through html links similar to <a href="geo:0,0?q=53.0
 
     <!-- added in version 0.3.* -->
     <string name="title_favorites">Favorites</string>
-    <string name="title_favorites_add">Add to Favorites</string>
 
     <string name="no_items_found">No items Found</string>
 

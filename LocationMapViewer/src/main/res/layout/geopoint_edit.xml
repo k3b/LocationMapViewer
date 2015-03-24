@@ -23,48 +23,48 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     <TextView
-	    android:id="@+id/category_name"
+	    android:id="@+id/label_name"
         android:text="Name:"
         android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		/>
 
 	<EditText
-	    android:id="@+id/edit_time_category_name_field"
+	    android:id="@+id/edit_name"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:layout_below="@+id/category_name"
+	    android:layout_below="@+id/label_name"
 	    android:inputType="textCapWords"
 	    android:text="" />
 	<TextView 
-	    android:id="@+id/category_description"
+	    android:id="@+id/label_description"
 	    android:text="Description:"
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
-		android:layout_below="@+id/edit_time_category_name_field"
+		android:layout_below="@+id/edit_name"
 		/>
 
 	<EditText
-	    android:id="@+id/edit_time_category_desc_field"
+	    android:id="@+id/edit_description"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:layout_below="@+id/category_description"
+	    android:layout_below="@+id/label_description"
 	    android:inputType="textCapSentences"
 	    android:text="" />
 
 	<Button
-	    android:id="@+id/edit_time_category_save_button"
+	    android:id="@+id/cmd_save"
 	    android:text="@string/cmd_save" 
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content"
-        android:layout_below="@+id/edit_time_category_desc_field"
+        android:layout_below="@+id/edit_description"
 		android:textSize="20sp"/>
 	<Button 
-		android:id="@+id/edit_time_category_cancel_button" 
+		android:id="@+id/cmd_cancel"
 	    android:text="@string/cmd_cancel" 
 	    android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-        android:layout_below="@+id/edit_time_category_desc_field"
+        android:layout_below="@+id/edit_description"
         android:layout_toRightOf="@+id/cmd_save"
         android:textSize="20sp"
 		android:layout_gravity="left"/>

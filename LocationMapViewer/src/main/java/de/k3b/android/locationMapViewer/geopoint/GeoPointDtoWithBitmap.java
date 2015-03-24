@@ -17,35 +17,32 @@
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 
-package de.k3b.geo.api;
+package de.k3b.android.locationMapViewer.geopoint;
 
-import java.util.List;
+import android.graphics.Bitmap;
+
+import java.io.Serializable;
+
+import de.k3b.geo.api.GeoPointDto;
 
 /**
- * Abstract Repository to load/save List<{@link de.k3b.geo.api.GeoPointDto} > .
+ * a GeoPoint with a bitmap.
  *
- * Created by k3b on 17.03.2015.
+ * Created by k3b on 24.03.2015.
  */
-public interface IGeoRepository<T extends GeoPointDto> {
+public class GeoPointDtoWithBitmap extends GeoPointDto implements Serializable {
+    public static final int WIDTH = 16;
+    public static final int HEIGHT = 16;
+    /** a bitmap representing the GeoPoint */
+    private Bitmap bitmap = null;
 
-    /** (cached) load from repository
-     *
-     * @return data loaded
-     */
-    List<T> load();
+    /** a bitmap representing the GeoPoint */
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
 
-    /** uncached, fresh load from repository
-     *
-     * @return data loaded
-     */
-    List<T> reload();
-
-    /** save back to repository
-     *
-     * @return false: error.
-     */
-    boolean save();
-
-    /** generates a new id */
-    String createId();
+    public GeoPointDtoWithBitmap setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+        return this;
+    }
 }

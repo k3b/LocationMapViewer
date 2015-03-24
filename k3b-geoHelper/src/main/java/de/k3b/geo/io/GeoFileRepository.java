@@ -29,12 +29,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.api.IGeoRepository;
 
 /**
@@ -42,23 +42,30 @@ import de.k3b.geo.api.IGeoRepository;
  *
  * Created by k3b on 17.03.2015.
  */
-public class GeoFileRepository implements IGeoRepository {
+public class GeoFileRepository<T extends GeoPointDto> implements IGeoRepository<T> {
     private static final Logger logger = LoggerFactory.getLogger(GeoFileRepository.class);
 
+    /** used to translate between {@link de.k3b.geo.api.IGeoPointInfo} and uri string */
     private static final GeoUri converter = new GeoUri(GeoUri.OPT_DEFAULT);
 
+    /** where data is loaded from/saved to */
     private final File file;
-    private List<GeoPointDto> data = null;
+    private final T factory;
 
-    public GeoFileRepository(File file) {
+    /** the content of the repository */
+    private List<T> data = null;
+
+    /** connect repository to file */
+    public GeoFileRepository(File file, T factory) {
         this.file = file;
+        this.factory = factory;
     }
 
     /** load from repository
      *
      * @return data loaded
      */
-    public List<GeoPointDto> load() {
+    public List<T> load() {
         if (data == null) {
             data = new ArrayList<>();
             if (this.file.exists()) {
@@ -77,9 +84,22 @@ public class GeoFileRepository implements IGeoRepository {
         return data;
     }
 
+    /**
+     * uncached, fresh load from repository
+     *
+     * @return data loaded
+     */
+    @Override
+    public List<T> reload() {
+        this.data = null;
+        return load();
+    }
+
+    /** generate a new id */
     public String createId() {
         return UUID.randomUUID().toString();
     }
+
     /** save to repository
      *
      * @return false: error.
@@ -106,29 +126,59 @@ public class GeoFileRepository implements IGeoRepository {
     }
 
     // load(new InputStreamReader(inputStream, "UTF-8"))
-    static void load(List<GeoPointDto> result, Reader reader) throws IOException {
+    /** load points from reader */
+    void load(List<T> result, Reader reader) throws IOException {
         String line;
         BufferedReader br = new BufferedReader(reader);
         while ((line = br.readLine()) != null) {
+            T geo = loadItem(line);
+            final boolean valid = isValid(geo);
             if (logger.isDebugEnabled()) {
-                logger.debug("load(" +line + ")");
+                logger.debug("load(" +line + "): " + ((valid) ? "loaded" : "ignored" ));
             }
 
-            GeoPointDto geo = converter.fromUri(line, new GeoPointDto());
-            if (geo != null) result.add(geo);
+            if (valid) result.add(geo);
         }
         br.close();
     }
 
-    static void save(List<GeoPointDto> source, Writer writer) throws IOException {
-        for (GeoPointDto geo : source) {
-            final String line = converter.toUriString(geo);
-            if (logger.isDebugEnabled()) {
-                logger.debug("save(" +line + ")");
-            }
+    protected T loadItem(String line) {
+        return converter.fromUri(line, create());
+    }
+
+    protected T create() {
+        return (T) factory.clone().clear();
+    }
+
+    /** save points to writer */
+    void save(List<T> source, Writer writer) throws IOException {
+        for (T geo : source) {
+            saveItem(writer, geo);
+        }
+        writer.close();
+    }
+
+    protected boolean saveItem(Writer writer, T geo) throws IOException {
+        final boolean valid = isValid(geo);
+
+        final String line = converter.toUriString(geo);
+        if (valid) {
             writer.write(line);
             writer.write("\n");
         }
-        writer.close();
+        if (logger.isDebugEnabled()) {
+            logger.debug("save(" + line + "): " + ((valid) ? "saved" : "ignored" ));
+        }
+        return valid;
+    }
+
+    /** returns true if geo should be loaded from / saved to repository */
+    private static boolean isValid(IGeoPointInfo geo) {
+        return ((geo != null) && (isValidId(geo.getId())));
+    }
+
+    /** returns true if geo.id should be loaded from / saved to repository */
+    private static boolean isValidId(String id) {
+        return ((id != null) && (!id.startsWith("#")));
     }
 }

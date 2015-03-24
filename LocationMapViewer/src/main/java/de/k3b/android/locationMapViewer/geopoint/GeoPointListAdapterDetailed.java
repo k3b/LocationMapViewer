@@ -26,15 +26,19 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Locale;
 
 import de.k3b.android.locationMapViewer.R;
 import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.api.IGeoRepository;
 
 /** Adapter to display IGeoPointInfo in a ListView. */
 class GeoPointListAdapterDetailed extends
-        ArrayAdapter<GeoPointDto> {
+        ArrayAdapter<GeoPointDtoWithBitmap> {
 
     /**
      * Corresponds to filter ignore catagory or edit to create a new category
@@ -42,47 +46,32 @@ class GeoPointListAdapterDetailed extends
     public static final int NO_CATEGORY = -1;
 
     /**
-     * false means short disply only with categoryname but witout description
-     */
-    private final boolean withDescription;
-
-    /**
      * The Resource used for the adapter
      */
     private final int viewId;
 
-    /**
-     * Workaround for recycled Items: Sometimes Text is not visible because
-     * previous ItemHeight==0 is sometimes remembered.
-     */
-    private int itemHight = 0;
-
     private GeoPointListAdapterDetailed(final Context context,
-                                        final int textViewResourceId, final List<GeoPointDto> items,
-                                        final boolean withDescription) {
+                                        final int textViewResourceId, final List<GeoPointDtoWithBitmap> items) {
         super(context, textViewResourceId, items);
-        this.withDescription = withDescription;
         this.viewId = textViewResourceId;
     }
 
-    public static ArrayAdapter<GeoPointDto> createAdapter(
+    public static ArrayAdapter<GeoPointDtoWithBitmap> createAdapter(
             final Context context, final int viewId,
-            final boolean withDescription,
-            final GeoPointDto firstElement,
+            final GeoPointDtoWithBitmap firstElement,
             final IGeoRepository repository) {
-        final List<GeoPointDto> categories = repository.load();
+        final List<GeoPointDtoWithBitmap> items = repository.reload();
 
         if (firstElement != null) {
-            categories.add(0, firstElement);
+            items.add(0, firstElement);
         }
-        return new GeoPointListAdapterDetailed(context, viewId, categories,
-                withDescription);
+        return new GeoPointListAdapterDetailed(context, viewId, items);
     }
 
     @Override
     public View getView(final int position, final View convertView,
                         final ViewGroup parent) {
-        final GeoPointDto obj = this.getItem(position);
+        final GeoPointDtoWithBitmap obj = this.getItem(position);
 
         View itemView = convertView;
         if (itemView == null) {
@@ -99,54 +88,35 @@ class GeoPointListAdapterDetailed extends
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         itemView = vi.inflate(this.viewId, null);
 
-        if ((this.itemHight == 0) && (this.withDescription)) {
-            this.itemHight = itemView.findViewById(R.id.description)
-                    .getHeight();
-
-        }
         return itemView;
     }
 
-    private void setItemContent(final View itemView, final GeoPointDto dto) {
+    private void setItemContent(final View itemView, final IGeoPointInfo dto) {
         if (dto != null) {
             final TextView nameView = (TextView) itemView
                     .findViewById(R.id.name);
             final TextView descriptionView = (TextView) itemView
                     .findViewById(R.id.description);
-            final TextView activeView = (TextView) itemView
-                    .findViewById(R.id.active);
 
-            if (this.withDescription) {
-                this.setTextViewContent(descriptionView, dto.getDescription());
-                this.setTextViewContent(activeView, dto.getUri());
-                this.setTextViewContent(nameView, dto.toString());
-            } else {
-                this.setTextViewContent(descriptionView, null);
-                this.setTextViewContent(activeView, null);
-                this.setTextViewContent(nameView, dto.toString());
-            }
+            this.setTextViewContent(descriptionView, toString(dto));
+            this.setTextViewContent(nameView, dto.getName());
         }
     }
 
     private void setTextViewContent(final TextView view, final String text) {
         if (view != null) {
-            if (this.itemHight == 0) {
-                this.itemHight = view.getHeight();
-            }
             if ((text != null) && (text.length() > 0)) {
                 view.setText(text);
-                if (this.itemHight == 0) {
-                    this.itemHight = view.getHeight();
-                }
-                if ((this.itemHight > 0) && (view.getHeight() == 0)) {
-                    // Workaround for recycled Items:
-                    // Sometimes Text is not visible because previous
-                    // ItemHeight==0 is sometimes remembered.
-                    view.setHeight(this.itemHight);
-                }
-            } else {
-                view.setHeight(0);
             }
         }
+    }
+
+    private static final DecimalFormat latLonFormatter = new DecimalFormat("#.#######", new DecimalFormatSymbols(Locale.ENGLISH));
+
+    /** formatting helper: */
+    private static String toString(IGeoPointInfo geoPoint) {
+        return "(n/e)=(" +
+                latLonFormatter.format(geoPoint.getLatitude()) + "/" +
+                latLonFormatter.format(geoPoint.getLongitude())+ ");z=" + geoPoint.getZoomMin();
     }
 }

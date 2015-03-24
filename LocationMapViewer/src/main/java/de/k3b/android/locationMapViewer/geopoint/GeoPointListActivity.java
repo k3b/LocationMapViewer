@@ -34,7 +34,6 @@ import android.widget.AdapterView;
 import java.util.List;
 
 import de.k3b.android.locationMapViewer.R;
-import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.api.IGeoRepository;
@@ -52,22 +51,30 @@ public class GeoPointListActivity extends ListActivity implements
     private static final String NEW_ITEM = "#newitem";
 
     /** parameter from caller to this: paramRepository where does data come from/go to */
-    private static IGeoRepository paramRepository;
+    private static IGeoRepository<GeoPointDtoWithBitmap> paramRepository;
     /** parameter from caller to this: paramResourceIdActivityTitle resourceid of the list caption */
     private static int paramResourceIdActivityTitle;
+    /** parameter from caller to this: paramResourceIdActivityTitle resourceid of the list caption */
+    private static GeoPointDtoWithBitmap paramCurrentZoom;
 
-    private IGeoRepository repository = null;
-    private GeoPointDto geoPointInfoClicked;
+    private IGeoRepository<GeoPointDtoWithBitmap> repository = null;
+    private GeoPointDtoWithBitmap geoPointInfoClicked;
     private GeoPointEditDialog edit = null;
 
     /** pseudo item as placeholder for creating a new item */
-    private final GeoPointDto newGeoPointInfo = new GeoPointDto();
+    private GeoPointDtoWithBitmap newGeoPointInfo = null;
 
     /** public api to show this list */
-    public static void show(Context context, IGeoRepository repository, int resourceIdActivityTitle, int idOnOkResultCode) {
+    public static void show(
+            Context context,
+            IGeoRepository<GeoPointDtoWithBitmap> repository,
+            int resourceIdActivityTitle,
+            int idOnOkResultCode,
+            GeoPointDtoWithBitmap currentZoom) {
         // parameters to be consumed in onCreate()
         GeoPointListActivity.paramRepository = repository;
         GeoPointListActivity.paramResourceIdActivityTitle = resourceIdActivityTitle;
+        GeoPointListActivity.paramCurrentZoom = currentZoom;
 
         final Intent intent = new Intent().setClass(context,
                 GeoPointListActivity.class);
@@ -88,20 +95,23 @@ public class GeoPointListActivity extends ListActivity implements
         paramRepository = null;
         this.setTitle(getString(paramResourceIdActivityTitle));
 
+        this.newGeoPointInfo = GeoPointListActivity.paramCurrentZoom;
+        GeoPointListActivity.paramCurrentZoom = null;
+
         setNewItemPlaceholder(this.newGeoPointInfo);
         this.registerForContextMenu(this.getListView());
         this.reloadGuiFromRepository();
     }
 
     /** sets data for NewItemPlaceholder */
-    private GeoPointDto setNewItemPlaceholder(final GeoPointDto newGeoPointInfo) {
-        newGeoPointInfo.clear().setName(getString(R.string.point_new_item_placeholder)).setId(NEW_ITEM);
+    private GeoPointDtoWithBitmap setNewItemPlaceholder(final GeoPointDtoWithBitmap newGeoPointInfo) {
+        newGeoPointInfo.setName(getString(R.string.point_new_item_placeholder)).setId(NEW_ITEM);
         return newGeoPointInfo;
     }
 
     private void reloadGuiFromRepository() {
         this.setListAdapter(GeoPointListAdapterDetailed.createAdapter(this,
-                R.layout.geopoint_list_view_row, true, newGeoPointInfo, repository));
+                R.layout.geopoint_list_view_row, newGeoPointInfo, repository));
     }
 
     /**
@@ -115,9 +125,10 @@ public class GeoPointListActivity extends ListActivity implements
             this.showGeoPointEditDialog(null);
             return true;
         } else if (NEW_ITEM.compareTo(geoPointInfo.getId()) == 0) {
-            List<GeoPointDto> items = this.repository.load();
-            geoPointInfo = this.newGeoPointInfo.clone().setId(this.repository.createId() );
-            items.add(1, (GeoPointDto) geoPointInfo);
+            List<GeoPointDtoWithBitmap> items = this.repository.load();
+            GeoPointDtoWithBitmap newItem = (GeoPointDtoWithBitmap) this.newGeoPointInfo.clone();
+            newItem.setBitmap(this.newGeoPointInfo.getBitmap()).setId(this.repository.createId() );
+            items.add(1, newItem);
             saveChangesToRepository();
         } else {
             saveChangesToRepository();
@@ -127,28 +138,19 @@ public class GeoPointListActivity extends ListActivity implements
     }
 
     private void saveChangesToRepository() {
-        List<GeoPointDto> items = this.repository.load();
-        if ((items != null) && (items.size() > 0)) {
-            GeoPointDto tempItem = items.get(0);
-
-            if (NEW_ITEM.compareTo(tempItem.getId()) == 0) {
-                items.remove(0);
-            }
-        }
-        this.repository.save();
         this.setNewItemPlaceholder(this.newGeoPointInfo);
-        items.add(0,this.newGeoPointInfo);
+        this.repository.save();
     }
 
     private boolean isValid(final IGeoPointInfo geoPointInfo) {
-        return (geoPointInfo != null) && (geoPointInfo instanceof GeoPointDto);
+        return (geoPointInfo != null) && (geoPointInfo instanceof GeoPointDtoWithBitmap);
     }
 
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v,
                                     final ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        this.geoPointInfoClicked = (GeoPointDto) this
+        this.geoPointInfoClicked = (GeoPointDtoWithBitmap) this
                 .getListView()
                 .getItemAtPosition(((AdapterView.AdapterContextMenuInfo) menuInfo).position);
 
@@ -208,7 +210,7 @@ public class GeoPointListActivity extends ListActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    public void showGeoPointEditDialog(final GeoPointDto geoPointInfo) {
+    public void showGeoPointEditDialog(final GeoPointDtoWithBitmap geoPointInfo) {
         if (this.edit == null) {
             this.edit = new GeoPointEditDialog(this, this);
         }

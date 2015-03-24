@@ -37,10 +37,10 @@ import de.k3b.geo.api.IGeoPointInfo;
  */
 public class GeoPointEditDialog extends Dialog implements IGeoInfoHandler {
     private final IGeoInfoHandler dialogResultConsumer;
-    private final EditText catNameField;
-    private final EditText catDescField;
-    private final Button saveButton;
-    private final Button cancelButton;
+    private final EditText editName;
+    private final EditText editDescription;
+    private final Button buttonSave;
+    private final Button buttonCancel;
 
     private GeoPointDto mCategory;
 
@@ -48,25 +48,25 @@ public class GeoPointEditDialog extends Dialog implements IGeoInfoHandler {
         super(context);
         this.dialogResultConsumer = dialogResultConsumer;
         this.setContentView(R.layout.geopoint_edit);
-        this.catNameField = (EditText) this
-                .findViewById(R.id.edit_time_category_name_field);
-        this.catDescField = (EditText) this
-                .findViewById(R.id.edit_time_category_desc_field);
-        this.saveButton = (Button) this
-                .findViewById(R.id.edit_time_category_save_button);
-        this.cancelButton = (Button) this
-                .findViewById(R.id.edit_time_category_cancel_button);
+        this.editName = (EditText) this
+                .findViewById(R.id.edit_name);
+        this.editDescription = (EditText) this
+                .findViewById(R.id.edit_description);
+        this.buttonSave = (Button) this
+                .findViewById(R.id.cmd_save);
+        this.buttonCancel = (Button) this
+                .findViewById(R.id.cmd_cancel);
 
-        this.catNameField.setWidth(200);
-        this.catDescField.setWidth(404);
-        this.saveButton.setOnClickListener(new View.OnClickListener() {
+        this.editName.setWidth(200);
+        this.editDescription.setWidth(404);
+        this.buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
                 saveChangesAndExit(GeoPointEditDialog.this.dialogResultConsumer);
             }
 
         });
-        this.cancelButton.setOnClickListener(new View.OnClickListener() {
+        this.buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
                 cancel();
@@ -80,8 +80,8 @@ public class GeoPointEditDialog extends Dialog implements IGeoInfoHandler {
     }
 
     private void saveChangesAndExit(final IGeoInfoHandler owner) {
-        this.mCategory.setName(this.catNameField.getText().toString());
-        this.mCategory.setDescription(this.catDescField.getText().toString());
+        this.mCategory.setName(this.editName.getText().toString());
+        this.mCategory.setDescription(this.editDescription.getText().toString());
         if (owner != null) {
             owner.onGeoInfo(this.mCategory);
         }

@@ -22,13 +22,26 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+    <ImageView
+        android:id="@+id/thumbnail"
+        android:layout_width="@dimen/thumb_width"
+        android:layout_height="@dimen/thumb_height" />
+
+    <TextView
+        android:id="@+id/label_id"
+        android:text="id:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/thumbnail"
+        />
+
     <TextView
 	    android:id="@+id/label_name"
         android:text="Name:"
         android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+        android:layout_below="@id/thumbnail"
 		/>
-
 	<EditText
 	    android:id="@+id/edit_name"
 	    android:layout_width="match_parent"
@@ -36,35 +49,105 @@
 	    android:layout_below="@+id/label_name"
 	    android:inputType="textCapWords"
 	    android:text="" />
-	<TextView 
-	    android:id="@+id/label_description"
-	    android:text="Description:"
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
-		android:layout_below="@+id/edit_name"
-		/>
 
-	<EditText
-	    android:id="@+id/edit_description"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_below="@+id/label_description"
-	    android:inputType="textCapSentences"
-	    android:text="" />
+    <TextView
+        android:id="@+id/label_latitude"
+        android:text="latitude:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edit_name"
+        />
+    <EditText
+        android:id="@+id/edit_latitude"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/label_latitude"
+        android:text="" />
+
+    <TextView
+        android:layout_below="@id/edit_latitude"
+        android:id="@+id/label_longitude"
+        android:text="longitude:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    <EditText
+        android:id="@+id/edit_longitude"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/label_longitude"
+        android:text="" />
+
+    <TextView
+        android:layout_below="@id/edit_longitude"
+        android:id="@+id/label_zoom"
+        android:text="zoom:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    <EditText
+        android:id="@+id/edit_zoom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/label_zoom"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/label_description"
+        android:text="Description:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edit_zoom"
+        />
+    <EditText
+        android:id="@+id/edit_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/label_description"
+        android:inputType="textCapSentences"
+        android:text="" />
+
+    <TextView
+        android:layout_below="@id/edit_description"
+        android:id="@+id/label_time"
+        android:text="time:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    <EditText
+        android:id="@+id/edit_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/label_time"
+        android:text="" />
+
+    <TextView
+        android:layout_below="@id/edit_time"
+        android:id="@+id/label_uri"
+        android:text="uri:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    <EditText
+        android:id="@+id/edit_uri"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/label_uri"
+        android:text="" />
 
 	<Button
 	    android:id="@+id/cmd_save"
 	    android:text="@string/cmd_save" 
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content"
-        android:layout_below="@+id/edit_description"
+        android:layout_below="@+id/edit_uri"
 		android:textSize="20sp"/>
 	<Button 
 		android:id="@+id/cmd_cancel"
 	    android:text="@string/cmd_cancel" 
 	    android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-        android:layout_below="@+id/edit_description"
+        android:layout_below="@+id/edit_uri"
         android:layout_toRightOf="@+id/cmd_save"
         android:textSize="20sp"
 		android:layout_gravity="left"/>

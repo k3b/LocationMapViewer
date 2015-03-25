@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -91,15 +92,18 @@ class GeoPointListAdapterDetailed extends
         return itemView;
     }
 
-    private void setItemContent(final View itemView, final IGeoPointInfo dto) {
+    private void setItemContent(final View itemView, final GeoPointDtoWithBitmap dto) {
         if (dto != null) {
             final TextView nameView = (TextView) itemView
                     .findViewById(R.id.name);
             final TextView descriptionView = (TextView) itemView
                     .findViewById(R.id.description);
+            final ImageView thumbnail = (ImageView) itemView.findViewById(R.id.thumbnail);
 
             this.setTextViewContent(descriptionView, toString(dto));
             this.setTextViewContent(nameView, dto.getName());
+
+            thumbnail.setImageBitmap(dto.getBitmap());
         }
     }
 
@@ -115,8 +119,8 @@ class GeoPointListAdapterDetailed extends
 
     /** formatting helper: */
     private static String toString(IGeoPointInfo geoPoint) {
-        return "(n/e)=(" +
+        return " (" +
                 latLonFormatter.format(geoPoint.getLatitude()) + "/" +
-                latLonFormatter.format(geoPoint.getLongitude())+ ");z=" + geoPoint.getZoomMin();
+                latLonFormatter.format(geoPoint.getLongitude())+ ") z=" + geoPoint.getZoomMin();
     }
 }

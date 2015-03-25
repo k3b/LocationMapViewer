@@ -31,8 +31,8 @@ import de.k3b.geo.api.GeoPointDto;
  * Created by k3b on 24.03.2015.
  */
 public class GeoPointDtoWithBitmap extends GeoPointDto implements Serializable {
-    public static final int WIDTH = 16;
-    public static final int HEIGHT = 16;
+    public static final int WIDTH = 32;
+    public static final int HEIGHT = 32;
     /** a bitmap representing the GeoPoint */
     private Bitmap bitmap = null;
 

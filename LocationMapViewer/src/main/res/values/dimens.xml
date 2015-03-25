@@ -22,4 +22,7 @@ this program. If not, see <http://www.gnu.org/licenses/>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="thumb_width">32px</dimen>
+    <dimen name="thumb_height">32px</dimen>
+    <dimen name="vspace_between_list_item">4px</dimen>
 </resources>

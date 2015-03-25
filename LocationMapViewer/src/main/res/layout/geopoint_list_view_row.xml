@@ -18,18 +18,26 @@
   ~ this program. If not, see <http://www.gnu.org/licenses/>
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="0dip"
     android:layout_weight="1"
     android:layout_height="fill_parent">
+    <ImageView
+        android:id="@+id/thumbnail"
+        android:layout_width="@dimen/thumb_width"
+        android:layout_height="@dimen/thumb_height" />
     <TextView android:id="@+id/name"
+        android:layout_marginLeft="@dimen/vspace_between_list_item"
         android:layout_width="fill_parent"
-        android:layout_height="0dip" android:layout_weight="1" android:textSize="16sp"
+        android:layout_height="wrap_content" android:layout_weight="1" android:textSize="16sp"
+        android:layout_toRightOf="@id/thumbnail"
         android:gravity="center_vertical" android:textColor="#FFFFFF"/>
     <TextView android:id="@+id/description"
         android:layout_width="fill_parent"
-        android:layout_height="0dip" android:layout_weight="1"
-        android:layout_marginLeft="6dip"
+        android:layout_height="wrap_content" android:layout_weight="1"
+        android:layout_marginLeft="@dimen/vspace_between_list_item"
+        android:layout_toRightOf="@id/thumbnail"
+        android:layout_below="@id/name"
         android:singleLine="true" android:ellipsize="marquee" />
-</LinearLayout>
+</RelativeLayout>

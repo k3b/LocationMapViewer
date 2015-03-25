@@ -32,11 +32,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoPointInfo;
+import de.k3b.util.IsoDateTimeParser;
 
 /**
  * Converts between a {@link de.k3b.geo.api.IGeoPointInfo} and a uri string.<br/>
@@ -93,6 +95,9 @@ public class GeoUri {
     /** for uri-formatter: next delimiter for a parameter. can be "?" or "&"  */
     private String delim;
 
+    static {
+        timeFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
     /** create wit options from OPT_xxx */
     public GeoUri(int options) {
         this.options = options;
@@ -180,14 +185,10 @@ public class GeoUri {
     /** parsing helper: Get the first datetime finding in whereToSearch if currentValue is not set yet.
      * Returns currentValue or finding as Date . */
     private Date parseTimeFromPattern(String currentValue, List<String> whereToSearch) {
-        String match = parseFindFromPattern(patternTime, currentValue, whereToSearch);
+        String match = parseFindFromPattern(IsoDateTimeParser.ISO8601_FRACTIONAL_PATTERN, currentValue, whereToSearch);
 
         if (match != null) {
-            try {
-                return timeFormatter.parse(match);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            return IsoDateTimeParser.parse(match);
         }
         return null;
     }

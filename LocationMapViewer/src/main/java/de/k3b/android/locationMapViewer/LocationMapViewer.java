@@ -71,15 +71,14 @@ import java.util.List;
 
 import de.k3b.android.GeoUtil;
 import de.k3b.android.locationMapViewer.constants.Constants;
-import de.k3b.android.locationMapViewer.geopoint.GeoBmpFileRepository;
-import de.k3b.android.locationMapViewer.geopoint.GeoPointDtoWithBitmap;
-import de.k3b.android.locationMapViewer.geopoint.GeoPointListActivity;
+import de.k3b.android.locationMapViewer.geobmp.GeoBmpDto;
+import de.k3b.android.locationMapViewer.geobmp.GeoBmpFileRepository;
+import de.k3b.android.locationMapViewer.geobmp.GeoBmpListActivity;
 import de.k3b.android.widgets.AboutDialogPreference;
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.api.IGeoRepository;
-import de.k3b.geo.io.GeoFileRepository;
 import de.k3b.geo.io.GeoUri;
 import de.k3b.geo.io.gpx.GpxReaderBase;
 import microsoft.mappoint.TileSystem;
@@ -141,7 +140,7 @@ public class LocationMapViewer extends Activity implements Constants {
     private boolean mUsePicker;
     private GuestureOverlay mGuesturesOverlay;
     private SeekBar mZoomBar;
-    private IGeoRepository<GeoPointDtoWithBitmap> favoriteRespository;
+    private IGeoRepository<GeoBmpDto> favoriteRespository;
 
     // ===========================================================
     // Constructors
@@ -581,8 +580,8 @@ public class LocationMapViewer extends Activity implements Constants {
                 return true;
 
             case MENU_FAVORITE:
-                GeoPointDtoWithBitmap current = getCurrentAsGeoPointDto();
-                GeoPointListActivity.show(this, this.favoriteRespository, R.string.title_favorites, 0, current);
+                GeoBmpDto current = getCurrentAsGeoPointDto();
+                GeoBmpListActivity.show(this, this.favoriteRespository, R.string.title_favorites, 0, current);
                 return true;
 
             case MENU_SETTINGS_ID: {
@@ -601,10 +600,10 @@ public class LocationMapViewer extends Activity implements Constants {
         return false;
     }
 
-    GeoPointDtoWithBitmap getCurrentAsGeoPointDto() {
-        GeoPointDtoWithBitmap current = new GeoPointDtoWithBitmap();
+    GeoBmpDto getCurrentAsGeoPointDto() {
+        GeoBmpDto current = new GeoBmpDto();
         GeoUtil.createFavorite(this.mMapView.getMapCenter(), this.mMapView.getZoomLevel(), "current", current);
-        current.setBitmap(GeoUtil.createBitmapFromMapView(mMapView, GeoPointDtoWithBitmap.WIDTH,GeoPointDtoWithBitmap.HEIGHT));
+        current.setBitmap(GeoUtil.createBitmapFromMapView(mMapView, GeoBmpDto.WIDTH, GeoBmpDto.HEIGHT));
         return current;
     }
 
@@ -831,7 +830,7 @@ public class LocationMapViewer extends Activity implements Constants {
 
     //7. Customizing the bubble behaviour
     class CustomInfoWindow extends MarkerInfoWindow {
-        GeoPointDtoWithBitmap mSelectedPoi;
+        GeoBmpDto mSelectedPoi;
 
         public CustomInfoWindow(MapView mapView) {
             super(R.layout.bubble_geo_point_dto, mapView);
@@ -853,7 +852,7 @@ public class LocationMapViewer extends Activity implements Constants {
             super.onOpen(item);
             mView.findViewById(R.id.bubble_moreinfo).setVisibility(View.VISIBLE);
             Marker marker = (Marker) item;
-            mSelectedPoi = (GeoPointDtoWithBitmap) marker.getRelatedObject();
+            mSelectedPoi = (GeoBmpDto) marker.getRelatedObject();
             TextView description = (TextView) mView.findViewById(R.id.bubble_description);
             if (mSelectedPoi != null) {
                 description.setText(mSelectedPoi.getDescription());

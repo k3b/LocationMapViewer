@@ -17,14 +17,13 @@
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 
-package de.k3b.android.locationMapViewer.geopoint;
+package de.k3b.android.locationMapViewer.geobmp;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -33,13 +32,12 @@ import java.util.List;
 import java.util.Locale;
 
 import de.k3b.android.locationMapViewer.R;
-import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.api.IGeoRepository;
 
 /** Adapter to display IGeoPointInfo in a ListView. */
-class GeoPointListAdapterDetailed extends
-        ArrayAdapter<GeoPointDtoWithBitmap> {
+class GeoBmpListAdapter extends
+        ArrayAdapter<GeoBmpDto> {
 
     /**
      * Corresponds to filter ignore catagory or edit to create a new category
@@ -51,28 +49,28 @@ class GeoPointListAdapterDetailed extends
      */
     private final int viewId;
 
-    private GeoPointListAdapterDetailed(final Context context,
-                                        final int textViewResourceId, final List<GeoPointDtoWithBitmap> items) {
+    private GeoBmpListAdapter(final Context context,
+                              final int textViewResourceId, final List<GeoBmpDto> items) {
         super(context, textViewResourceId, items);
         this.viewId = textViewResourceId;
     }
 
-    public static ArrayAdapter<GeoPointDtoWithBitmap> createAdapter(
+    public static ArrayAdapter<GeoBmpDto> createAdapter(
             final Context context, final int viewId,
-            final GeoPointDtoWithBitmap firstElement,
+            final GeoBmpDto firstElement,
             final IGeoRepository repository) {
-        final List<GeoPointDtoWithBitmap> items = repository.reload();
+        final List<GeoBmpDto> items = repository.reload();
 
         if (firstElement != null) {
             items.add(0, firstElement);
         }
-        return new GeoPointListAdapterDetailed(context, viewId, items);
+        return new GeoBmpListAdapter(context, viewId, items);
     }
 
     @Override
     public View getView(final int position, final View convertView,
                         final ViewGroup parent) {
-        final GeoPointDtoWithBitmap obj = this.getItem(position);
+        final GeoBmpDto obj = this.getItem(position);
 
         View itemView = convertView;
         if (itemView == null) {
@@ -92,18 +90,9 @@ class GeoPointListAdapterDetailed extends
         return itemView;
     }
 
-    private void setItemContent(final View itemView, final GeoPointDtoWithBitmap dto) {
+    private void setItemContent(final View itemView, final GeoBmpDto dto) {
         if (dto != null) {
-            final TextView nameView = (TextView) itemView
-                    .findViewById(R.id.name);
-            final TextView descriptionView = (TextView) itemView
-                    .findViewById(R.id.description);
-            final ImageView thumbnail = (ImageView) itemView.findViewById(R.id.thumbnail);
-
-            this.setTextViewContent(descriptionView, toString(dto));
-            this.setTextViewContent(nameView, dto.getName());
-
-            thumbnail.setImageBitmap(dto.getBitmap());
+            GeoBmpBinder.toGui(itemView, dto);
         }
     }
 
@@ -113,14 +102,5 @@ class GeoPointListAdapterDetailed extends
                 view.setText(text);
             }
         }
-    }
-
-    private static final DecimalFormat latLonFormatter = new DecimalFormat("#.#######", new DecimalFormatSymbols(Locale.ENGLISH));
-
-    /** formatting helper: */
-    private static String toString(IGeoPointInfo geoPoint) {
-        return " (" +
-                latLonFormatter.format(geoPoint.getLatitude()) + "/" +
-                latLonFormatter.format(geoPoint.getLongitude())+ ") z=" + geoPoint.getZoomMin();
     }
 }

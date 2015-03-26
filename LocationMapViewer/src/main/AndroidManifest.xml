@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
 * Copyright (C) 2015 k3b
 *
@@ -17,10 +17,14 @@
 * You should have received a copy of the GNU General Public License along with
 * this program. If not, see <http://www.gnu.org/licenses/>
 -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="de.k3b.android.locationMapViewer" >
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="de.k3b.android.locationMapViewer">
-	<supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true"/>
-	<!--
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true" />
+    <!--
          permission INTERNET and WRITE_EXTERNAL_STORAGE required by MapTileDownloader
         to load maps from internet and cache them in a cache on sdcard which is shared
         by all osmdroid apps to minimize internet downloads.
@@ -32,9 +36,9 @@
         you can use the MapTileAssetsProvider to put the card material into the apk-s
         asset folder.
     -->
-	<uses-permission android:name="android.permission.INTERNET"/>
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-	<!--
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!--
          permission ACCESS_NETWORK_STATE and ACCESS_WIFI_STATE
         osmdroid can find out if internet is available and if it is wlan or cellphone-network to decide
         when to download or refresh downloaded tiles.
@@ -42,84 +46,117 @@
         Note: if these permissions are missing osmdroid will work but will not download
         any map from internet.
     -->
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-	<!--
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!--
          permission ACCESS_FINE_LOCATION and ACCESS_COARSE_LOCATION
         if osmdroid should display current position using MyLocation(New)Overlay with GpsMyLocationProvider
     -->
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-	<uses-feature android:name="android.hardware.location.network" android:required="false"/>
-	<uses-feature android:name="android.hardware.location.gps" android:required="false"/>
-	<application android:allowBackup="true" android:icon="@drawable/ic_launcher" android:label="@string/app_name"
-		 android:theme="@style/GlobalStyle">
-		<activity android:name=".LocationMapViewer" android:label="@string/app_name">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN"/>
-				<category android:name="android.intent.category.LAUNCHER"/>
-			</intent-filter>
-			<intent-filter>
-				<!-- trigger if there is uri=geo:.... with any mime -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-				<action android:name="android.intent.action.VIEW"/>
-				<action android:name="android.intent.action.PICK"/>
-				<action android:name="android.intent.action.SEND"/>
-				<action android:name="android.intent.action.SENDTO"/>
-				<action android:name="android.intent.action.SEND_MULTIPLE"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<category android:name="android.intent.category.BROWSABLE"/>
-				<data android:mimeType="*/*"/>
-				<data android:scheme="geo"/>
-			</intent-filter>
-			<intent-filter>
-				<!-- trigger if there is uri=geo:.... without mime -->
+    <uses-feature
+        android:name="android.hardware.location.network"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="false" />
 
-				<action android:name="android.intent.action.VIEW"/>
-				<action android:name="android.intent.action.PICK"/>
-				<action android:name="android.intent.action.SEND"/>
-				<action android:name="android.intent.action.SENDTO"/>
-				<action android:name="android.intent.action.SEND_MULTIPLE"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<category android:name="android.intent.category.BROWSABLE"/>
-				<data android:scheme="geo"/>
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<data android:mimeType="*/*"/>
-				<data android:scheme="file"/>
-				<data android:pathPattern=".*\\.gpx"/>
-				<data android:pathPattern=".*\\.kml"/>
-			</intent-filter>
-			<!-- version with host and without host -->
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<category android:name="android.intent.category.BROWSABLE"/>
-				<data android:scheme="http"/>
-				<data android:scheme="https"/>
-				<data android:scheme="ftp"/>
-				<data android:scheme="content"/>
-				<data android:mimeType="application/vnd.google-earth.kml+xml"/>
-				<data android:mimeType="application/xml+kml"/>
-				<data android:mimeType="application/xml+gpx"/>
-				<data android:host="*"/>
-			</intent-filter>
-			<intent-filter> 
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<category android:name="android.intent.category.BROWSABLE"/>
-				<data android:scheme="http"/>
-				<data android:scheme="https"/>
-				<data android:scheme="ftp"/>
-				<data android:scheme="content"/>
-				<data android:mimeType="application/vnd.google-earth.kml+xml"/>
-				<data android:mimeType="application/xml+kml"/>
-				<data android:mimeType="application/xml+gpx"/>
-			</intent-filter>
-		</activity>
-		<activity android:name=".SettingsActivity" android:label="@string/title_activity_settings"/>
-        <activity android:name=".geopoint.GeoPointListActivity" android:label="@string/title_activity_geopoint_list"/>
-	</application>
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/GlobalStyle" >
+        <activity
+            android:name=".LocationMapViewer"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+
+                <!-- trigger if there is uri=geo:.... with any mime -->
+
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.PICK" />
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SENDTO" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:mimeType="*/*" />
+                <data android:scheme="geo" />
+            </intent-filter>
+            <intent-filter>
+
+                <!-- trigger if there is uri=geo:.... without mime -->
+
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.PICK" />
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SENDTO" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="geo" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="*/*" />
+                <data android:scheme="file" />
+                <data android:pathPattern=".*\\.gpx" />
+                <data android:pathPattern=".*\\.kml" />
+            </intent-filter>
+            <!-- version with host and without host -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:scheme="ftp" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/vnd.google-earth.kml+xml" />
+                <data android:mimeType="application/xml+kml" />
+                <data android:mimeType="application/xml+gpx" />
+                <data android:host="*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:scheme="ftp" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/vnd.google-earth.kml+xml" />
+                <data android:mimeType="application/xml+kml" />
+                <data android:mimeType="application/xml+gpx" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" />
+        <activity
+            android:name=".geobmp.GeoBmpListActivity"
+            android:label="@string/title_activity_geopoint_list" />
+        <activity
+            android:name=".geobmp.GeoBmpEditActivity"
+            android:label="@string/title_activity_geopoint_edit" >
+        </activity>
+    </application>
+
 </manifest>

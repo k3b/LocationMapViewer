@@ -17,9 +17,8 @@
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 
-package de.k3b.android.locationMapViewer.geopoint;
+package de.k3b.android.locationMapViewer.geobmp;
 
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import java.io.File;
@@ -32,7 +31,7 @@ import de.k3b.geo.io.GeoFileRepository;
 /**
  * Created by k3b on 24.03.2015.
  */
-public class GeoBmpFileRepository extends GeoFileRepository<GeoPointDtoWithBitmap> {
+public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDto> {
     private final File iconDir;
 
     /**
@@ -41,13 +40,13 @@ public class GeoBmpFileRepository extends GeoFileRepository<GeoPointDtoWithBitma
      * @param file
      */
     public GeoBmpFileRepository(File file) {
-        super(file, new GeoPointDtoWithBitmap());
+        super(file, new GeoBmpDto());
         this.iconDir = new File(file.getAbsolutePath() + ".icons");
         this.iconDir.mkdirs();
     }
 
-    protected GeoPointDtoWithBitmap loadItem(String line) {
-        GeoPointDtoWithBitmap geo = super.loadItem(line);
+    protected GeoBmpDto loadItem(String line) {
+        GeoBmpDto geo = super.loadItem(line);
         File bmpFile = getBmpFile(geo);
 
         if ((bmpFile != null) && (bmpFile.exists())) {
@@ -56,7 +55,7 @@ public class GeoBmpFileRepository extends GeoFileRepository<GeoPointDtoWithBitma
         return geo;
     }
 
-    protected boolean saveItem(Writer writer, GeoPointDtoWithBitmap geo) throws IOException {
+    protected boolean saveItem(Writer writer, GeoBmpDto geo) throws IOException {
         final boolean valid = super.saveItem(writer, geo);
 
         File bmpFile = (valid) ? getBmpFile(geo) : null;
@@ -67,7 +66,7 @@ public class GeoBmpFileRepository extends GeoFileRepository<GeoPointDtoWithBitma
         return valid;
     }
 
-    private File getBmpFile(GeoPointDtoWithBitmap geo) {
+    private File getBmpFile(GeoBmpDto geo) {
         if (geo == null) return null;
         final String id = geo.getId();
 

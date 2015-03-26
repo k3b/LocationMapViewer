@@ -17,20 +17,24 @@
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 
-package de.k3b.android.locationMapViewer.geopoint;
+package de.k3b.android.locationMapViewer.geobmp;
 
 import android.graphics.Bitmap;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.io.GeoFormatter;
 
 /**
  * a GeoPoint with a bitmap.
  *
  * Created by k3b on 24.03.2015.
  */
-public class GeoPointDtoWithBitmap extends GeoPointDto implements Serializable {
+public class GeoBmpDto extends GeoPointDto implements Serializable {
     public static final int WIDTH = 32;
     public static final int HEIGHT = 32;
     /** a bitmap representing the GeoPoint */
@@ -41,8 +45,16 @@ public class GeoPointDtoWithBitmap extends GeoPointDto implements Serializable {
         return bitmap;
     }
 
-    public GeoPointDtoWithBitmap setBitmap(Bitmap bitmap) {
+    public GeoBmpDto setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
         return this;
     }
+
+    /** formatting helper: */
+    public String getSummary() {
+        return " (" +
+                GeoFormatter.formatLatLon(this.getLatitude()) + "/" +
+                GeoFormatter.formatLatLon(this.getLongitude())+ ") z=" + GeoFormatter.formatZoom(this.getZoomMin());
+    }
+
 }

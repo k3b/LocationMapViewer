@@ -83,10 +83,6 @@ public class GeoUri {
     private final static String regexpLatLonAlt = regexpDouble + regexpCommaDouble + regexpCommaDoubleOptional;
     private final static Pattern patternLatLonAlt = Pattern.compile(regexpLatLonAlt);
     private final static Pattern patternTime = Pattern.compile("([12]\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ)");
-    /* converter for Datatypes */
-    private static final DecimalFormat latLonFormatter = new DecimalFormat("#.#######", new DecimalFormatSymbols(Locale.ENGLISH));
-    private static final DateFormat timeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
     /* current state */
 
     /** formating/parsing options */
@@ -95,9 +91,6 @@ public class GeoUri {
     /** for uri-formatter: next delimiter for a parameter. can be "?" or "&"  */
     private String delim;
 
-    static {
-        timeFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
     /** create wit options from OPT_xxx */
     public GeoUri(int options) {
         this.options = options;
@@ -126,8 +119,8 @@ public class GeoUri {
             parseResult.setDescription(parmLookup.get("d"));
             parseResult.setUri(parmLookup.get("uri"));
             parseResult.setId(parmLookup.get("id"));
-            parseResult.setZoomMin(parseZoom(parmLookup.get("z")));
-            parseResult.setZoomMax(parseZoom(parmLookup.get("z2")));
+            parseResult.setZoomMin(GeoFormatter.parseZoom(parmLookup.get("z")));
+            parseResult.setZoomMax(GeoFormatter.parseZoom(parmLookup.get("z2")));
 
             // parameters from standard value and/or infered
             ArrayList<String> whereToSearch = new ArrayList<String>();
@@ -154,19 +147,14 @@ public class GeoUri {
         if (m != null) {
             try {
                 final String val = m.group(1);
-                double lat = parseLatOrLon(val);
-                double lon = parseLatOrLon(m.group(2));
+                double lat = GeoFormatter.parseLatOrLon(val);
+                double lon = GeoFormatter.parseLatOrLon(m.group(2));
 
                 parseResult.setLatitude(lat).setLongitude(lon);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
-    }
-
-    /** parsing helper: converts a double value from string to double */
-    private double parseLatOrLon(String val) throws ParseException {
-        return latLonFormatter.parse(val).doubleValue();
     }
 
     /** parsing helper: Get the first finding of pattern in whereToSearch if currentValue is not set yet.
@@ -206,20 +194,6 @@ public class GeoUri {
         return null;
     }
 
-    /** parsing helper: converts value into zoom compatible int */
-    private int parseZoom(String value) {
-        if (value != null) {
-            try {
-                int result = Integer.parseInt(value);
-                if ((result >= 0) && (result < 64)) {
-                    return result;
-                }
-            } catch (Exception ignore) {
-            }
-        }
-        return IGeoPointInfo.NO_ZOOM;
-    }
-
     /** parsing helper: add a found query-parameter to a map for fast lookup */
     private void parseAddQueryParamToMap(HashMap<String, String> parmLookup, String param) {
         if (param != null) {
@@ -255,7 +229,7 @@ public class GeoUri {
         appendQueryParameter(result, "d", geoPoint.getDescription(), true);
         appendQueryParameter(result, "id", geoPoint.getId(), true);
         if (geoPoint.getTimeOfMeasurement() != null) {
-            appendQueryParameter(result, "t", timeFormatter.format(geoPoint.getTimeOfMeasurement()), false);
+            appendQueryParameter(result, "t", GeoFormatter.formatDate(geoPoint.getTimeOfMeasurement()), false);
         }
 
         return result.toString();
@@ -286,12 +260,10 @@ public class GeoUri {
 
     /** formatting helper: */
     private void formatLatLon(StringBuffer result, IGeoPointInfo geoPoint) {
-        if (geoPoint.getLatitude() != IGeoPointInfo.NO_LAT_LON) {
-            result.append(latLonFormatter.format(geoPoint.getLatitude()));
-        }
-        if (geoPoint.getLongitude() != IGeoPointInfo.NO_LAT_LON) {
-            result.append(",").append(latLonFormatter.format(geoPoint.getLongitude()));
-        }
+        result
+            .append(GeoFormatter.formatLatLon(geoPoint.getLatitude()))
+            .append(",")
+            .append(GeoFormatter.formatLatLon(geoPoint.getLongitude()));
     }
 
     /** formatting helper: */

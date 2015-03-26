@@ -17,7 +17,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 
-package de.k3b.android.locationMapViewer.geopoint;
+package de.k3b.android.locationMapViewer.geobmp;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -43,41 +43,41 @@ import de.k3b.geo.api.IGeoRepository;
  *
  * Created by k3b on 23.03.2015.
  */
-public class GeoPointListActivity extends ListActivity implements
+public class GeoBmpListActivity extends ListActivity implements
         IGeoInfoHandler {
-    private static final int MENU_ADD_CATEGORY = Menu.FIRST;
+    // private static final int MENU_ADD_CATEGORY = Menu.FIRST;
     private static final int EDIT_MENU_ID = Menu.FIRST + 1;
     private static final int DELETE_MENU_ID = Menu.FIRST + 2;
     private static final String NEW_ITEM = "#newitem";
 
     /** parameter from caller to this: paramRepository where does data come from/go to */
-    private static IGeoRepository<GeoPointDtoWithBitmap> paramRepository;
+    private static IGeoRepository<GeoBmpDto> paramRepository;
     /** parameter from caller to this: paramResourceIdActivityTitle resourceid of the list caption */
     private static int paramResourceIdActivityTitle;
     /** parameter from caller to this: paramResourceIdActivityTitle resourceid of the list caption */
-    private static GeoPointDtoWithBitmap paramCurrentZoom;
+    private static GeoBmpDto paramCurrentZoom;
 
-    private IGeoRepository<GeoPointDtoWithBitmap> repository = null;
-    private GeoPointDtoWithBitmap geoPointInfoClicked;
-    private GeoPointEditDialog edit = null;
+    private IGeoRepository<GeoBmpDto> repository = null;
+    private GeoBmpDto geoPointInfoClicked;
+    private GeoBmpEditDialog edit = null;
 
     /** pseudo item as placeholder for creating a new item */
-    private GeoPointDtoWithBitmap newGeoPointInfo = null;
+    private GeoBmpDto newGeoPointInfo = null;
 
     /** public api to show this list */
     public static void show(
             Context context,
-            IGeoRepository<GeoPointDtoWithBitmap> repository,
+            IGeoRepository<GeoBmpDto> repository,
             int resourceIdActivityTitle,
             int idOnOkResultCode,
-            GeoPointDtoWithBitmap currentZoom) {
+            GeoBmpDto currentZoom) {
         // parameters to be consumed in onCreate()
-        GeoPointListActivity.paramRepository = repository;
-        GeoPointListActivity.paramResourceIdActivityTitle = resourceIdActivityTitle;
-        GeoPointListActivity.paramCurrentZoom = currentZoom;
+        GeoBmpListActivity.paramRepository = repository;
+        GeoBmpListActivity.paramResourceIdActivityTitle = resourceIdActivityTitle;
+        GeoBmpListActivity.paramCurrentZoom = currentZoom;
 
         final Intent intent = new Intent().setClass(context,
-                GeoPointListActivity.class);
+                GeoBmpListActivity.class);
 
         if (idOnOkResultCode != 0) {
             ((Activity) context).startActivityForResult(intent,
@@ -90,13 +90,13 @@ public class GeoPointListActivity extends ListActivity implements
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.geopoint_list);
+        this.setContentView(R.layout.geobmp_list);
         this.repository = paramRepository;
         paramRepository = null;
         this.setTitle(getString(paramResourceIdActivityTitle));
 
-        this.newGeoPointInfo = GeoPointListActivity.paramCurrentZoom;
-        GeoPointListActivity.paramCurrentZoom = null;
+        this.newGeoPointInfo = GeoBmpListActivity.paramCurrentZoom;
+        GeoBmpListActivity.paramCurrentZoom = null;
 
         setNewItemPlaceholder(this.newGeoPointInfo);
         this.registerForContextMenu(this.getListView());
@@ -104,14 +104,18 @@ public class GeoPointListActivity extends ListActivity implements
     }
 
     /** sets data for NewItemPlaceholder */
-    private GeoPointDtoWithBitmap setNewItemPlaceholder(final GeoPointDtoWithBitmap newGeoPointInfo) {
-        newGeoPointInfo.setName(getString(R.string.point_new_item_placeholder)).setId(NEW_ITEM);
+    private GeoBmpDto setNewItemPlaceholder(final GeoBmpDto newGeoPointInfo) {
+        newGeoPointInfo.setName(getNewItemName()).setId(NEW_ITEM);
         return newGeoPointInfo;
     }
 
+    private String getNewItemName() {
+        return getString(R.string.point_new_item_placeholder);
+    }
+
     private void reloadGuiFromRepository() {
-        this.setListAdapter(GeoPointListAdapterDetailed.createAdapter(this,
-                R.layout.geopoint_list_view_row, newGeoPointInfo, repository));
+        this.setListAdapter(GeoBmpListAdapter.createAdapter(this,
+                R.layout.geobmp_list_view_row, newGeoPointInfo, repository));
     }
 
     /**
@@ -125,11 +129,14 @@ public class GeoPointListActivity extends ListActivity implements
             this.showGeoPointEditDialog(null);
             return true;
         } else if (NEW_ITEM.compareTo(geoPointInfo.getId()) == 0) {
-            List<GeoPointDtoWithBitmap> items = this.repository.load();
-            GeoPointDtoWithBitmap newItem = (GeoPointDtoWithBitmap) this.newGeoPointInfo.clone();
-            newItem.setBitmap(this.newGeoPointInfo.getBitmap()).setId(this.repository.createId() );
-            items.add(1, newItem);
-            saveChangesToRepository();
+            if ( getNewItemName().compareTo(geoPointInfo.getName()) != 0) {
+                List<GeoBmpDto> items = this.repository.load();
+                GeoBmpDto newItem = (GeoBmpDto) this.newGeoPointInfo.clone();
+                newItem.setBitmap(this.newGeoPointInfo.getBitmap()).setId(this.repository.createId());
+                items.add(1, newItem);
+                this.setNewItemPlaceholder(this.newGeoPointInfo);
+                saveChangesToRepository();
+            }
         } else {
             saveChangesToRepository();
         }
@@ -143,22 +150,22 @@ public class GeoPointListActivity extends ListActivity implements
     }
 
     private boolean isValid(final IGeoPointInfo geoPointInfo) {
-        return (geoPointInfo != null) && (geoPointInfo instanceof GeoPointDtoWithBitmap);
+        return (geoPointInfo != null) && (geoPointInfo instanceof GeoBmpDto);
     }
 
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v,
                                     final ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        this.geoPointInfoClicked = (GeoPointDtoWithBitmap) this
+        this.geoPointInfoClicked = (GeoBmpDto) this
                 .getListView()
                 .getItemAtPosition(((AdapterView.AdapterContextMenuInfo) menuInfo).position);
 
         if (this.geoPointInfoClicked != null) {
             menu.setHeaderTitle("" + this.geoPointInfoClicked.getName());
         }
-        menu.add(0, GeoPointListActivity.EDIT_MENU_ID, 0, R.string.cmd_edit);
-        menu.add(0, GeoPointListActivity.DELETE_MENU_ID, 0, R.string.cmd_delete);
+        menu.add(0, GeoBmpListActivity.EDIT_MENU_ID, 0, R.string.cmd_edit);
+        menu.add(0, GeoBmpListActivity.DELETE_MENU_ID, 0, R.string.cmd_delete);
     }
 
     @Override
@@ -185,7 +192,7 @@ public class GeoPointListActivity extends ListActivity implements
     protected Dialog onCreateDialog(final int id) {
         switch (id) {
             case EDIT_MENU_ID:
-            case MENU_ADD_CATEGORY:
+            // case MENU_ADD_CATEGORY:
                 return this.edit;
         }
 
@@ -195,26 +202,30 @@ public class GeoPointListActivity extends ListActivity implements
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         super.onCreateOptionsMenu(menu);
-        menu.add(0, GeoPointListActivity.MENU_ADD_CATEGORY, 0,
+        /*
+        menu.add(0, GeoBmpListActivity.MENU_ADD_CATEGORY, 0,
                 "Create a new geoPointInfo.");
+        */
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
+        /*
         switch (item.getItemId()) {
             case MENU_ADD_CATEGORY:
                 this.showGeoPointEditDialog(null);
                 return true;
         }
+        */
         return super.onOptionsItemSelected(item);
     }
 
-    public void showGeoPointEditDialog(final GeoPointDtoWithBitmap geoPointInfo) {
+    public void showGeoPointEditDialog(final GeoBmpDto geoPointInfo) {
         if (this.edit == null) {
-            this.edit = new GeoPointEditDialog(this, this);
+            this.edit = new GeoBmpEditDialog(this, this, R.layout.geobmp_edit_name);
         }
         this.edit.onGeoInfo(geoPointInfo);
-        this.showDialog(GeoPointListActivity.EDIT_MENU_ID);
+        this.showDialog(GeoBmpListActivity.EDIT_MENU_ID);
     }
 }

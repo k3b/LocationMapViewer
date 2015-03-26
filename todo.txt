@@ -1,11 +1,16 @@
 D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
 LocationMapViewer-Todo
+>	next
+		FavoriteList-Edit mit dialog-caption
+		FavoriteList-selchange => zoomTo after close
+		besserer name für << new item >>
+
 v   icon
 	Settings
 V		anzeige/edit current center,current zoomlevel.
 V		Text-summary anzeige der aktuellen einstellung (android 2.2. ok aber nicht android 4.4)
-		Button add to favorites
+?		Button add to favorites
 v		checkbox: enable guesture-debug
 v       about-box
 v           resourcen anpassen von toGoZip
@@ -30,22 +35,30 @@ v			==> disabled via GuestureOverlay.onDoubleTap(MotionEvent ev, MapView mapView
 v		todo in guestre-detector (wenn drag dist kleiner als 10) zoom mit center=tap-point
 		?? Tripple tap to zoom in 2 stufen, quad-tap 3 stufen .....
 		
-	Favoriten-liste mit name, geocenter, zoomlevel 
-		fileformat: zeilen von geo-uri-s mit datei-Endung "*.lmv.fav"
+>	Favoriten-liste mit name, geocenter, zoomlevel 
+v		fileformat: zeilen von geo-uri-s mit datei-Endung "*.txt"
+v       fovorite-thumbnail
 		Favorite-Marker der den Ausschnitt als blaues quadrat anzeigt
-		dialog zum auswählen des favoriten
+>		listactivity zum auswählen des favoriten
+			v darstellung minitaturansichtder karte (thubnail) in der liste
 			- bei select (vor OK) entweder drunterligende karte sofort zoomen
 			- oder in darunterligender karte Favorite-Marker (mit ausschnitt) anzeigen markieren
-		? Edit
+	        v Edit name
 	
 v	Zoom-level slider in map
 	
 	Menue
-		Favorites (add/select)
-		Settings
-		about
+>		Favorites
+v		Settings
+v		about
 		
 v	Ok in map für picker
+
+?	umstellung api8+appcompat+fragmente
+		map
+		map+favoriteList (selchange in list=>update map zoom)
+		favoriteList+favoriteDetails
+		?settings
 
 ----------------------
 

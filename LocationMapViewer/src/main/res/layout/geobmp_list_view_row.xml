@@ -33,7 +33,7 @@
         android:layout_height="wrap_content" android:layout_weight="1" android:textSize="16sp"
         android:layout_toRightOf="@id/thumbnail"
         android:gravity="center_vertical" android:textColor="#FFFFFF"/>
-    <TextView android:id="@+id/description"
+    <TextView android:id="@+id/summary"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" android:layout_weight="1"
         android:layout_marginLeft="@dimen/vspace_between_list_item"

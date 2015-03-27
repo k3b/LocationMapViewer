@@ -18,12 +18,66 @@
   ~ this program. If not, see <http://www.gnu.org/licenses/>
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 		style="@style/GlobalStyle"
 	android:layout_width="wrap_content" android:layout_height="fill_parent">
-	<ListView android:id="@+id/android:list" android:layout_width="fill_parent"
-		android:layout_height="fill_parent" android:fastScrollEnabled="true" />
-	<TextView android:id="@+id/android:empty"
-		android:layout_width="fill_parent" android:layout_height="fill_parent"
-		android:text="@string/no_items_found" />
-</LinearLayout>
+    <LinearLayout android:id="@+id/commands" android:layout_width="fill_parent"
+        android:layout_height="wrap_content" android:orientation="horizontal"
+        >
+
+        <ImageButton android:id="@+id/cmd_zoom_to"
+            android:layout_width="60dp" android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_map"
+            android:layout_marginBottom="32dp"
+            android:contentDescription="show in map"
+
+            />
+
+        <ImageButton android:id="@+id/cmd_edit"
+            android:layout_width="60dp" android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_edit"
+            android:layout_marginBottom="32dp"
+            android:contentDescription="rename"
+            />
+
+        <ImageButton android:id="@+id/cmd_save_as"
+            android:layout_width="60dp" android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_important"
+            android:layout_marginBottom="32dp"
+            android:contentDescription="save as favorite"
+            />
+
+        <ImageButton android:id="@+id/cmd_delete"
+            android:layout_width="60dp" android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_delete"
+            android:layout_marginBottom="32dp"
+            android:contentDescription="delete"
+            />
+
+        <ImageButton android:id="@+id/cmd_cancel"
+            android:layout_width="60dp" android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_cancel"
+            android:layout_marginBottom="32dp"
+            android:contentDescription="cancel"
+            />
+
+        <ImageButton android:id="@+id/cmd_help"
+            android:layout_width="60dp" android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_help"
+            android:layout_marginBottom="32dp"
+            android:contentDescription="help"
+            />
+
+    </LinearLayout>
+
+    <ListView android:id="@+id/android:list"
+        android:layout_width="fill_parent" android:layout_height="fill_parent"
+        android:layout_below="@id/commands"
+        android:choiceMode="singleChoice"
+        android:listSelector="#aa190c88"
+        android:fastScrollEnabled="true"/>
+    <TextView android:id="@+id/android:empty"
+        android:layout_width="fill_parent" android:layout_height="fill_parent"
+        android:layout_below="@id/commands"
+        android:text="@string/no_items_found"/>
+</RelativeLayout>

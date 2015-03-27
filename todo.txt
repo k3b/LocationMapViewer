@@ -2,9 +2,17 @@ D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
 LocationMapViewer-Todo
 >	next
-		FavoriteList-Edit mit dialog-caption
-		FavoriteList-selchange => zoomTo after close
-		besserer name für << new item >>
+		suche demo app src mit listview ohne long-tab
+		FavoriteList
+			pseudofavoriten
+				inital
+				current
+			toolbar buttons: edit, delete, gotoMap, cancel
+			description=orgiginal-name to be restored
+			saveAsFav für pseudo else rename
+			-Edit mit dialog-caption
+			FavoriteList-selchange => zoomTo after close
+			besserer name für << new item >>
 
 v   icon
 	Settings

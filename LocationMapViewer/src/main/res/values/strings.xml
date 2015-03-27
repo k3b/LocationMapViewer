@@ -60,6 +60,7 @@ GeoIntentDemo.java</a>) or through html links similar to <a href="geo:0,0?q=53.0
     <string name="cmd_edit">Edit</string>
     <string name="cmd_save"> Save </string>
     <string name="cmd_cancel"> Cancel </string>
+    <string name="cmd_zoom">Map</string>
     <string name="title_activity_geopoint_edit">Edit</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>

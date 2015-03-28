@@ -25,12 +25,9 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.ContextMenu;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -51,7 +48,6 @@ public class GeoBmpListActivity extends ListActivity implements
     // private static final int MENU_ADD_CATEGORY = Menu.FIRST;
     private static final int EDIT_MENU_ID = Menu.FIRST + 1;
     private static final int DELETE_MENU_ID = Menu.FIRST + 2;
-    private static final String NEW_ITEM = "#newitem";
 
     /**
      * parameter from caller to this: paramRepository where does data come from/go to
@@ -70,7 +66,6 @@ public class GeoBmpListActivity extends ListActivity implements
     private ImageButton cmdEdit     ;
     private ImageButton cmdSaveAs   ;
     private ImageButton cmdDelete   ;
-    private ImageButton cmdCancel   ;
     private ImageButton cmdHelp     ;
 
     private IGeoRepository<GeoBmpDto> repository = null;
@@ -118,9 +113,17 @@ public class GeoBmpListActivity extends ListActivity implements
         this.newGeoPointInfo = GeoBmpListActivity.paramCurrentZoom;
         GeoBmpListActivity.paramCurrentZoom = null;
 
-        setNewItemPlaceholder(this.newGeoPointInfo);
+        FavoriteUtil.markAsTemplate(this.newGeoPointInfo, getNewItemName());
         final ListView listView = this.getListView();
-        // listView.setItemsCanFocus(true);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                setCurrentItem((GeoBmpDto) listView.getItemAtPosition(position));
+            }
+        });
+        /* does not work: onItemSelected is never called
+        listView.setItemsCanFocus(true);
 
         listView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -134,7 +137,7 @@ public class GeoBmpListActivity extends ListActivity implements
                 setCurrentItem(null);
             }
         });
-
+*/
         // this.registerForContextMenu(listView);
         createButtons();
 
@@ -148,78 +151,44 @@ public class GeoBmpListActivity extends ListActivity implements
         cmdEdit = (ImageButton) findViewById(R.id.cmd_edit);
         cmdSaveAs = (ImageButton) findViewById(R.id.cmd_save_as);
         cmdDelete = (ImageButton) findViewById(R.id.cmd_delete);
-        cmdCancel = (ImageButton) findViewById(R.id.cmd_cancel);
         cmdHelp = (ImageButton) findViewById(R.id.cmd_help);
 
         cmdZoomTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GeoBmpListActivity.this.onZoomTo();
             }
         });
 
         cmdEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GeoBmpListActivity.this.onEdit();
+                GeoBmpListActivity.this.showGeoPointEditDialog(GeoBmpListActivity.this.currentItem);
             }
         });
 
         cmdSaveAs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GeoBmpListActivity.this.onSaveAs();
+                GeoBmpListActivity.this.showGeoPointEditDialog(FavoriteUtil.createFavorite(GeoBmpListActivity.this.currentItem));
             }
         });
 
         cmdDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GeoBmpListActivity.this.onDelete();
-            }
-        });
-
-        cmdCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                GeoBmpListActivity.this.onCancel();
+                if (GeoBmpListActivity.this.repository.load().remove(GeoBmpListActivity.this.currentItem)) {
+                    repository.save();
+                    GeoBmpListActivity.this.reloadGuiFromRepository();
+                }
             }
         });
 
         cmdHelp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GeoBmpListActivity.this.onHelp();
             }
         });
 
-    }
-
-    private void onZoomTo() {}
-    private void onEdit() {
-        this.showGeoPointEditDialog(this.currentItem);
-    }
-
-    private void onSaveAs() {
-        this.showGeoPointEditDialog(createFavorite(this.currentItem));
-    }
-
-    /** clones currentPositon */
-    private GeoBmpDto createFavorite(GeoBmpDto item) {
-        GeoBmpDto result = (GeoBmpDto) item.clone();
-        result.setDescription(null).setId(this.repository.createId());
-        return result;
-    }
-
-    private void onDelete() {
-        if (this.repository.load().remove(this.currentItem)) {
-            repository.save();
-            this.reloadGuiFromRepository();
-        }
-    }
-    private void onCancel() {}
-
-    private void onHelp() {
     }
 
     private void setCurrentItem(GeoBmpDto newSelection) {
@@ -228,22 +197,10 @@ public class GeoBmpListActivity extends ListActivity implements
         final boolean sel = newSelection != null;
         if (cmdZoomTo != null) {
             cmdZoomTo.setEnabled(sel);
-            cmdEdit.setEnabled(sel && isFavorite(newSelection));
-            cmdSaveAs.setEnabled(sel && !isFavorite(newSelection));
-            cmdDelete.setEnabled(sel && isFavorite(newSelection));
+            cmdEdit.setEnabled(sel && FavoriteUtil.isFavorite(newSelection));
+            cmdSaveAs.setEnabled(sel && !FavoriteUtil.isFavorite(newSelection));
+            cmdDelete.setEnabled(sel && FavoriteUtil.isFavorite(newSelection));
         }
-    }
-
-    private boolean isFavorite(GeoBmpDto item) {
-        return ((item != null) && (item.getDescription() == null));
-    }
-
-    /**
-     * sets data for NewItemPlaceholder
-     */
-    private GeoBmpDto setNewItemPlaceholder(final GeoBmpDto newGeoPointInfo) {
-        newGeoPointInfo.setName(getNewItemName()).setId(NEW_ITEM);
-        return newGeoPointInfo;
     }
 
     private String getNewItemName() {
@@ -262,32 +219,17 @@ public class GeoBmpListActivity extends ListActivity implements
      */
     @Override
     public boolean onGeoInfo(IGeoPointInfo geoPointInfo) {
-        if (!isValid(geoPointInfo)) {
-            this.showGeoPointEditDialog(null);
-            return true;
-        } else if (NEW_ITEM.compareTo(geoPointInfo.getId()) == 0) {
-            if (getNewItemName().compareTo(geoPointInfo.getName()) != 0) {
+        if (FavoriteUtil.isValid(geoPointInfo)) {
+            GeoBmpDto item = (GeoBmpDto) geoPointInfo;
+            if (FavoriteUtil.isNew(item)) {
+                item.setId(repository.createId());
                 List<GeoBmpDto> items = this.repository.load();
-                GeoBmpDto newItem = (GeoBmpDto) this.newGeoPointInfo.clone();
-                newItem.setBitmap(this.newGeoPointInfo.getBitmap()).setId(this.repository.createId());
-                items.add(1, newItem);
-                this.setNewItemPlaceholder(this.newGeoPointInfo);
-                saveChangesToRepository();
+                items.add(0, item);
             }
-        } else {
-            saveChangesToRepository();
+            this.repository.save();
+            this.reloadGuiFromRepository();
         }
-        this.reloadGuiFromRepository();
         return true;
-    }
-
-    private void saveChangesToRepository() {
-        this.setNewItemPlaceholder(this.newGeoPointInfo);
-        this.repository.save();
-    }
-
-    private boolean isValid(final IGeoPointInfo geoPointInfo) {
-        return (geoPointInfo != null) && (geoPointInfo instanceof GeoBmpDto);
     }
 
     @Override

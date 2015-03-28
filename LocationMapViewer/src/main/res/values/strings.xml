@@ -56,13 +56,7 @@ GeoIntentDemo.java</a>) or through html links similar to <a href="geo:0,0?q=53.0
     <string name="no_items_found">No items Found</string>
     <string name="title_activity_geopoint_list">Points</string>
     <string name="point_new_item_placeholder"><![CDATA[<< new item >>]]></string>
-    <string name="cmd_delete">Delete</string>
-    <string name="cmd_edit">Edit</string>
     <string name="cmd_save"> Save </string>
     <string name="cmd_cancel"> Cancel </string>
-    <string name="cmd_zoom">Map</string>
     <string name="title_activity_geopoint_edit">Edit</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-
 </resources>

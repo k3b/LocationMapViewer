@@ -70,7 +70,7 @@ public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDto> {
         if (geo == null) return null;
         final String id = geo.getId();
 
-        if ((id != null) && (!id.isEmpty())) {
+        if (FavoriteUtil.isNotEmpty(id)) {
             return new File(this.iconDir, id + ".icon");
         }
         return null;

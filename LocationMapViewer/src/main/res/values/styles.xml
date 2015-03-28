@@ -19,18 +19,40 @@
   -->
 
 <resources>
-    <style name="GlobalStyle" >
-    </style>
-    <style name="GlobalStyle.TextView" >
-    </style>
-    <style name="GlobalStyle.TextView.Caption" >
+    <!--
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    -->
+    <style name="AppBaseTheme" parent="android:Theme.Light">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
     </style>
 
-    <style name="GlobalStyle.Line" >
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+
+    <style name="AppTheme.ImageButton" >
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">32dp</item>
+    </style>
+
+    <style name="AppTheme.TextView" >
+    </style>
+
+    <style name="AppTheme.TextView.Caption" >
+    </style>
+
+    <style name="AppTheme.Line" >
         <item name="android:background">#FFffffff</item>
     </style>
 
-    <style name="GlobalStyle.Line.Horizontal" >
+    <style name="AppTheme.Line.Horizontal" >
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">1dip</item>
     </style>

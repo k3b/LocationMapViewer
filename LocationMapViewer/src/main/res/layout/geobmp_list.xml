@@ -19,53 +19,40 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-		style="@style/GlobalStyle"
+		style="@style/AppTheme"
 	android:layout_width="wrap_content" android:layout_height="fill_parent">
     <LinearLayout android:id="@+id/commands" android:layout_width="fill_parent"
         android:layout_height="wrap_content" android:orientation="horizontal"
         >
 
         <ImageButton android:id="@+id/cmd_zoom_to"
-            android:layout_width="60dp" android:layout_height="wrap_content"
             android:src="@drawable/ic_action_map"
-            android:layout_marginBottom="32dp"
             android:contentDescription="show in map"
-
+            style="@style/AppTheme.ImageButton"
             />
 
         <ImageButton android:id="@+id/cmd_edit"
-            android:layout_width="60dp" android:layout_height="wrap_content"
             android:src="@drawable/ic_action_edit"
-            android:layout_marginBottom="32dp"
             android:contentDescription="rename"
+            style="@style/AppTheme.ImageButton"
             />
 
         <ImageButton android:id="@+id/cmd_save_as"
-            android:layout_width="60dp" android:layout_height="wrap_content"
             android:src="@drawable/ic_action_important"
-            android:layout_marginBottom="32dp"
             android:contentDescription="save as favorite"
+            style="@style/AppTheme.ImageButton"
             />
 
         <ImageButton android:id="@+id/cmd_delete"
-            android:layout_width="60dp" android:layout_height="wrap_content"
             android:src="@drawable/ic_action_delete"
-            android:layout_marginBottom="32dp"
             android:contentDescription="delete"
-            />
-
-        <ImageButton android:id="@+id/cmd_cancel"
-            android:layout_width="60dp" android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_cancel"
-            android:layout_marginBottom="32dp"
-            android:contentDescription="cancel"
+            style="@style/AppTheme.ImageButton"
             />
 
         <ImageButton android:id="@+id/cmd_help"
-            android:layout_width="60dp" android:layout_height="wrap_content"
             android:src="@drawable/ic_action_help"
-            android:layout_marginBottom="32dp"
             android:contentDescription="help"
+            style="@style/AppTheme.ImageButton"
             />
 
     </LinearLayout>

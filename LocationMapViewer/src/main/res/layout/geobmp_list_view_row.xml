@@ -28,11 +28,10 @@
         android:layout_width="@dimen/thumb_width"
         android:layout_height="@dimen/thumb_height" />
     <TextView android:id="@+id/name"
-        android:layout_marginLeft="@dimen/vspace_between_list_item"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" android:layout_weight="1" android:textSize="16sp"
+        style="@style/AppTheme.TextView.Caption"
+        android:layout_width="fill_parent" android:layout_height="wrap_content"
         android:layout_toRightOf="@id/thumbnail"
-        android:gravity="center_vertical" android:textColor="#FFFFFF"/>
+        android:gravity="center_vertical" />
     <TextView android:id="@+id/summary"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" android:layout_weight="1"

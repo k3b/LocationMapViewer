@@ -20,6 +20,7 @@
 package de.k3b.android.locationMapViewer.geobmp;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,7 @@ class GeoBmpListAdapter extends
      * The Resource used for the adapter
      */
     private final int viewId;
+    private GeoBmpDto currentSelecion;
 
     private GeoBmpListAdapter(final Context context,
                               final int textViewResourceId, final List<GeoBmpDto> items) {
@@ -93,6 +95,9 @@ class GeoBmpListAdapter extends
     private void setItemContent(final View itemView, final GeoBmpDto dto) {
         if (dto != null) {
             GeoBmpBinder.toGui(itemView, dto);
+
+            final int backgroundColor = ((this.currentSelecion == dto)) ? Color.LTGRAY : Color.WHITE;
+            itemView.setBackgroundColor(backgroundColor);
         }
     }
 
@@ -101,6 +106,13 @@ class GeoBmpListAdapter extends
             if ((text != null) && (text.length() > 0)) {
                 view.setText(text);
             }
+        }
+    }
+
+    public void setCurrentSelecion(GeoBmpDto currentSelecion) {
+        if (this.currentSelecion != currentSelecion) {
+            this.currentSelecion = currentSelecion;
+            notifyDataSetChanged();
         }
     }
 }

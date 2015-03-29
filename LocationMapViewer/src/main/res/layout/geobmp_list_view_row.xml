@@ -22,7 +22,8 @@
     android:orientation="vertical"
     android:layout_width="0dip"
     android:layout_weight="1"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    >
     <ImageView
         android:id="@+id/thumbnail"
         android:layout_width="@dimen/thumb_width"

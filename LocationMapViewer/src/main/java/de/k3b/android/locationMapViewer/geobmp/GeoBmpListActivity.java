@@ -119,7 +119,8 @@ public class GeoBmpListActivity extends ListActivity implements
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                setCurrentItem((GeoBmpDto) listView.getItemAtPosition(position));
+                final GeoBmpDto currenSelection = (GeoBmpDto) listView.getItemAtPosition(position);
+                setCurrentItem(currenSelection);
             }
         });
         /* does not work: onItemSelected is never called
@@ -142,8 +143,6 @@ public class GeoBmpListActivity extends ListActivity implements
         createButtons();
 
         this.reloadGuiFromRepository();
-
-        setCurrentItem(null);
     }
 
     private void createButtons() {
@@ -192,6 +191,9 @@ public class GeoBmpListActivity extends ListActivity implements
     }
 
     private void setCurrentItem(GeoBmpDto newSelection) {
+        final GeoBmpListAdapter listAdapter = (GeoBmpListAdapter) getListAdapter();
+        listAdapter.setCurrentSelecion(newSelection);
+
         this.currentItem = newSelection;
 
         final boolean sel = newSelection != null;
@@ -210,6 +212,7 @@ public class GeoBmpListActivity extends ListActivity implements
     private void reloadGuiFromRepository() {
         this.setListAdapter(GeoBmpListAdapter.createAdapter(this,
                 R.layout.geobmp_list_view_row, newGeoPointInfo, repository));
+        setCurrentItem(newGeoPointInfo);
     }
 
     /**

@@ -1,9 +1,14 @@
 package de.k3b.android.locationMapViewer.constants;
 
+import android.os.Build;
+
 /**
  * This class contains constants used by the application.
  */
 public interface Constants {
+    /** false: old android-2.3 or below that does not support actionbars */
+    public static final boolean USE_ACTIONBAR = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB);
+
     // ===========================================================
     // keys for preferences
     // ===========================================================

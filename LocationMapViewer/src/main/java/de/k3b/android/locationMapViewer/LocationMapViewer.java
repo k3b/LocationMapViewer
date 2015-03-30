@@ -89,7 +89,16 @@ import microsoft.mappoint.TileSystem;
 
 /**
  * An app that can display geografic info in a map for Android 2.1 (Eclair, API 7) .<br/>
- * no support for actionbar and fragments.<br/>
+ * The view can be customized via intent-api. Supported intent elements
+ * - "geo:..." show this location in the map
+ * - "file:/.../*.kml" or "file:/.../*.gpx" show these in map
+ * - Supported Action
+ * - - VIEW show in map
+ * - - PICK select a position from a map and return it to the caller
+ * - extra title:
+ * - - on android >= 3.0 (honycomp) show actionbar with this tiltle and actionbar-menubar if title set. Else button for popup-menu
+ * - - on android < 3.0 show with this tiltle in titlebar if title set. Else no titlebar. Menu via the menu-key.
+ * no support for fragments.<br/>
  * The code is based on "org.osmdroid.samples.SampleWithMinimapItemizedoverlay in DemoApp OpenStreetMapViewer"
  */
 public class LocationMapViewer extends Activity implements Constants  {
@@ -245,7 +254,7 @@ public class LocationMapViewer extends Activity implements Constants  {
     }
 
     private void setNoTitle() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        if (USE_ACTIONBAR) {
             setNoActionbar();
         }
     }
@@ -275,7 +284,7 @@ public class LocationMapViewer extends Activity implements Constants  {
                 PopupMenu popup = new PopupMenu(LocationMapViewer.this, view);
                 popup.setOnMenuItemClickListener(popUpListener);
                 MenuInflater inflater = popup.getMenuInflater();
-                inflater.inflate(R.menu.location_map_viewer_menu, popup.getMenu());
+                inflater.inflate(R.menu.location_map_viewer, popup.getMenu());
                 popup.show();
             }
         });
@@ -603,7 +612,7 @@ public class LocationMapViewer extends Activity implements Constants  {
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.location_map_viewer_menu, menu);
+        inflater.inflate(R.menu.location_map_viewer, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

@@ -28,6 +28,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -37,6 +39,7 @@ import android.widget.ListView;
 import java.util.List;
 
 import de.k3b.android.locationMapViewer.R;
+import de.k3b.android.locationMapViewer.constants.Constants;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.api.IGeoRepository;
@@ -47,7 +50,7 @@ import de.k3b.geo.api.IGeoRepository;
  * Created by k3b on 23.03.2015.
  */
 public class FavoriteListActivity extends ListActivity implements
-        IGeoInfoHandler {
+        IGeoInfoHandler, Constants {
 
     private static final String FAVORITES_FILE_NAME = "favorites.txt";
 
@@ -60,11 +63,17 @@ public class FavoriteListActivity extends ListActivity implements
      */
     private static GeoBmpDto[] paramAdditionalPoints;
 
-    private ImageButton cmdZoomTo   ;
-    private ImageButton cmdEdit     ;
-    private ImageButton cmdSaveAs   ;
-    private ImageButton cmdDelete   ;
-    private ImageButton cmdHelp     ;
+    private ImageButton cmdZoomTo   = null;
+    private ImageButton cmdEdit     = null;
+    private ImageButton cmdSaveAs   = null;
+    private ImageButton cmdDelete   = null;
+    private ImageButton cmdHelp     = null;
+
+    private MenuItem menuItemZoomTo  = null ;
+    private MenuItem menuItemEdit    = null ;
+    private MenuItem menuItemSaveAs  = null ;
+    private MenuItem menuItemDelete  = null ;
+    private MenuItem menuItemHelp    = null ;
 
     private IGeoRepository<GeoBmpDto> repository = null;
     private GeoBmpDto currentItem;
@@ -99,13 +108,15 @@ public class FavoriteListActivity extends ListActivity implements
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.favorite_list);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        if (USE_ACTIONBAR) {
+            this.setContentView(R.layout.favorite_list_ab);
             initActionBar();
+        } else {
+            this.setContentView(R.layout.favorite_list);
+            createButtons();
         }
 
         this.repository = new GeoBmpFileRepository(this.getDatabasePath(FAVORITES_FILE_NAME));
-        this.setTitle(getString(R.string.title_favorite_list));
 
         this.additionalPoints = FavoriteListActivity.paramAdditionalPoints;
         FavoriteListActivity.paramAdditionalPoints = null;
@@ -139,7 +150,6 @@ public class FavoriteListActivity extends ListActivity implements
         });
 */
         // this.registerForContextMenu(listView);
-        createButtons();
 
         this.reloadGuiFromRepository();
     }
@@ -194,14 +204,63 @@ public class FavoriteListActivity extends ListActivity implements
 
     }
 
+    /** called by options/actionBar-menu */
+    @Override
+    public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.cmd_zoom_to   :
+                return true;
+
+            case R.id.cmd_edit      :
+                FavoriteListActivity.this.showGeoPointEditDialog(FavoriteListActivity.this.currentItem);
+                return true;
+
+            case R.id.cmd_save_as   :
+                FavoriteListActivity.this.showGeoPointEditDialog(FavoriteUtil.createFavorite(FavoriteListActivity.this.currentItem));
+                return true;
+
+            case R.id.cmd_delete    :
+                if (FavoriteListActivity.this.repository.load().remove(FavoriteListActivity.this.currentItem)) {
+                    repository.save();
+                    FavoriteListActivity.this.reloadGuiFromRepository();
+                }
+                return true;
+
+            case R.id.cmd_help:
+                // this.showDialog(R.id.cmd_help);
+                return true;
+        }
+        return super.onMenuItemSelected(featureId, item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        if (USE_ACTIONBAR) {
+            // Inflate the menu items for use in the action bar
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.favorite_list_ab, menu);
+
+            menuItemZoomTo  = menu.findItem(R.id.cmd_zoom_to)   ;
+            menuItemEdit    = menu.findItem(R.id.cmd_edit)      ;
+            menuItemSaveAs  = menu.findItem(R.id.cmd_save_as)   ;
+            menuItemDelete  = menu.findItem(R.id.cmd_delete)    ;
+            menuItemHelp    = menu.findItem(R.id.cmd_help)      ;
+
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
     private void setCurrentItem(GeoBmpDto newSelection) {
         final GeoBmpListAdapter listAdapter = (GeoBmpListAdapter) getListAdapter();
         listAdapter.setCurrentSelecion(newSelection);
 
         this.currentItem = newSelection;
 
-        final boolean sel = newSelection != null;
-        if (cmdZoomTo != null) {
+        final boolean sel = (newSelection != null);
+        if ((USE_ACTIONBAR) && (menuItemZoomTo != null)) {
+            onActionIconsChanged();
+        } else if (cmdZoomTo != null) {
             cmdZoomTo.setEnabled(sel);
             cmdEdit.setEnabled(sel && FavoriteUtil.isFavorite(newSelection));
             cmdSaveAs.setEnabled(sel && !FavoriteUtil.isFavorite(newSelection));
@@ -209,8 +268,40 @@ public class FavoriteListActivity extends ListActivity implements
         }
     }
 
-    private String getNewItemName() {
-        return getString(R.string.point_new_item_placeholder);
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void onActionIconsChanged() {
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (USE_ACTIONBAR) {
+            updateMenu(this.currentItem);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void updateMenu(GeoBmpDto newSelection) {
+        if (menuItemZoomTo != null) {
+            final boolean sel = (newSelection != null);
+            enable(menuItemZoomTo, true, sel);
+            enable(menuItemEdit, true, sel && FavoriteUtil.isFavorite(newSelection));
+            enable(menuItemSaveAs, true, sel && !FavoriteUtil.isFavorite(newSelection));
+            enable(menuItemDelete, false, sel && FavoriteUtil.isFavorite(newSelection));
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void enable(MenuItem menuItem, boolean alwaysIfEnabled, boolean enabled) {
+        menuItem.setEnabled(enabled);
+
+        if (enabled) {
+            menuItem.setShowAsAction(alwaysIfEnabled ? MenuItem.SHOW_AS_ACTION_ALWAYS : MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        } else {
+            menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER); //
+        }
+//      menuItem.setVisible(enabled);
     }
 
     private void reloadGuiFromRepository() {

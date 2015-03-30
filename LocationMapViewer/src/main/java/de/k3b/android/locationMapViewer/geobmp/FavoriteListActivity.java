@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -39,28 +40,23 @@ import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.api.IGeoRepository;
 
 /**
- * Activity to show a list of {@link de.k3b.geo.api.GeoPointDto} items with options to edit/delete/add.
+ * Activity to show a list of Favorites as {@link de.k3b.geo.api.GeoPointDto}-s with options to edit/delete/add.
  * <p/>
  * Created by k3b on 23.03.2015.
  */
-public class GeoBmpListActivity extends ListActivity implements
+public class FavoriteListActivity extends ListActivity implements
         IGeoInfoHandler {
+
+    private static final String FAVORITES_FILE_NAME = "favorites.txt";
+
     // private static final int MENU_ADD_CATEGORY = Menu.FIRST;
     private static final int EDIT_MENU_ID = Menu.FIRST + 1;
     private static final int DELETE_MENU_ID = Menu.FIRST + 2;
 
     /**
-     * parameter from caller to this: paramRepository where does data come from/go to
-     */
-    private static IGeoRepository<GeoBmpDto> paramRepository;
-    /**
      * parameter from caller to this: paramResourceIdActivityTitle resourceid of the list caption
      */
-    private static int paramResourceIdActivityTitle;
-    /**
-     * parameter from caller to this: paramResourceIdActivityTitle resourceid of the list caption
-     */
-    private static GeoBmpDto paramCurrentZoom;
+    private static GeoBmpDto[] paramAdditionalPoints;
 
     private ImageButton cmdZoomTo   ;
     private ImageButton cmdEdit     ;
@@ -73,26 +69,22 @@ public class GeoBmpListActivity extends ListActivity implements
     private GeoBmpEditDialog edit = null;
 
     /**
-     * pseudo item as placeholder for creating a new item
+     * pseudo item as placeholder for creating a new items for current, initial, gps
      */
-    private GeoBmpDto newGeoPointInfo = null;
+    private GeoBmpDto[] additionalPoints = null;
 
     /**
      * public api to show this list
      */
     public static void show(
             Context context,
-            IGeoRepository<GeoBmpDto> repository,
-            int resourceIdActivityTitle,
             int idOnOkResultCode,
-            GeoBmpDto currentZoom) {
+            GeoBmpDto... additionalPoints) {
         // parameters to be consumed in onCreate()
-        GeoBmpListActivity.paramRepository = repository;
-        GeoBmpListActivity.paramResourceIdActivityTitle = resourceIdActivityTitle;
-        GeoBmpListActivity.paramCurrentZoom = currentZoom;
+        FavoriteListActivity.paramAdditionalPoints = additionalPoints;
 
         final Intent intent = new Intent().setClass(context,
-                GeoBmpListActivity.class);
+                FavoriteListActivity.class);
 
         if (idOnOkResultCode != 0) {
             ((Activity) context).startActivityForResult(intent,
@@ -105,15 +97,16 @@ public class GeoBmpListActivity extends ListActivity implements
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.geobmp_list);
-        this.repository = paramRepository;
-        paramRepository = null;
-        this.setTitle(getString(paramResourceIdActivityTitle));
+        this.setContentView(R.layout.favorite_list);
+        this.repository = new GeoBmpFileRepository(this.getDatabasePath(FAVORITES_FILE_NAME));
+        this.setTitle(getString(R.string.title_favorites));
 
-        this.newGeoPointInfo = GeoBmpListActivity.paramCurrentZoom;
-        GeoBmpListActivity.paramCurrentZoom = null;
+        this.additionalPoints = FavoriteListActivity.paramAdditionalPoints;
+        FavoriteListActivity.paramAdditionalPoints = null;
 
-        FavoriteUtil.markAsTemplate(this.newGeoPointInfo, getNewItemName());
+        for (GeoBmpDto template : this.additionalPoints) {
+            FavoriteUtil.markAsTemplate(template);
+        }
         final ListView listView = this.getListView();
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -161,23 +154,23 @@ public class GeoBmpListActivity extends ListActivity implements
         cmdEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GeoBmpListActivity.this.showGeoPointEditDialog(GeoBmpListActivity.this.currentItem);
+                FavoriteListActivity.this.showGeoPointEditDialog(FavoriteListActivity.this.currentItem);
             }
         });
 
         cmdSaveAs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GeoBmpListActivity.this.showGeoPointEditDialog(FavoriteUtil.createFavorite(GeoBmpListActivity.this.currentItem));
+                FavoriteListActivity.this.showGeoPointEditDialog(FavoriteUtil.createFavorite(FavoriteListActivity.this.currentItem));
             }
         });
 
         cmdDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (GeoBmpListActivity.this.repository.load().remove(GeoBmpListActivity.this.currentItem)) {
+                if (FavoriteListActivity.this.repository.load().remove(FavoriteListActivity.this.currentItem)) {
                     repository.save();
-                    GeoBmpListActivity.this.reloadGuiFromRepository();
+                    FavoriteListActivity.this.reloadGuiFromRepository();
                 }
             }
         });
@@ -210,9 +203,10 @@ public class GeoBmpListActivity extends ListActivity implements
     }
 
     private void reloadGuiFromRepository() {
-        this.setListAdapter(GeoBmpListAdapter.createAdapter(this,
-                R.layout.geobmp_list_view_row, newGeoPointInfo, repository));
-        setCurrentItem(newGeoPointInfo);
+        final ArrayAdapter<GeoBmpDto> adapter = GeoBmpListAdapter.createAdapter(this,
+                R.layout.geobmp_list_view_row, repository, additionalPoints);
+        this.setListAdapter(adapter);
+        setCurrentItem(adapter.isEmpty() ? null : adapter.getItem(0));
     }
 
     /**
@@ -251,6 +245,6 @@ public class GeoBmpListActivity extends ListActivity implements
             this.edit = new GeoBmpEditDialog(this, this, R.layout.geobmp_edit_name);
         }
         this.edit.onGeoInfo(geoPointInfo);
-        this.showDialog(GeoBmpListActivity.EDIT_MENU_ID);
+        this.showDialog(FavoriteListActivity.EDIT_MENU_ID);
     }
 }

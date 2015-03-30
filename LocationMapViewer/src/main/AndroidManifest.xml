@@ -151,8 +151,8 @@
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name=".geobmp.GeoBmpListActivity"
-            android:label="@string/title_activity_geopoint_list" />
+            android:name=".geobmp.FavoriteListActivity"
+            android:label="@string/title_activity_geopoint_list"  />
         <activity
             android:name=".geobmp.GeoBmpEditActivity"
             android:label="@string/title_activity_geopoint_edit" >

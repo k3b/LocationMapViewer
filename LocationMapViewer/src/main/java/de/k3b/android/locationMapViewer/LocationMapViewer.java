@@ -71,9 +71,9 @@ import java.util.List;
 
 import de.k3b.android.GeoUtil;
 import de.k3b.android.locationMapViewer.constants.Constants;
+import de.k3b.android.locationMapViewer.geobmp.FavoriteListActivity;
 import de.k3b.android.locationMapViewer.geobmp.GeoBmpDto;
 import de.k3b.android.locationMapViewer.geobmp.GeoBmpFileRepository;
-import de.k3b.android.locationMapViewer.geobmp.GeoBmpListActivity;
 import de.k3b.android.widgets.AboutDialogPreference;
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
@@ -100,7 +100,6 @@ public class LocationMapViewer extends Activity implements Constants {
     private static final int MENU_ABOUT = Menu.FIRST + 2;
 
     private static final DecimalFormat LAT_LON2TEXT = new DecimalFormat("#.#########");
-    private static final String FAVORITES_FILE_NAME = "favorites.txt";
 
     // ===========================================================
     // Fields
@@ -140,7 +139,6 @@ public class LocationMapViewer extends Activity implements Constants {
     private boolean mUsePicker;
     private GuestureOverlay mGuesturesOverlay;
     private SeekBar mZoomBar;
-    private IGeoRepository<GeoBmpDto> favoriteRespository;
 
     // ===========================================================
     // Constructors
@@ -241,7 +239,6 @@ public class LocationMapViewer extends Activity implements Constants {
 //        if (initalMapCenterZoom != null) {
 //            setCenterZoom(initalMapCenterZoom);
 //        }
-        favoriteRespository = new GeoBmpFileRepository(this.getDatabasePath(FAVORITES_FILE_NAME));
     }
 
     private void createZoomBar() {
@@ -581,7 +578,7 @@ public class LocationMapViewer extends Activity implements Constants {
 
             case MENU_FAVORITE:
                 GeoBmpDto current = getCurrentAsGeoPointDto();
-                GeoBmpListActivity.show(this, this.favoriteRespository, R.string.title_favorites, 0, current);
+                FavoriteListActivity.show(this, 0, current);
                 return true;
 
             case MENU_SETTINGS_ID: {

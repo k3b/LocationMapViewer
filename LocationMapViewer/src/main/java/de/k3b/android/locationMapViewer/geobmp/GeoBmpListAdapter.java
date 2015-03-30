@@ -59,12 +59,18 @@ class GeoBmpListAdapter extends
 
     public static ArrayAdapter<GeoBmpDto> createAdapter(
             final Context context, final int viewId,
-            final GeoBmpDto firstElement,
-            final IGeoRepository repository) {
+            final IGeoRepository repository,
+            final GeoBmpDto... additionalPoints
+    ) {
         final List<GeoBmpDto> items = repository.reload();
 
-        if (firstElement != null) {
-            items.add(0, firstElement);
+        if (additionalPoints != null) {
+            for(int index = additionalPoints.length -1; index >= 0; index--) {
+                final GeoBmpDto item = additionalPoints[index];
+                if (item != null) {
+                    items.add(0, item);
+                }
+            }
         }
         return new GeoBmpListAdapter(context, viewId, items);
     }

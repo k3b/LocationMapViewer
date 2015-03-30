@@ -2,9 +2,12 @@ D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
 LocationMapViewer-Todo
 >	next
-		map-view icons for settings and favorites
+		bug map-fav-"<" start new view instead of return to old
+		?? fav-list mit action-menu??
+
+		v map-view icons for settings and favorites
 		FavoriteList
-		    local repository
+		    v local repository
 			v edit-dialog caption
 			pseudofavoriten
 			    via intent
@@ -12,8 +15,7 @@ LocationMapViewer-Todo
 				currentSel
 				currentGps
 			FavoriteList-selchange => zoomTo after close
-			besserer name für << new item >>
-			
+
 		?? Fav-Share
 
 v   icon

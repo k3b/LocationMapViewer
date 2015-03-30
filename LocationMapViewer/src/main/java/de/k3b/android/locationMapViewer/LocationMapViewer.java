@@ -634,7 +634,7 @@ public class LocationMapViewer extends Activity implements Constants  {
 
             case R.id.cmd_favorite_list:
                 GeoBmpDto current = getCurrentAsGeoPointDto();
-                FavoriteListActivity.show(this, 0, current);
+                FavoriteListActivity.show(this, R.id.cmd_favorite_list, current);
                 return true;
 
             case R.id.cmd_settings: {
@@ -664,16 +664,31 @@ public class LocationMapViewer extends Activity implements Constants  {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
         if (logger.isDebugEnabled()) logger.debug("onActivityResult(requestCode="+requestCode+", resultCode="+resultCode+", data="+data+")");
-        if (requestCode == R.id.cmd_settings) {
-            RestoreXYZ(); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
+        switch (requestCode) {
+            case R.id.cmd_settings:
+                RestoreXYZ(); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
 
-            // apply xyz changes from settings back to view
-            int changes = setZoom(mPrefs.getString(PREFS_CURRENT_ZOOMLEVEL, "").trim())
-                   + setCenter(mPrefs.getString(PREFS_CURRENT_NORTH, "").trim(), mPrefs.getString(PREFS_CURRENT_EAST, "").trim());
+                // apply xyz changes from settings back to view
+                int changes = setZoom(mPrefs.getString(PREFS_CURRENT_ZOOMLEVEL, "").trim())
+                        + setCenter(mPrefs.getString(PREFS_CURRENT_NORTH, "").trim(), mPrefs.getString(PREFS_CURRENT_EAST, "").trim());
 
-           if (changes > 0) {
-               saveLastXYZ(); // otherwhise onResume() would overwrite the new values
-           }
+                if (changes > 0) {
+                    saveLastXYZ(); // otherwhise onResume() would overwrite the new values
+                }
+
+                break;
+            case R.id.cmd_favorite_list:
+                if (data != null) {
+                    RestoreXYZ(); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
+
+                    IGeoPointInfo newCenterZoom = new GeoUri(GeoUri.OPT_DEFAULT).fromUri(data.getData().toString());
+                    if (newCenterZoom != null) {
+                        setDelayedCenterZoom(newCenterZoom);
+                        saveLastXYZ(); // otherwhise onResume() would overwrite the new values
+                    }
+
+                }
+                break;
         }
     }
 

@@ -20,11 +20,13 @@
 package de.k3b.android.locationMapViewer.geobmp;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -43,6 +45,7 @@ import de.k3b.android.locationMapViewer.constants.Constants;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.api.IGeoRepository;
+import de.k3b.geo.io.GeoUri;
 
 /**
  * Activity to show a list of Favorites as {@link de.k3b.geo.api.GeoPointDto}-s with options to edit/delete/add.
@@ -156,7 +159,9 @@ public class FavoriteListActivity extends ListActivity implements
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void initActionBar() {
-        this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        final ActionBar actionBar = getActionBar();
+        actionBar.setDisplayShowHomeEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(false);
     }
 
     private void createButtons() {
@@ -169,6 +174,9 @@ public class FavoriteListActivity extends ListActivity implements
         cmdZoomTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                setResult(R.id.cmd_zoom_to, createIntent(currentItem));
+                finish();
+
             }
         });
 
@@ -208,7 +216,14 @@ public class FavoriteListActivity extends ListActivity implements
     @Override
     public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.cmd_cancel   :
+                this.setResult(R.id.cmd_cancel, createIntent(null));
+                this.finish();
+                return true;
+
             case R.id.cmd_zoom_to   :
+                this.setResult(R.id.cmd_zoom_to, createIntent(this.currentItem));
+                this.finish();
                 return true;
 
             case R.id.cmd_edit      :
@@ -231,6 +246,11 @@ public class FavoriteListActivity extends ListActivity implements
                 return true;
         }
         return super.onMenuItemSelected(featureId, item);
+    }
+
+    private Intent createIntent(GeoBmpDto currentItem) {
+        if (currentItem == null) return null;
+        return new Intent(Intent.ACTION_PICK , Uri.parse(new GeoUri(GeoUri.OPT_DEFAULT).toUriString(this.currentItem)));
     }
 
     @Override

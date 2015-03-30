@@ -2,9 +2,10 @@ D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
 LocationMapViewer-Todo
 >	next
+		map-view icons for settings and favorites
 		FavoriteList
 		    local repository
-			edit-dialog caption
+			v edit-dialog caption
 			pseudofavoriten
 			    via intent
 				inital
@@ -12,6 +13,8 @@ LocationMapViewer-Todo
 				currentGps
 			FavoriteList-selchange => zoomTo after close
 			besserer name für << new item >>
+			
+		?? Fav-Share
 
 v   icon
 	Settings

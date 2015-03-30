@@ -26,6 +26,15 @@
         android:id="@+id/mapview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:src="@android:drawable/ic_menu_more"
+        android:id="@+id/cmd_menu"
+
+        android:layout_alignParentRight="true"
+        />
 
     <SeekBar
         android:layout_width="wrap_content"

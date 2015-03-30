@@ -52,7 +52,8 @@ GeoIntentDemo.java</a>) or through html links similar to <a href="geo:0,0?q=53.0
 "</string>
 
     <!-- added in version 0.3.* -->
-    <string name="title_favorites">Favorites</string>
+    <string name="title_favorite_list">Favorites</string>
+    <string name="title_favorite_edit">Favorite</string>
     <string name="no_items_found">No items Found</string>
     <string name="title_activity_geopoint_list">Points</string>
     <string name="point_new_item_placeholder"><![CDATA[<< new item >>]]></string>

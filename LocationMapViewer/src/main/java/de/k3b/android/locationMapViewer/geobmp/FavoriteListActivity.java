@@ -19,11 +19,13 @@
 
 package de.k3b.android.locationMapViewer.geobmp;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -98,8 +100,12 @@ public class FavoriteListActivity extends ListActivity implements
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.favorite_list);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            initActionBar();
+        }
+
         this.repository = new GeoBmpFileRepository(this.getDatabasePath(FAVORITES_FILE_NAME));
-        this.setTitle(getString(R.string.title_favorites));
+        this.setTitle(getString(R.string.title_favorite_list));
 
         this.additionalPoints = FavoriteListActivity.paramAdditionalPoints;
         FavoriteListActivity.paramAdditionalPoints = null;
@@ -136,6 +142,11 @@ public class FavoriteListActivity extends ListActivity implements
         createButtons();
 
         this.reloadGuiFromRepository();
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void initActionBar() {
+        this.getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void createButtons() {
@@ -243,6 +254,7 @@ public class FavoriteListActivity extends ListActivity implements
     public void showGeoPointEditDialog(final GeoBmpDto geoPointInfo) {
         if (this.edit == null) {
             this.edit = new GeoBmpEditDialog(this, this, R.layout.geobmp_edit_name);
+            this.edit.setTitle(getString(R.string.title_favorite_edit));
         }
         this.edit.onGeoInfo(geoPointInfo);
         this.showDialog(FavoriteListActivity.EDIT_MENU_ID);

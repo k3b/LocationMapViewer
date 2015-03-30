@@ -18,6 +18,8 @@
  */
 package de.k3b.android.locationMapViewer;
 
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
@@ -26,13 +28,17 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,12 +79,10 @@ import de.k3b.android.GeoUtil;
 import de.k3b.android.locationMapViewer.constants.Constants;
 import de.k3b.android.locationMapViewer.geobmp.FavoriteListActivity;
 import de.k3b.android.locationMapViewer.geobmp.GeoBmpDto;
-import de.k3b.android.locationMapViewer.geobmp.GeoBmpFileRepository;
 import de.k3b.android.widgets.AboutDialogPreference;
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
-import de.k3b.geo.api.IGeoRepository;
 import de.k3b.geo.io.GeoUri;
 import de.k3b.geo.io.gpx.GpxReaderBase;
 import microsoft.mappoint.TileSystem;
@@ -88,16 +92,12 @@ import microsoft.mappoint.TileSystem;
  * no support for actionbar and fragments.<br/>
  * The code is based on "org.osmdroid.samples.SampleWithMinimapItemizedoverlay in DemoApp OpenStreetMapViewer"
  */
-public class LocationMapViewer extends Activity implements Constants {
+public class LocationMapViewer extends Activity implements Constants  {
     private static final Logger logger = LoggerFactory.getLogger(LocationMapViewer.class);
 
     // ===========================================================
     // Constants
     // ===========================================================
-
-    private static final int MENU_SETTINGS_ID = Menu.FIRST;
-    private static final int MENU_FAVORITE = Menu.FIRST + 1;
-    private static final int MENU_ABOUT = Menu.FIRST + 2;
 
     private static final DecimalFormat LAT_LON2TEXT = new DecimalFormat("#.#########");
 
@@ -156,8 +156,9 @@ public class LocationMapViewer extends Activity implements Constants {
 
         String extraTitle = intent.getStringExtra(Intent.EXTRA_TITLE);
         if (extraTitle == null) {
-            // must be called before this.setContentView(...) else crash
-            this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                // must be called before this.setContentView(...) else crash
+              this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -175,6 +176,8 @@ public class LocationMapViewer extends Activity implements Constants {
 
         if (extraTitle != null) {
             this.setTitle(extraTitle);
+        } else {
+            setNoTitle();
         }
 
         GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
@@ -241,6 +244,43 @@ public class LocationMapViewer extends Activity implements Constants {
 //        }
     }
 
+    private void setNoTitle() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            setNoActionbar();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void setNoActionbar() {
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
+
+        // android-version < 3.0 does not need this. they use the menu key instead
+        // ImageButton as replacement for hidden action menue
+
+        final PopupMenu.OnMenuItemClickListener popUpListener = new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                return LocationMapViewer.this.onMenuItemClick(menuItem);
+            }
+        };
+
+        ImageButton cmdOk = (ImageButton) findViewById(R.id.cmd_menu);
+        cmdOk.setVisibility(View.VISIBLE);
+        cmdOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupMenu popup = new PopupMenu(LocationMapViewer.this, view);
+                popup.setOnMenuItemClickListener(popUpListener);
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.location_map_viewer_menu, popup.getMenu());
+                popup.show();
+            }
+        });
+    }
+
     private void createZoomBar() {
         mMapView.setBuiltInZoomControls(true);
 
@@ -250,7 +290,8 @@ public class LocationMapViewer extends Activity implements Constants {
         mZoomBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) mMapView.getController().setZoom(progress - mMapView.getMinZoomLevel());
+                if (fromUser)
+                    mMapView.getController().setZoom(progress - mMapView.getMinZoomLevel());
             }
 
             @Override
@@ -559,29 +600,35 @@ public class LocationMapViewer extends Activity implements Constants {
     // ===========================================================
 
     @Override
-    public boolean onCreateOptionsMenu(final Menu pMenu) {
-        pMenu.add(0, MENU_FAVORITE, Menu.NONE, getString(R.string.title_favorites));
-        pMenu.add(0, MENU_SETTINGS_ID, Menu.NONE, R.string.title_activity_settings);
-        pMenu.add(0, MENU_ABOUT, Menu.NONE, R.string.about_summary);
-
-        return true;
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.location_map_viewer_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
+    /** called by options/actionBar-menu */
     @Override
     public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
+        if (onMenuItemClick(item)) {
+            return true;
+        }
+        return super.onMenuItemSelected(featureId, item);
+    }
+
+    /** called by popup-menu */
+    public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
-
-
-            case MENU_ABOUT:
-                this.showDialog(MENU_ABOUT);
+            case R.id.cmd_help:
+                this.showDialog(R.id.cmd_help);
                 return true;
 
-            case MENU_FAVORITE:
+            case R.id.cmd_favorite_list:
                 GeoBmpDto current = getCurrentAsGeoPointDto();
                 FavoriteListActivity.show(this, 0, current);
                 return true;
 
-            case MENU_SETTINGS_ID: {
+            case R.id.cmd_settings: {
                 // set current xyz to prefs so they can be displayed/modified in the settings
                 final IGeoPoint mapCenter = mMapView.getMapCenter();
 
@@ -590,7 +637,7 @@ public class LocationMapViewer extends Activity implements Constants {
                 edit.putString(PREFS_CURRENT_NORTH, LAT_LON2TEXT.format(mapCenter.getLatitude()));
                 edit.putString(PREFS_CURRENT_EAST, LAT_LON2TEXT.format(mapCenter.getLongitude()));
                 edit.commit();
-                SettingsActivity.show(this, MENU_SETTINGS_ID);
+                SettingsActivity.show(this, R.id.cmd_settings);
                 return true;
             }
         }
@@ -608,7 +655,7 @@ public class LocationMapViewer extends Activity implements Constants {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
         if (logger.isDebugEnabled()) logger.debug("onActivityResult(requestCode="+requestCode+", resultCode="+resultCode+", data="+data+")");
-        if (requestCode == MENU_SETTINGS_ID) {
+        if (requestCode == R.id.cmd_settings) {
             RestoreXYZ(); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
 
             // apply xyz changes from settings back to view
@@ -709,7 +756,7 @@ public class LocationMapViewer extends Activity implements Constants {
     @Override
     protected Dialog onCreateDialog(final int id) {
         switch (id) {
-            case MENU_ABOUT:
+            case R.id.cmd_help:
                 return AboutDialogPreference.createAboutDialog(this);
 
         }

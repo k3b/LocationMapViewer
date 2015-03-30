@@ -152,7 +152,9 @@
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".geobmp.FavoriteListActivity"
-            android:label="@string/title_activity_geopoint_list"  />
+            android:label="@string/title_activity_geopoint_list"
+            android:parentActivityName="de.k3b.android.locationMapViewer.LocationMapViewer" 
+            />
         <activity
             android:name=".geobmp.GeoBmpEditActivity"
             android:label="@string/title_activity_geopoint_edit" >

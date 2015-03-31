@@ -10,10 +10,9 @@ v		? delete via repository-method that also removes the thumb
 			v edit-dialog caption
 			pseudofavoriten
 			    via intent
-				inital
-				currentSel
-				currentGps
-			FavoriteList-selchange => zoomTo after close
+v				inital
+v				currentSel
+v				currentGps
 
 		?? Fav-Share
 

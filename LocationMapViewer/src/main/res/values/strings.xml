@@ -68,5 +68,8 @@ GeoIntentDemo.java</a>) or through html links similar to <a href="geo:0,0?q=53.0
     <string name="format_question_delete">"Are you sure you want to permanently delete \n\n %1$s ? \n\n This is NOT undoable.</string>
     <string name="cmd_yes">Yes</string>
     <string name="cmd_no">No</string>
+    <string name="favorite_template_current">[Current Window] </string>
+    <string name="favorite_template_initial">[Inital Window] </string>
+    <string name="favorite_template_gps">"[GPS] "</string>
 
 </resources>

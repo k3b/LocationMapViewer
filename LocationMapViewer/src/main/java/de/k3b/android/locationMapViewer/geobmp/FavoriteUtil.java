@@ -56,14 +56,16 @@ public class FavoriteUtil {
      * sets data for NewItemPlaceholder
      */
     public static GeoBmpDto markAsTemplate(final GeoBmpDto template) {
-        final String newId = "#" + (id++);
-        if (!isNotEmpty(template.getName())) {
-            template.setName(newId);
+        if (template != null) {
+            final String newId = "#" + (id++);
+            if (!isNotEmpty(template.getName())) {
+                template.setName(newId);
+            }
+            if (!isNotEmpty(template.getId())) {
+                template.setId(newId);
+            }
+            template.setDescription(template.getName());
         }
-        if (!isNotEmpty(template.getId())) {
-            template.setId(newId);
-        }
-        template.setDescription(template.getName());
         return template;
     }
 

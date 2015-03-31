@@ -27,6 +27,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.GeoFormatter;
 
 /**
@@ -40,6 +41,11 @@ public class GeoBmpDto extends GeoPointDto implements Serializable {
     /** a bitmap representing the GeoPoint */
     private Bitmap bitmap = null;
 
+    public GeoBmpDto() {}
+
+    public GeoBmpDto(IGeoPointInfo src) {
+        super(src);
+    }
     /** a bitmap representing the GeoPoint */
     public Bitmap getBitmap() {
         return bitmap;

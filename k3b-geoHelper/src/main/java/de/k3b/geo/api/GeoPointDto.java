@@ -95,6 +95,20 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         this.timeOfMeasurement = timeOfMeasurement;
     }
 
+    public GeoPointDto(IGeoPointInfo src) {
+        if (src != null) {
+            this.latitude = src.getLatitude();
+            this.longitude = src.getLongitude();
+            this.name = src.getName();
+            this.uri = src.getUri();
+            this.id = src.getId();
+            this.description = src.getDescription();
+            this.zoomMin = src.getZoomMin();
+            this.zoomMax = src.getZoomMax();
+            this.timeOfMeasurement = src.getTimeOfMeasurement();
+        }
+    }
+
     /**
      * Latitude, in degrees north. NO_LAT_LON if not set
      */

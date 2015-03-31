@@ -78,6 +78,7 @@ import java.util.List;
 import de.k3b.android.GeoUtil;
 import de.k3b.android.locationMapViewer.constants.Constants;
 import de.k3b.android.locationMapViewer.geobmp.FavoriteListActivity;
+import de.k3b.android.locationMapViewer.geobmp.FavoriteUtil;
 import de.k3b.android.locationMapViewer.geobmp.GeoBmpDto;
 import de.k3b.android.widgets.AboutDialogPreference;
 import de.k3b.geo.api.GeoPointDto;
@@ -149,6 +150,10 @@ public class LocationMapViewer extends Activity implements Constants  {
     private GuestureOverlay mGuesturesOverlay;
     private SeekBar mZoomBar;
 
+    /** first visible window as favorite candidate */
+    private GeoBmpDto initialWindow = null;
+    private boolean showLocation = false;
+
     // ===========================================================
     // Constructors
     // ===========================================================
@@ -217,6 +222,14 @@ public class LocationMapViewer extends Activity implements Constants  {
             };
 
         pointCollector.onGeoInfo(geoPointFromIntent);
+
+        if (geoPointFromIntent != null) {
+            initialWindow = new GeoBmpDto(geoPointFromIntent);
+            BitmapDrawable drawable = (BitmapDrawable) getResources().getDrawable(R.drawable.marker_yellow);
+            initialWindow.setBitmap(drawable.getBitmap());
+
+            initialWindow.setName(getString(R.string.favorite_template_initial) + geoPointFromIntent.getName());
+        }
 
         loadGeoPointDtosFromFile(intent, pointCollector);
 
@@ -339,7 +352,7 @@ public class LocationMapViewer extends Activity implements Constants  {
         poiMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         poiMarker.setPosition(toOsmGeoPoint(aGeoPoint));
 
-        if (notEmpty(description) || notEmpty(aGeoPoint.getUri())) {
+        if (FavoriteUtil.isNotEmpty(description) || FavoriteUtil.isNotEmpty(aGeoPoint.getUri())) {
             poiMarker.setIcon(mPoiIconWithData);
             // 7.
             poiMarker.setInfoWindow(new CustomInfoWindow(map));
@@ -355,10 +368,6 @@ public class LocationMapViewer extends Activity implements Constants  {
         poiMarker.setRelatedObject(aGeoPoint);
 
         return poiMarker;
-    }
-
-    private boolean notEmpty(String aString) {
-        return (aString != null) && (aString.length() > 0);
     }
 
     private RadiusMarkerClusterer createPointOfInterestOverlay(List<Overlay> overlays) {
@@ -473,7 +482,7 @@ public class LocationMapViewer extends Activity implements Constants  {
     public void onPause() {
         final SharedPreferences.Editor edit = mPrefs.edit();
         edit.putString(PREFS_TILE_SOURCE, mMapView.getTileProvider().getTileSource().name());
-        edit.putBoolean(PREFS_SHOW_LOCATION, mLocationOverlay.isMyLocationEnabled());
+        edit.putBoolean(PREFS_SHOW_LOCATION, this.showLocation);
         edit.putBoolean(PREFS_SHOW_MINIMAP, mMiniMapOverlay.isEnabled());
         edit.putBoolean(PREFS_CLUSTER_POINTS, this.mUseClusterPoints);
         //edit.putBoolean(PREFS_SHOW_GUESTURES, this.mGuesturesOverlay.isEnabled());
@@ -580,7 +589,8 @@ public class LocationMapViewer extends Activity implements Constants  {
         } catch (final IllegalArgumentException e) {
             mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
         }
-        if (mPrefs.getBoolean(PREFS_SHOW_LOCATION, false)) {
+        this.showLocation = mPrefs.getBoolean(PREFS_SHOW_LOCATION, showLocation);
+        if (showLocation) {
             this.mLocationOverlay.enableMyLocation();
         }
 
@@ -597,6 +607,7 @@ public class LocationMapViewer extends Activity implements Constants  {
             // see http://stackoverflow.com/questions/10411975/how-to-get-the-width-and-height-of-an-image-view-in-android/10412209#10412209
             this.mDelayedSetCenterZoom.execute("onWindowFocusChanged()", mMapView);
             this.mDelayedSetCenterZoom = null; // donot call it again
+
         }
     }
 
@@ -633,8 +644,18 @@ public class LocationMapViewer extends Activity implements Constants  {
                 return true;
 
             case R.id.cmd_favorite_list:
-                GeoBmpDto current = getCurrentAsGeoPointDto();
-                FavoriteListActivity.show(this, R.id.cmd_favorite_list, current);
+                GeoPoint gps = (this.mLocationOverlay != null) ? this.mLocationOverlay.getMyLocation() : null;
+
+                GeoBmpDto gpsWindow = null;
+                if (gps != null) {
+                    gpsWindow = new GeoBmpDto();
+                    GeoUtil.createFavorite(gps, IGeoPointInfo.NO_ZOOM, getString(R.string.favorite_template_gps), gpsWindow);
+                    BitmapDrawable drawable = (BitmapDrawable) getResources().getDrawable(R.drawable.person);
+                    gpsWindow.setBitmap(drawable.getBitmap());
+
+                }
+                GeoBmpDto currentWindow = getCurrentAsGeoPointDto(getString(R.string.favorite_template_current));
+                FavoriteListActivity.show(this, R.id.cmd_favorite_list, initialWindow, currentWindow, gpsWindow);
                 return true;
 
             case R.id.cmd_settings: {
@@ -653,9 +674,9 @@ public class LocationMapViewer extends Activity implements Constants  {
         return false;
     }
 
-    GeoBmpDto getCurrentAsGeoPointDto() {
+    private GeoBmpDto getCurrentAsGeoPointDto(String name) {
         GeoBmpDto current = new GeoBmpDto();
-        GeoUtil.createFavorite(this.mMapView.getMapCenter(), this.mMapView.getZoomLevel(), "current", current);
+        GeoUtil.createFavorite(this.mMapView.getMapCenter(), this.mMapView.getZoomLevel(), name, current);
         current.setBitmap(GeoUtil.createBitmapFromMapView(mMapView, GeoBmpDto.WIDTH, GeoBmpDto.HEIGHT));
         return current;
     }

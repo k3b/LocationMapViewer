@@ -63,4 +63,10 @@ GeoIntentDemo.java</a>) or through html links similar to <a href="geo:0,0?q=53.0
     <string name="title_delete">Delete</string>
     <string name="title_help">Help</string>
     <string name="title_map">Show in Map</string>
+
+    <string name="title_confirm_delete">"Confirm Delete "</string>
+    <string name="format_question_delete">"Are you sure you want to permanently delete \n\n %1$s ? \n\n This is NOT undoable.</string>
+    <string name="cmd_yes">Yes</string>
+    <string name="cmd_no">No</string>
+
 </resources>

@@ -76,5 +76,19 @@ public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDto> {
         return null;
     }
 
+    /**
+     * removes item from repository.
+     *
+     * @param item that should be removed
+     * @return true if successful
+     */
+    @Override
+    public boolean delete(GeoBmpDto item) {
+        File file = getBmpFile(item);
+        if (file != null) file.delete();
+
+        return super.delete(item);
+    }
+
 
 }

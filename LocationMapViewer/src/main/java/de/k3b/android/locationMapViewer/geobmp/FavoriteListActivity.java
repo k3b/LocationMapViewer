@@ -22,10 +22,14 @@ package de.k3b.android.locationMapViewer.geobmp;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,6 +41,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
+
+import org.osmdroid.ResourceProxy;
 
 import java.util.List;
 
@@ -59,7 +65,6 @@ public class FavoriteListActivity extends ListActivity implements
 
     // private static final int MENU_ADD_CATEGORY = Menu.FIRST;
     private static final int EDIT_MENU_ID = Menu.FIRST + 1;
-    private static final int DELETE_MENU_ID = Menu.FIRST + 2;
 
     /**
      * parameter from caller to this: paramResourceIdActivityTitle resourceid of the list caption
@@ -197,10 +202,7 @@ public class FavoriteListActivity extends ListActivity implements
         cmdDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (FavoriteListActivity.this.repository.load().remove(FavoriteListActivity.this.currentItem)) {
-                    repository.save();
-                    FavoriteListActivity.this.reloadGuiFromRepository();
-                }
+                deleteConfirm();
             }
         });
 
@@ -235,10 +237,7 @@ public class FavoriteListActivity extends ListActivity implements
                 return true;
 
             case R.id.cmd_delete    :
-                if (FavoriteListActivity.this.repository.load().remove(FavoriteListActivity.this.currentItem)) {
-                    repository.save();
-                    FavoriteListActivity.this.reloadGuiFromRepository();
-                }
+                deleteConfirm();
                 return true;
 
             case R.id.cmd_help:
@@ -370,4 +369,55 @@ public class FavoriteListActivity extends ListActivity implements
         this.edit.onGeoInfo(geoPointInfo);
         this.showDialog(FavoriteListActivity.EDIT_MENU_ID);
     }
+
+    private void deleteConfirm() {
+        if (this.currentItem != null) {
+            final String message = String.format(
+                    this.getString(R.string.format_question_delete).toString(),
+                    this.currentItem.getName() +"\n"+ this.currentItem.getSummary());
+
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            builder.setTitle(R.string.title_confirm_delete);
+            Bitmap bitmap = this.currentItem.getBitmap();
+
+            if (bitmap != null) {
+                BitmapDrawable drawable = (bitmap == null) ? null : new BitmapDrawable(getResources(), bitmap);
+                builder.setIcon(drawable);
+            }
+
+            builder.setMessage(message)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.cmd_yes,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(
+                                        final DialogInterface dialog,
+                                        final int id) {
+                                    deleteCurrent();
+                                }
+                            }
+                    )
+                    .setNegativeButton(R.string.cmd_no,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(
+                                        final DialogInterface dialog,
+                                        final int id) {
+                                    dialog.cancel();
+                                }
+                            }
+                    );
+
+            final AlertDialog alert = builder.create();
+            alert.show();
+        }
+    }
+
+    private void deleteCurrent() {
+        if (repository.delete(currentItem)) {
+            FavoriteListActivity.this.reloadGuiFromRepository();
+        }
+    }
+
 }

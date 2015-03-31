@@ -100,6 +100,22 @@ public class GeoFileRepository<T extends GeoPointDto> implements IGeoRepository<
         return UUID.randomUUID().toString();
     }
 
+    /**
+     * removes item from repository.
+     *
+     * @param item that should be removed
+     * @return true if successful
+     */
+    @Override
+    public boolean delete(T item) {
+        if ((item != null) && load().remove(item)) {
+            save();
+            return true;
+        }
+
+        return false;
+    }
+
     /** save to repository
      *
      * @return false: error.

@@ -48,4 +48,8 @@ public interface IGeoRepository<T extends GeoPointDto> {
 
     /** generates a new id */
     String createId();
+
+    /** removes item from repository.
+     * @return true if successful */
+    boolean delete(T item);
 }

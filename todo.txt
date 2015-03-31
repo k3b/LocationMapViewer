@@ -2,9 +2,8 @@ D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
 LocationMapViewer-Todo
 >	next
-		bug map-fav-"<" start new view instead of return to old
-		?? fav-list mit action-menu??
-
+v		? delete-areYouShure?
+v		? delete via repository-method that also removes the thumb
 		v map-view icons for settings and favorites
 		FavoriteList
 		    v local repository

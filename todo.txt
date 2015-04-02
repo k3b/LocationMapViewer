@@ -1,13 +1,72 @@
 D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
+resource tests
+
+	public class Test extends ActivityTestCase {
+
+	   public void testFoo() {  
+
+		  // .. test project environment
+		  Context testContext = getInstrumentation().getContext();
+		  Resources testRes = testContext.getResources();
+		  InputStream ts = testRes.openRawResource(R.raw.your_res);
+
+		  assertNotNull(testRes);
+	   }    
+	}
+
+
+
 LocationMapViewer-Todo
 >	next
-v		? delete-areYouShure?
-v		? delete via repository-method that also removes the thumb
+        map-picker
+            ? on tap: move current selection
 		v map-view icons for settings and favorites
 		FavoriteList
+		    ? logpress -> zoomTo
+		    ??? fav-help
+				html-with images from res:
+					// "android.resource://[package]/[res id]"
+					Uri path = Uri.parse("android.resource://com.androidbook.samplevideo/" + R.raw.myvideo);
+					// or "android.resource://[package]/[res type]/[res name]"
+					Uri path = Uri.parse("android.resource://com.androidbook.samplevideo/raw/myvideo");					
+				
+					http://stackoverflow.com/questions/4855008/loading-an-android-resource-into-a-webview
+					http://androidbook.blogspot.de/2009/08/referring-to-android-resources-using.html
+				html links
+					http://stackoverflow.com/questions/27056106/how-to-make-links-in-web-view-clickable-in-android/27056179#27056179	
+
+						browser = (WebView) findViewById(R.id.racehistory_webView);
+						private void gotoPage(){
+
+							browser.getSettings().setLoadsImagesAutomatically(true);
+							browser.getSettings().setJavaScriptEnabled(true);
+							browser.getSettings().setAllowContentAccess(true);
+							browser.setWebViewClient(new Callback()); 
+							browser.loadUrl(url);
+
+						}
+
+						private class Callback extends WebViewClient{  
+
+							 @Override
+							 public boolean shouldOverrideUrlLoading(WebView view, String url) {
+								 view.loadUrl(url);
+								 return true;
+							 }
+						}
+				markdown:
+					compile 'org.markdownj:markdownj-core:0.4'
+					compile 'org.commonjava.googlecode.markdown4j:markdown4j:2.2-cj-1.0'
+						https://code.google.com/p/markdown4j/#Using_Markdown4j
+						https://github.com/k3b/markdown4j
+					compile 'com.github.rjeschke:txtmark:0.13'
+						https://github.com/k3b/txtmark
+					
 		    v local repository
 			v edit-dialog caption
+    v		? delete-areYouShure?
+    v		? delete via repository-method that also removes the thumb
 			pseudofavoriten
 			    via intent
 v				inital

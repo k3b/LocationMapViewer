@@ -260,10 +260,15 @@ public class GeoUri {
 
     /** formatting helper: */
     private void formatLatLon(StringBuffer result, IGeoPointInfo geoPoint) {
-        result
-            .append(GeoFormatter.formatLatLon(geoPoint.getLatitude()))
-            .append(",")
-            .append(GeoFormatter.formatLatLon(geoPoint.getLongitude()));
+        if (geoPoint != null) {
+            result.append(GeoFormatter.formatLatLon(geoPoint.getLatitude()));
+
+            if (geoPoint.getLongitude() != IGeoPointInfo.NO_LAT_LON) {
+                result
+                        .append(",")
+                        .append(GeoFormatter.formatLatLon(geoPoint.getLongitude()));
+            }
+        }
     }
 
     /** formatting helper: */

@@ -225,7 +225,7 @@ public class LocationMapViewer extends Activity implements Constants  {
 
         if (geoPointFromIntent != null) {
             initialWindow = new GeoBmpDto(geoPointFromIntent);
-            BitmapDrawable drawable = (BitmapDrawable) getResources().getDrawable(R.drawable.marker_yellow);
+            BitmapDrawable drawable = (BitmapDrawable) getResources().getDrawable(R.drawable.marker_no_data);
             initialWindow.setBitmap(drawable.getBitmap());
 
             initialWindow.setName(getString(R.string.favorite_template_initial) + geoPointFromIntent.getName());
@@ -655,7 +655,7 @@ public class LocationMapViewer extends Activity implements Constants  {
 
                 }
                 GeoBmpDto currentWindow = getCurrentAsGeoPointDto(getString(R.string.favorite_template_current));
-                FavoriteListActivity.show(this, R.id.cmd_favorite_list, initialWindow, currentWindow, gpsWindow);
+                FavoriteListActivity.show(this, R.id.cmd_favorite_list, currentWindow, gpsWindow, initialWindow);
                 return true;
 
             case R.id.cmd_settings: {

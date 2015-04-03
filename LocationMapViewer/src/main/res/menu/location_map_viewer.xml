@@ -19,9 +19,9 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/cmd_favorite_list"
+    <item android:id="@+id/cmd_bookmark_list"
         android:icon="@drawable/ic_action_important"
-        android:title="@string/title_favorite_list"
+        android:title="@string/title_bookmark_list"
         android:showAsAction="always"/>
     <item android:id="@+id/cmd_settings"
         android:icon="@drawable/ic_action_settings"

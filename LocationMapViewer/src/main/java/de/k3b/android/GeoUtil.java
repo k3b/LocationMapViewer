@@ -19,7 +19,6 @@
 
 package de.k3b.android;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -40,12 +39,12 @@ import de.k3b.geo.api.IGeoPointInfo;
  */
 public class GeoUtil {
     /** convert from osm {@link org.osmdroid.api.IGeoPoint} to k3b - {@link de.k3b.geo.api.GeoPointDto} */
-    public static GeoPointDto createFavorite(IGeoPoint center, int zoomLevel, String name) {
-        return createFavorite(center, zoomLevel, name, new GeoPointDto());
+    public static GeoPointDto createBookmark(IGeoPoint center, int zoomLevel, String name) {
+        return createBookmark(center, zoomLevel, name, new GeoPointDto());
     }
 
     /** convert from osm {@link org.osmdroid.api.IGeoPoint} to k3b - {@link de.k3b.geo.api.GeoPointDto} */
-    public static GeoPointDto createFavorite(IGeoPoint center, int zoomLevel, String name, GeoPointDto destination) {
+    public static GeoPointDto createBookmark(IGeoPoint center, int zoomLevel, String name, GeoPointDto destination) {
         return destination
                 .setLatitude(center.getLatitude())
                 .setLongitude(center.getLongitude())

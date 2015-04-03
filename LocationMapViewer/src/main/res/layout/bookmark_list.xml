@@ -22,7 +22,7 @@
 		style="@style/AppTheme"
 	android:layout_width="wrap_content" android:layout_height="fill_parent"
     >
-    <!-- favorite_list (without Actionbar) for android < 3.0 using an icon-list to process the list-items -->
+    <!-- bookmark_list (without Actionbar) for android < 3.0 using an icon-list to process the list-items -->
     <LinearLayout android:id="@+id/commands" android:layout_width="fill_parent"
         android:layout_height="wrap_content" android:orientation="horizontal"
         >

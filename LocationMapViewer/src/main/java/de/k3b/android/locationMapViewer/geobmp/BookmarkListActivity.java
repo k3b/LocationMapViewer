@@ -42,8 +42,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
-import org.osmdroid.ResourceProxy;
-
 import java.util.List;
 
 import de.k3b.android.locationMapViewer.R;
@@ -54,14 +52,14 @@ import de.k3b.geo.api.IGeoRepository;
 import de.k3b.geo.io.GeoUri;
 
 /**
- * Activity to show a list of Favorites as {@link de.k3b.geo.api.GeoPointDto}-s with options to edit/delete/add.
+ * Activity to show a list of Bookmarks as {@link de.k3b.geo.api.GeoPointDto}-s with options to edit/delete/add.
  * <p/>
  * Created by k3b on 23.03.2015.
  */
-public class FavoriteListActivity extends ListActivity implements
+public class BookmarkListActivity extends ListActivity implements
         IGeoInfoHandler, Constants {
 
-    private static final String FAVORITES_FILE_NAME = "favorites.txt";
+    private static final String BOOKMARKS_FILE_NAME = "favorites.txt";
 
     // private static final int MENU_ADD_CATEGORY = Menu.FIRST;
     private static final int EDIT_MENU_ID = Menu.FIRST + 1;
@@ -100,10 +98,10 @@ public class FavoriteListActivity extends ListActivity implements
             int idOnOkResultCode,
             GeoBmpDto... additionalPoints) {
         // parameters to be consumed in onCreate()
-        FavoriteListActivity.paramAdditionalPoints = additionalPoints;
+        BookmarkListActivity.paramAdditionalPoints = additionalPoints;
 
         final Intent intent = new Intent().setClass(context,
-                FavoriteListActivity.class);
+                BookmarkListActivity.class);
 
         if (idOnOkResultCode != 0) {
             ((Activity) context).startActivityForResult(intent,
@@ -117,20 +115,20 @@ public class FavoriteListActivity extends ListActivity implements
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (USE_ACTIONBAR) {
-            this.setContentView(R.layout.favorite_list_ab);
+            this.setContentView(R.layout.bookmark_list_ab);
             initActionBar();
         } else {
-            this.setContentView(R.layout.favorite_list);
+            this.setContentView(R.layout.bookmark_list);
             createButtons();
         }
 
-        this.repository = new GeoBmpFileRepository(this.getDatabasePath(FAVORITES_FILE_NAME));
+        this.repository = new GeoBmpFileRepository(this.getDatabasePath(BOOKMARKS_FILE_NAME));
 
-        this.additionalPoints = FavoriteListActivity.paramAdditionalPoints;
-        FavoriteListActivity.paramAdditionalPoints = null;
+        this.additionalPoints = BookmarkListActivity.paramAdditionalPoints;
+        BookmarkListActivity.paramAdditionalPoints = null;
 
         for (GeoBmpDto template : this.additionalPoints) {
-            FavoriteUtil.markAsTemplate(template);
+            BookmarkUtil.markAsTemplate(template);
         }
         final ListView listView = this.getListView();
 
@@ -188,14 +186,14 @@ public class FavoriteListActivity extends ListActivity implements
         cmdEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FavoriteListActivity.this.showGeoPointEditDialog(FavoriteListActivity.this.currentItem);
+                BookmarkListActivity.this.showGeoPointEditDialog(BookmarkListActivity.this.currentItem);
             }
         });
 
         cmdSaveAs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FavoriteListActivity.this.showGeoPointEditDialog(FavoriteUtil.createFavorite(FavoriteListActivity.this.currentItem));
+                BookmarkListActivity.this.showGeoPointEditDialog(BookmarkUtil.createBookmark(BookmarkListActivity.this.currentItem));
             }
         });
 
@@ -229,11 +227,11 @@ public class FavoriteListActivity extends ListActivity implements
                 return true;
 
             case R.id.cmd_edit      :
-                FavoriteListActivity.this.showGeoPointEditDialog(FavoriteListActivity.this.currentItem);
+                BookmarkListActivity.this.showGeoPointEditDialog(BookmarkListActivity.this.currentItem);
                 return true;
 
             case R.id.cmd_save_as   :
-                FavoriteListActivity.this.showGeoPointEditDialog(FavoriteUtil.createFavorite(FavoriteListActivity.this.currentItem));
+                BookmarkListActivity.this.showGeoPointEditDialog(BookmarkUtil.createBookmark(BookmarkListActivity.this.currentItem));
                 return true;
 
             case R.id.cmd_delete    :
@@ -257,7 +255,7 @@ public class FavoriteListActivity extends ListActivity implements
         if (USE_ACTIONBAR) {
             // Inflate the menu items for use in the action bar
             MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.favorite_list_ab, menu);
+            inflater.inflate(R.menu.bookmark_list_ab, menu);
 
             menuItemZoomTo  = menu.findItem(R.id.cmd_zoom_to)   ;
             menuItemEdit    = menu.findItem(R.id.cmd_edit)      ;
@@ -281,9 +279,9 @@ public class FavoriteListActivity extends ListActivity implements
             onActionIconsChanged();
         } else if (cmdZoomTo != null) {
             cmdZoomTo.setEnabled(sel);
-            cmdEdit.setEnabled(sel && FavoriteUtil.isFavorite(newSelection));
-            cmdSaveAs.setEnabled(sel && !FavoriteUtil.isFavorite(newSelection));
-            cmdDelete.setEnabled(sel && FavoriteUtil.isFavorite(newSelection));
+            cmdEdit.setEnabled(sel && BookmarkUtil.isBookmark(newSelection));
+            cmdSaveAs.setEnabled(sel && !BookmarkUtil.isBookmark(newSelection));
+            cmdDelete.setEnabled(sel && BookmarkUtil.isBookmark(newSelection));
         }
     }
 
@@ -305,9 +303,9 @@ public class FavoriteListActivity extends ListActivity implements
         if (menuItemZoomTo != null) {
             final boolean sel = (newSelection != null);
             enable(menuItemZoomTo, true, sel);
-            enable(menuItemEdit, true, sel && FavoriteUtil.isFavorite(newSelection));
-            enable(menuItemSaveAs, true, sel && !FavoriteUtil.isFavorite(newSelection));
-            enable(menuItemDelete, false, sel && FavoriteUtil.isFavorite(newSelection));
+            enable(menuItemEdit, true, sel && BookmarkUtil.isBookmark(newSelection));
+            enable(menuItemSaveAs, true, sel && !BookmarkUtil.isBookmark(newSelection));
+            enable(menuItemDelete, false, sel && BookmarkUtil.isBookmark(newSelection));
         }
     }
 
@@ -337,9 +335,9 @@ public class FavoriteListActivity extends ListActivity implements
      */
     @Override
     public boolean onGeoInfo(IGeoPointInfo geoPointInfo) {
-        if (FavoriteUtil.isValid(geoPointInfo)) {
+        if (BookmarkUtil.isValid(geoPointInfo)) {
             GeoBmpDto item = (GeoBmpDto) geoPointInfo;
-            if (FavoriteUtil.isNew(item)) {
+            if (BookmarkUtil.isNew(item)) {
                 item.setId(repository.createId());
                 List<GeoBmpDto> items = this.repository.load();
                 items.add(0, item);
@@ -364,10 +362,10 @@ public class FavoriteListActivity extends ListActivity implements
     public void showGeoPointEditDialog(final GeoBmpDto geoPointInfo) {
         if (this.edit == null) {
             this.edit = new GeoBmpEditDialog(this, this, R.layout.geobmp_edit_name);
-            this.edit.setTitle(getString(R.string.title_favorite_edit));
+            this.edit.setTitle(getString(R.string.title_bookmark_edit));
         }
         this.edit.onGeoInfo(geoPointInfo);
-        this.showDialog(FavoriteListActivity.EDIT_MENU_ID);
+        this.showDialog(BookmarkListActivity.EDIT_MENU_ID);
     }
 
     private void deleteConfirm() {
@@ -416,7 +414,7 @@ public class FavoriteListActivity extends ListActivity implements
 
     private void deleteCurrent() {
         if (repository.delete(currentItem)) {
-            FavoriteListActivity.this.reloadGuiFromRepository();
+            BookmarkListActivity.this.reloadGuiFromRepository();
         }
     }
 

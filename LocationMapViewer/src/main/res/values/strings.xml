@@ -38,11 +38,11 @@
     <string name="about_content_about">"
 <![CDATA[
 <h1> LocationMapViewer </h1>
-<p> An app that can display geografic info in a map. It has 
-support for <strong>gpx</strong> and <strong>kml</strong> 
-files and <strong>geo-uri-s</strong> and can work offline 
+<p> An app that can display geografic info in a map. It has
+support for <strong>gpx</strong> and <strong>kml</strong>
+files and <strong>geo-uri-s</strong> and can work offline
 (without internet/wifi) once geodata is downloaded and cached. </p>
-<p> Other Android apps can use LocationMapViewer through an 
+<p> Other Android apps can use LocationMapViewer through an
 Intent interface (see <a
 href="https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/main/java/de/k3b/android/locationMapViewer/demo/GeoIntentDemoActivity.java">
 GeoIntentDemo.java</a>) or through html links similar to <a href="geo:0,0?q=53.0,8.0(Hello)">geo:0,0?q=53.0,8.0(Hello)</a>
@@ -52,14 +52,14 @@ GeoIntentDemo.java</a>) or through html links similar to <a href="geo:0,0?q=53.0
 "</string>
 
     <!-- added in version 0.3.* -->
-    <string name="title_favorite_list">Favorites</string>
-    <string name="title_favorite_edit">Favorite</string>
+    <string name="title_bookmark_list">Bookmarks</string>
+    <string name="title_bookmark_edit">Bookmark</string>
     <string name="no_items_found">No items Found</string>
     <string name="cmd_save"> Save </string>
     <string name="cmd_cancel"> Cancel </string>
     <string name="title_activity_geopoint_edit">Edit</string>
     <string name="title_rename">Rename</string>
-    <string name="title_save_as">Save as Favorite</string>
+    <string name="title_save_as">Save as Bookmark</string>
     <string name="title_delete">Delete</string>
     <string name="title_help">Help</string>
     <string name="title_map">Show in Map</string>
@@ -68,8 +68,8 @@ GeoIntentDemo.java</a>) or through html links similar to <a href="geo:0,0?q=53.0
     <string name="format_question_delete">"Are you sure you want to permanently delete \n\n %1$s ? \n\n This is NOT undoable.</string>
     <string name="cmd_yes">Yes</string>
     <string name="cmd_no">No</string>
-    <string name="favorite_template_current">[Current Window] </string>
-    <string name="favorite_template_initial">[Inital Window] </string>
-    <string name="favorite_template_gps">"[GPS] "</string>
+    <string name="bookmark_template_current">[Current Window] </string>
+    <string name="bookmark_template_initial">[Inital Window] </string>
+    <string name="bookmark_template_gps">"[GPS] "</string>
 
 </resources>

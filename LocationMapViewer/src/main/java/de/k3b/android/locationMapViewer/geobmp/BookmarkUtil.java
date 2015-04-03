@@ -22,15 +22,15 @@ package de.k3b.android.locationMapViewer.geobmp;
 import de.k3b.geo.api.IGeoPointInfo;
 
 /**
- * utils to handle favorite items.
+ * utils to handle bookmark items.
  *
  * Created by k3b on 27.03.2015.
  */
-public class FavoriteUtil {
+public class BookmarkUtil {
     private static int id =1;
 
     /** clones item (i.e. currentPositon) and mark it as new */
-    public static GeoBmpDto createFavorite(GeoBmpDto template) {
+    public static GeoBmpDto createBookmark(GeoBmpDto template) {
         GeoBmpDto result = (GeoBmpDto) template.clone();
         result
                 .setBitmap(template.getBitmap())
@@ -40,7 +40,7 @@ public class FavoriteUtil {
         return result;
     }
 
-    public static boolean isFavorite(GeoBmpDto item) {
+    public static boolean isBookmark(GeoBmpDto item) {
         return ((item != null) && (item.getDescription() == null));
     }
 

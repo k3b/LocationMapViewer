@@ -77,8 +77,8 @@ import java.util.List;
 
 import de.k3b.android.GeoUtil;
 import de.k3b.android.locationMapViewer.constants.Constants;
-import de.k3b.android.locationMapViewer.geobmp.FavoriteListActivity;
-import de.k3b.android.locationMapViewer.geobmp.FavoriteUtil;
+import de.k3b.android.locationMapViewer.geobmp.BookmarkListActivity;
+import de.k3b.android.locationMapViewer.geobmp.BookmarkUtil;
 import de.k3b.android.locationMapViewer.geobmp.GeoBmpDto;
 import de.k3b.android.widgets.AboutDialogPreference;
 import de.k3b.geo.api.GeoPointDto;
@@ -150,7 +150,7 @@ public class LocationMapViewer extends Activity implements Constants  {
     private GuestureOverlay mGuesturesOverlay;
     private SeekBar mZoomBar;
 
-    /** first visible window as favorite candidate */
+    /** first visible window as bookmark candidate */
     private GeoBmpDto initialWindow = null;
     private boolean showLocation = false;
 
@@ -228,7 +228,7 @@ public class LocationMapViewer extends Activity implements Constants  {
             BitmapDrawable drawable = (BitmapDrawable) getResources().getDrawable(R.drawable.marker_no_data);
             initialWindow.setBitmap(drawable.getBitmap());
 
-            initialWindow.setName(getString(R.string.favorite_template_initial) + geoPointFromIntent.getName());
+            initialWindow.setName(getString(R.string.bookmark_template_initial) + geoPointFromIntent.getName());
         }
 
         loadGeoPointDtosFromFile(intent, pointCollector);
@@ -352,7 +352,7 @@ public class LocationMapViewer extends Activity implements Constants  {
         poiMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         poiMarker.setPosition(toOsmGeoPoint(aGeoPoint));
 
-        if (FavoriteUtil.isNotEmpty(description) || FavoriteUtil.isNotEmpty(aGeoPoint.getUri())) {
+        if (BookmarkUtil.isNotEmpty(description) || BookmarkUtil.isNotEmpty(aGeoPoint.getUri())) {
             poiMarker.setIcon(mPoiIconWithData);
             // 7.
             poiMarker.setInfoWindow(new CustomInfoWindow(map));
@@ -643,19 +643,19 @@ public class LocationMapViewer extends Activity implements Constants  {
                 this.showDialog(R.id.cmd_help);
                 return true;
 
-            case R.id.cmd_favorite_list:
+            case R.id.cmd_bookmark_list:
                 GeoPoint gps = (this.mLocationOverlay != null) ? this.mLocationOverlay.getMyLocation() : null;
 
                 GeoBmpDto gpsWindow = null;
                 if (gps != null) {
                     gpsWindow = new GeoBmpDto();
-                    GeoUtil.createFavorite(gps, IGeoPointInfo.NO_ZOOM, getString(R.string.favorite_template_gps), gpsWindow);
+                    GeoUtil.createBookmark(gps, IGeoPointInfo.NO_ZOOM, getString(R.string.bookmark_template_gps), gpsWindow);
                     BitmapDrawable drawable = (BitmapDrawable) getResources().getDrawable(R.drawable.person);
                     gpsWindow.setBitmap(drawable.getBitmap());
 
                 }
-                GeoBmpDto currentWindow = getCurrentAsGeoPointDto(getString(R.string.favorite_template_current));
-                FavoriteListActivity.show(this, R.id.cmd_favorite_list, currentWindow, gpsWindow, initialWindow);
+                GeoBmpDto currentWindow = getCurrentAsGeoPointDto(getString(R.string.bookmark_template_current));
+                BookmarkListActivity.show(this, R.id.cmd_bookmark_list, currentWindow, gpsWindow, initialWindow);
                 return true;
 
             case R.id.cmd_settings: {
@@ -676,7 +676,7 @@ public class LocationMapViewer extends Activity implements Constants  {
 
     private GeoBmpDto getCurrentAsGeoPointDto(String name) {
         GeoBmpDto current = new GeoBmpDto();
-        GeoUtil.createFavorite(this.mMapView.getMapCenter(), this.mMapView.getZoomLevel(), name, current);
+        GeoUtil.createBookmark(this.mMapView.getMapCenter(), this.mMapView.getZoomLevel(), name, current);
         current.setBitmap(GeoUtil.createBitmapFromMapView(mMapView, GeoBmpDto.WIDTH, GeoBmpDto.HEIGHT));
         return current;
     }
@@ -698,7 +698,7 @@ public class LocationMapViewer extends Activity implements Constants  {
                 }
 
                 break;
-            case R.id.cmd_favorite_list:
+            case R.id.cmd_bookmark_list:
                 if (data != null) {
                     RestoreXYZ(); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
 
@@ -774,9 +774,9 @@ public class LocationMapViewer extends Activity implements Constants  {
         setDelayedCenterZoom("setDelayedZoom", null, null, zoomLevel);
     }
 
-    /** Zoom to center / zoomLevel from favorite. */
-    public void setDelayedCenterZoom(IGeoPointInfo favorite) {
-        this.setDelayedCenterZoom("fromFavorite", GeoUtil.createOsmPoint(favorite), null, favorite.getZoomMin());
+    /** Zoom to center / zoomLevel from bookmark. */
+    public void setDelayedCenterZoom(IGeoPointInfo bookmark) {
+        this.setDelayedCenterZoom("fromBookmark", GeoUtil.createOsmPoint(bookmark), null, bookmark.getZoomMin());
     }
 
     /** impelementation of setDelayedXXXX() */

@@ -17,12 +17,12 @@
   ~ You should have received a copy of the GNU General Public License along with
   ~ this program. If not, see <http://www.gnu.org/licenses/>
   -->
-<!-- favorite_list for android >= 3.0 using action-bar-commands to process the list-items -->
+<!-- bookmark_list for android >= 3.0 using action-bar-commands to process the list-items -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 		style="@style/AppTheme"
 	android:layout_width="wrap_content" android:layout_height="fill_parent"
     >
-    <!-- favorite_list_ab with Actionbar) for android >= 3.0 using actionbar instead of icon-list to process the list-items -->
+    <!-- bookmark_list_ab with Actionbar) for android >= 3.0 using actionbar instead of icon-list to process the list-items -->
     <ListView android:id="@+id/android:list"
         android:layout_width="fill_parent" android:layout_height="fill_parent"
         android:choiceMode="singleChoice"

@@ -166,9 +166,14 @@ public class LocationMapViewer extends Activity implements Constants  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = this.getIntent();
+        GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
+
         mUsePicker = (Intent.ACTION_PICK.equals(intent.getAction()));
 
         String extraTitle = intent.getStringExtra(Intent.EXTRA_TITLE);
+        if (extraTitle == null && (geoPointFromIntent == null)) {
+            extraTitle = getString(R.string.app_name);
+        }
         if (extraTitle == null) {
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
                 // must be called before this.setContentView(...) else crash
@@ -193,8 +198,6 @@ public class LocationMapViewer extends Activity implements Constants  {
         } else {
             setNoTitle();
         }
-
-        GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
 
         mUseClusterPoints = mPrefs.getBoolean(PREFS_CLUSTER_POINTS, true);
 

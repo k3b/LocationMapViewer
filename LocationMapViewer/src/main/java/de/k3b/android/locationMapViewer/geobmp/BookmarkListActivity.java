@@ -109,7 +109,9 @@ public class BookmarkListActivity extends ListActivity implements
             createButtons();
         }
 
-        this.bookMarkController = new BookmarkListController(this, this.getListView(), BookmarkListActivity.paramAdditionalPoints);
+        this.bookMarkController = new BookmarkListController(this, this.getListView())
+                .setAdditionalPoints(BookmarkListActivity.paramAdditionalPoints)
+                .reloadGuiFromRepository();
         this.bookMarkController.setSelChangedListener(new BookmarkListController.OnSelChangedListener() {
             @Override
             public void onSelChanged(GeoBmpDto newSelection) {

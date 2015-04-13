@@ -102,7 +102,7 @@ class GeoBmpListAdapter extends
         if (dto != null) {
             GeoBmpBinder.toGui(itemView, dto);
 
-            final int backgroundColor = ((this.currentSelecion == dto)) ? Color.LTGRAY : Color.WHITE;
+            final int backgroundColor = ((this.currentSelecion == dto)) ? Color.LTGRAY : Color.TRANSPARENT;
             itemView.setBackgroundColor(backgroundColor);
         }
     }

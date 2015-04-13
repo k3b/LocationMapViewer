@@ -17,42 +17,123 @@
 * You should have received a copy of the GNU General Public License along with
 * this program. If not, see <http://www.gnu.org/licenses/>
 -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/parent_container"
+<android.support.v4.widget.DrawerLayout
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <org.osmdroid.views.MapView
-        android:id="@+id/mapview"
+    <!-- the gui -->
+    <RelativeLayout
+        android:id="@+id/parent_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:src="@android:drawable/ic_menu_more"
-        android:id="@+id/cmd_menu"
+        android:layout_height="match_parent">
 
-        android:layout_alignParentRight="true"
-        />
+        <org.osmdroid.views.MapView
+            android:id="@+id/mapview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:src="@android:drawable/ic_menu_more"
+            android:id="@+id/cmd_menu"
 
-    <SeekBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/zoomBar"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentLeft="true"
-        />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:text="@string/label_select"
-        android:id="@+id/ok"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_above="@id/zoomBar"
-        />
+            android:layout_alignParentRight="true"
+            />
 
-</RelativeLayout>
+        <SeekBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/zoomBar"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentLeft="true"
+            />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:text="@string/label_select"
+            android:id="@+id/ok"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_above="@id/zoomBar"
+            />
+
+
+        <!-- to show fragment_bookmark_list which is normally hidden -->
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_important"
+            android:id="@+id/cmd_unhide_bookmark_list"
+            android:visibility="gone"
+
+            android:layout_alignParentLeft="true"
+            />
+    </RelativeLayout>
+
+    <!-- made visible via @+id/cmd_unhide_bookmark_list and as navigation drawer
+        width = 5Buttons à 60 dp
+    -->
+    <RelativeLayout
+        android:id="@+id/fragment_bookmark_list"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        >
+        <!-- Icon toolbar -->
+        <LinearLayout android:id="@+id/commands" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="horizontal"
+            >
+
+            <ImageButton android:id="@+id/cmd_edit"
+                android:src="@drawable/ic_action_edit"
+                android:contentDescription="@string/title_rename"
+                style="@style/AppTheme.ImageButton"
+                />
+
+            <ImageButton android:id="@+id/cmd_save_as"
+                android:src="@drawable/ic_action_important"
+                android:contentDescription="@string/title_save_as"
+                style="@style/AppTheme.ImageButton"
+                />
+
+            <ImageButton android:id="@+id/cmd_delete"
+                android:src="@drawable/ic_action_delete"
+                android:contentDescription="@string/title_delete"
+                style="@style/AppTheme.ImageButton"
+                />
+
+            <ImageButton android:id="@+id/cmd_help"
+                android:src="@drawable/ic_action_help"
+                android:contentDescription="@string/title_help"
+                style="@style/AppTheme.ImageButton"
+                />
+
+            <!-- hide fragment -->
+            <ImageButton android:id="@+id/cmd_cancel"
+                android:src="@drawable/ic_action_cancel"
+                android:contentDescription="@string/title_help"
+                style="@style/AppTheme.ImageButton"
+                />
+
+        </LinearLayout>
+
+        <!-- listview with bookmarks -->
+        <ListView android:id="@+id/android:list"
+            android:layout_width="fill_parent" android:layout_height="fill_parent"
+            android:layout_below="@id/commands"
+            android:choiceMode="singleChoice"
+            android:layout_alignParentRight="@+id/commands"
+            android:layout_alignParentLeft="@+id/commands"
+            android:dividerHeight="2dp"
+            android:fastScrollEnabled="true"/>
+
+    </RelativeLayout>
+</android.support.v4.widget.DrawerLayout>

@@ -39,7 +39,7 @@
     <style name="AppTheme.ImageButton" >
         <item name="android:layout_width">60dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">32dp</item>
+        <!-- <item name="android:layout_marginBottom">32dp</item> -->
         <item name="android:background">@drawable/custom_button</item>
     </style>
 

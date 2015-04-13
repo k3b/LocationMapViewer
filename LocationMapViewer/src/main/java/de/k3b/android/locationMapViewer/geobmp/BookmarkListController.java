@@ -41,6 +41,14 @@ public class BookmarkListController {
 
     private GeoBmpDto currentItem;
 
+    public BookmarkListController setAdditionalPoints(GeoBmpDto[] additionalPoints) {
+        this.additionalPoints = additionalPoints;
+        for (GeoBmpDto template : this.additionalPoints) {
+            BookmarkUtil.markAsTemplate(template);
+        }
+        return this;
+    }
+
     interface OnSelChangedListener
     {
         void onSelChanged(GeoBmpDto newSelection);
@@ -49,21 +57,13 @@ public class BookmarkListController {
     private final Context context;
     private final ListView listView;
     private final IGeoRepository<GeoBmpDto> repository;
-    /**
-     * pseudo item as placeholder for creating a new items for current, initial, gps
-     */
     private GeoBmpDto[] additionalPoints = null;
     private OnSelChangedListener selChangedListener = null;
 
-    public BookmarkListController(Context context, final ListView listView, GeoBmpDto[] additionalPoints) {
+    public BookmarkListController(Context context, final ListView listView) {
         this.context = context;
         this.listView = listView;
         this.repository = new GeoBmpFileRepository(this.context.getDatabasePath(BOOKMARKS_FILE_NAME));
-
-        this.additionalPoints = additionalPoints;
-        for (GeoBmpDto template : this.additionalPoints) {
-            BookmarkUtil.markAsTemplate(template);
-        }
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -90,19 +90,18 @@ public class BookmarkListController {
 */
         // this.registerForContextMenu(listView);
 
-        this.reloadGuiFromRepository();
-
     }
 
     public void setSelChangedListener(OnSelChangedListener selChangedListener) {
         this.selChangedListener = selChangedListener;
     }
 
-    public void reloadGuiFromRepository() {
+    public BookmarkListController reloadGuiFromRepository() {
         final ArrayAdapter<GeoBmpDto> adapter = GeoBmpListAdapter.createAdapter(this.context,
                 R.layout.geobmp_list_view_row, repository, additionalPoints);
         this.listView.setAdapter(adapter);
         this.setCurrentItem(adapter.isEmpty() ? null : adapter.getItem(0));
+        return this;
     }
 
 

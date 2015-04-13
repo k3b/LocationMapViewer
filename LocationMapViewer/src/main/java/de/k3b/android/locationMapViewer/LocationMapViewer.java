@@ -78,6 +78,7 @@ import java.util.List;
 import de.k3b.android.GeoUtil;
 import de.k3b.android.locationMapViewer.constants.Constants;
 import de.k3b.android.locationMapViewer.geobmp.BookmarkListActivity;
+import de.k3b.android.locationMapViewer.geobmp.BookmarkListOverlay;
 import de.k3b.android.locationMapViewer.geobmp.BookmarkUtil;
 import de.k3b.android.locationMapViewer.geobmp.GeoBmpDto;
 import de.k3b.android.widgets.AboutDialogPreference;
@@ -102,7 +103,7 @@ import microsoft.mappoint.TileSystem;
  * no support for fragments.<br/>
  * The code is based on "org.osmdroid.samples.SampleWithMinimapItemizedoverlay in DemoApp OpenStreetMapViewer"
  */
-public class LocationMapViewer extends Activity implements Constants  {
+public class LocationMapViewer extends Activity implements Constants, BookmarkListOverlay.AdditionalPoints  {
     private static final Logger logger = LoggerFactory.getLogger(LocationMapViewer.class);
 
     // ===========================================================
@@ -153,6 +154,7 @@ public class LocationMapViewer extends Activity implements Constants  {
     /** first visible window as bookmark candidate */
     private GeoBmpDto initialWindow = null;
     private boolean showLocation = false;
+    private BookmarkListOverlay bookmarkListOverlay;
 
     // ===========================================================
     // Constructors
@@ -267,6 +269,17 @@ public class LocationMapViewer extends Activity implements Constants  {
 //        if (initalMapCenterZoom != null) {
 //            setCenterZoom(initalMapCenterZoom);
 //        }
+
+        this.bookmarkListOverlay = new BookmarkListOverlay(this, this) {
+            @Override
+            protected void onSelChanged(GeoBmpDto newSelection) {
+                super.onSelChanged(newSelection);
+
+                if (newSelection != null) {
+                    setDelayedCenterZoom(newSelection);
+                }
+            }
+        };
     }
 
     private void setNoTitle() {
@@ -647,18 +660,8 @@ public class LocationMapViewer extends Activity implements Constants  {
                 return true;
 
             case R.id.cmd_bookmark_list:
-                GeoPoint gps = (this.mLocationOverlay != null) ? this.mLocationOverlay.getMyLocation() : null;
-
-                GeoBmpDto gpsWindow = null;
-                if (gps != null) {
-                    gpsWindow = new GeoBmpDto();
-                    GeoUtil.createBookmark(gps, IGeoPointInfo.NO_ZOOM, getString(R.string.bookmark_template_gps), gpsWindow);
-                    BitmapDrawable drawable = (BitmapDrawable) getResources().getDrawable(R.drawable.person);
-                    gpsWindow.setBitmap(drawable.getBitmap());
-
-                }
-                GeoBmpDto currentWindow = getCurrentAsGeoPointDto(getString(R.string.bookmark_template_current));
-                BookmarkListActivity.show(this, R.id.cmd_bookmark_list, currentWindow, gpsWindow, initialWindow);
+                GeoBmpDto[] additionalPoints = getAdditionalPoints();
+                BookmarkListActivity.show(this, R.id.cmd_bookmark_list, additionalPoints);
                 return true;
 
             case R.id.cmd_settings: {
@@ -675,6 +678,22 @@ public class LocationMapViewer extends Activity implements Constants  {
             }
         }
         return false;
+    }
+
+    /** implements interface BookmarkListOverlay.AdditionalPoints() */
+    public GeoBmpDto[] getAdditionalPoints() {
+        GeoPoint gps = (this.mLocationOverlay != null) ? this.mLocationOverlay.getMyLocation() : null;
+
+        GeoBmpDto gpsWindow = null;
+        if (gps != null) {
+            gpsWindow = new GeoBmpDto();
+            GeoUtil.createBookmark(gps, IGeoPointInfo.NO_ZOOM, getString(R.string.bookmark_template_gps), gpsWindow);
+            BitmapDrawable drawable = (BitmapDrawable) getResources().getDrawable(R.drawable.person);
+            gpsWindow.setBitmap(drawable.getBitmap());
+
+        }
+        GeoBmpDto currentWindow = getCurrentAsGeoPointDto(getString(R.string.bookmark_template_current));
+        return new GeoBmpDto[]{currentWindow, gpsWindow, initialWindow};
     }
 
     private GeoBmpDto getCurrentAsGeoPointDto(String name) {
@@ -803,6 +822,9 @@ public class LocationMapViewer extends Activity implements Constants  {
 
     @Override
     protected Dialog onCreateDialog(final int id) {
+        Dialog result = this.bookmarkListOverlay.onCreateDialog(id);
+        if (result != null) return result;
+
         switch (id) {
             case R.id.cmd_help:
                 return AboutDialogPreference.createAboutDialog(this);
@@ -810,7 +832,6 @@ public class LocationMapViewer extends Activity implements Constants  {
         }
         return null;
     }
-
 
     // ===========================================================
     // Inner and Anonymous Classes

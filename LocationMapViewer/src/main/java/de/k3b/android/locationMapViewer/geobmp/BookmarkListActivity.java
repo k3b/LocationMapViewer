@@ -37,18 +37,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.ListView;
-
-import java.util.List;
 
 import de.k3b.android.locationMapViewer.R;
 import de.k3b.android.locationMapViewer.constants.Constants;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
-import de.k3b.geo.api.IGeoRepository;
 import de.k3b.geo.io.GeoUri;
 
 /**
@@ -59,13 +53,11 @@ import de.k3b.geo.io.GeoUri;
 public class BookmarkListActivity extends ListActivity implements
         IGeoInfoHandler, Constants {
 
-    private static final String BOOKMARKS_FILE_NAME = "favorites.txt";
-
     // private static final int MENU_ADD_CATEGORY = Menu.FIRST;
     private static final int EDIT_MENU_ID = Menu.FIRST + 1;
 
     /**
-     * parameter from caller to this: paramResourceIdActivityTitle resourceid of the list caption
+     * parameter from caller to this
      */
     private static GeoBmpDto[] paramAdditionalPoints;
 
@@ -81,14 +73,9 @@ public class BookmarkListActivity extends ListActivity implements
     private MenuItem menuItemDelete  = null ;
     private MenuItem menuItemHelp    = null ;
 
-    private IGeoRepository<GeoBmpDto> repository = null;
-    private GeoBmpDto currentItem;
     private GeoBmpEditDialog edit = null;
 
-    /**
-     * pseudo item as placeholder for creating a new items for current, initial, gps
-     */
-    private GeoBmpDto[] additionalPoints = null;
+    private BookmarkListController bookMarkController;
 
     /**
      * public api to show this list
@@ -122,42 +109,15 @@ public class BookmarkListActivity extends ListActivity implements
             createButtons();
         }
 
-        this.repository = new GeoBmpFileRepository(this.getDatabasePath(BOOKMARKS_FILE_NAME));
+        this.bookMarkController = new BookmarkListController(this, this.getListView(), BookmarkListActivity.paramAdditionalPoints);
+        this.bookMarkController.setSelChangedListener(new BookmarkListController.OnSelChangedListener() {
+            @Override
+            public void onSelChanged(GeoBmpDto newSelection) {
+                BookmarkListActivity.this.onSelChanged(newSelection);
+            }
+        });
 
-        this.additionalPoints = BookmarkListActivity.paramAdditionalPoints;
         BookmarkListActivity.paramAdditionalPoints = null;
-
-        for (GeoBmpDto template : this.additionalPoints) {
-            BookmarkUtil.markAsTemplate(template);
-        }
-        final ListView listView = this.getListView();
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                final GeoBmpDto currenSelection = (GeoBmpDto) listView.getItemAtPosition(position);
-                setCurrentItem(currenSelection);
-            }
-        });
-        /* does not work: onItemSelected is never called
-        listView.setItemsCanFocus(true);
-
-        listView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View childView,
-                                       int position, long id) {
-                setCurrentItem((GeoBmpDto) listView.getItemAtPosition(position));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                setCurrentItem(null);
-            }
-        });
-*/
-        // this.registerForContextMenu(listView);
-
-        this.reloadGuiFromRepository();
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -177,7 +137,7 @@ public class BookmarkListActivity extends ListActivity implements
         cmdZoomTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setResult(R.id.cmd_zoom_to, createIntent(currentItem));
+                setResult(R.id.cmd_zoom_to, createIntent(bookMarkController.getCurrentItem()));
                 finish();
 
             }
@@ -186,14 +146,14 @@ public class BookmarkListActivity extends ListActivity implements
         cmdEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BookmarkListActivity.this.showGeoPointEditDialog(BookmarkListActivity.this.currentItem);
+                BookmarkListActivity.this.showGeoPointEditDialog(bookMarkController.getCurrentItem());
             }
         });
 
         cmdSaveAs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BookmarkListActivity.this.showGeoPointEditDialog(BookmarkUtil.createBookmark(BookmarkListActivity.this.currentItem));
+                BookmarkListActivity.this.showGeoPointEditDialog(BookmarkUtil.createBookmark(bookMarkController.getCurrentItem()));
             }
         });
 
@@ -222,16 +182,16 @@ public class BookmarkListActivity extends ListActivity implements
                 return true;
 
             case R.id.cmd_zoom_to   :
-                this.setResult(R.id.cmd_zoom_to, createIntent(this.currentItem));
+                this.setResult(R.id.cmd_zoom_to, createIntent(this.bookMarkController.getCurrentItem()));
                 this.finish();
                 return true;
 
             case R.id.cmd_edit      :
-                BookmarkListActivity.this.showGeoPointEditDialog(BookmarkListActivity.this.currentItem);
+                BookmarkListActivity.this.showGeoPointEditDialog(bookMarkController.getCurrentItem());
                 return true;
 
             case R.id.cmd_save_as   :
-                BookmarkListActivity.this.showGeoPointEditDialog(BookmarkUtil.createBookmark(BookmarkListActivity.this.currentItem));
+                BookmarkListActivity.this.showGeoPointEditDialog(BookmarkUtil.createBookmark(BookmarkListActivity.this.bookMarkController.getCurrentItem()));
                 return true;
 
             case R.id.cmd_delete    :
@@ -247,7 +207,7 @@ public class BookmarkListActivity extends ListActivity implements
 
     private Intent createIntent(GeoBmpDto currentItem) {
         if (currentItem == null) return null;
-        return new Intent(Intent.ACTION_PICK , Uri.parse(new GeoUri(GeoUri.OPT_DEFAULT).toUriString(this.currentItem)));
+        return new Intent(Intent.ACTION_PICK , Uri.parse(new GeoUri(GeoUri.OPT_DEFAULT).toUriString(this.bookMarkController.getCurrentItem())));
     }
 
     @Override
@@ -268,12 +228,8 @@ public class BookmarkListActivity extends ListActivity implements
     }
 
 
-    private void setCurrentItem(GeoBmpDto newSelection) {
-        final GeoBmpListAdapter listAdapter = (GeoBmpListAdapter) getListAdapter();
-        listAdapter.setCurrentSelecion(newSelection);
-
-        this.currentItem = newSelection;
-
+    /** called after selection has changed */
+    private void onSelChanged(GeoBmpDto newSelection) {
         final boolean sel = (newSelection != null);
         if ((USE_ACTIONBAR) && (menuItemZoomTo != null)) {
             onActionIconsChanged();
@@ -293,7 +249,7 @@ public class BookmarkListActivity extends ListActivity implements
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (USE_ACTIONBAR) {
-            updateMenu(this.currentItem);
+            updateMenu(this.bookMarkController.getCurrentItem());
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -321,13 +277,6 @@ public class BookmarkListActivity extends ListActivity implements
 //      menuItem.setVisible(enabled);
     }
 
-    private void reloadGuiFromRepository() {
-        final ArrayAdapter<GeoBmpDto> adapter = GeoBmpListAdapter.createAdapter(this,
-                R.layout.geobmp_list_view_row, repository, additionalPoints);
-        this.setListAdapter(adapter);
-        setCurrentItem(adapter.isEmpty() ? null : adapter.getItem(0));
-    }
-
     /**
      * called by GeoPointEditDialog to inform list about changes
      *
@@ -335,16 +284,7 @@ public class BookmarkListActivity extends ListActivity implements
      */
     @Override
     public boolean onGeoInfo(IGeoPointInfo geoPointInfo) {
-        if (BookmarkUtil.isValid(geoPointInfo)) {
-            GeoBmpDto item = (GeoBmpDto) geoPointInfo;
-            if (BookmarkUtil.isNew(item)) {
-                item.setId(repository.createId());
-                List<GeoBmpDto> items = this.repository.load();
-                items.add(0, item);
-            }
-            this.repository.save();
-            this.reloadGuiFromRepository();
-        }
+        this.bookMarkController.update(geoPointInfo);
         return true;
     }
 
@@ -368,16 +308,18 @@ public class BookmarkListActivity extends ListActivity implements
         this.showDialog(BookmarkListActivity.EDIT_MENU_ID);
     }
 
+    /** before deleting: "Are you shure?" */
     private void deleteConfirm() {
-        if (this.currentItem != null) {
+        final GeoBmpDto currentItem = this.bookMarkController.getCurrentItem();
+        if (currentItem != null) {
             final String message = String.format(
                     this.getString(R.string.format_question_delete).toString(),
-                    this.currentItem.getName() +"\n"+ this.currentItem.getSummary());
+                    currentItem.getName() +"\n"+ currentItem.getSummary());
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             builder.setTitle(R.string.title_confirm_delete);
-            Bitmap bitmap = this.currentItem.getBitmap();
+            Bitmap bitmap = currentItem.getBitmap();
 
             if (bitmap != null) {
                 BitmapDrawable drawable = (bitmap == null) ? null : new BitmapDrawable(getResources(), bitmap);
@@ -392,7 +334,7 @@ public class BookmarkListActivity extends ListActivity implements
                                 public void onClick(
                                         final DialogInterface dialog,
                                         final int id) {
-                                    deleteCurrent();
+                                    BookmarkListActivity.this.bookMarkController.deleteCurrent();
                                 }
                             }
                     )
@@ -411,11 +353,4 @@ public class BookmarkListActivity extends ListActivity implements
             alert.show();
         }
     }
-
-    private void deleteCurrent() {
-        if (repository.delete(currentItem)) {
-            BookmarkListActivity.this.reloadGuiFromRepository();
-        }
-    }
-
 }

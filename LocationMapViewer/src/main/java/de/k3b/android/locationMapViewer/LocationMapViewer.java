@@ -155,6 +155,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
     private GeoBmpDto initialWindow = null;
     private boolean showLocation = false;
     private BookmarkListOverlay bookmarkListOverlay;
+    private ImageButton cmdShowMenu = null;
 
     // ===========================================================
     // Constructors
@@ -305,9 +306,9 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
             }
         };
 
-        ImageButton cmdOk = (ImageButton) findViewById(R.id.cmd_menu);
-        cmdOk.setVisibility(View.VISIBLE);
-        cmdOk.setOnClickListener(new View.OnClickListener() {
+        cmdShowMenu = (ImageButton) findViewById(R.id.cmd_menu);
+        cmdShowMenu.setVisibility(View.VISIBLE);
+        cmdShowMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 PopupMenu popup = new PopupMenu(LocationMapViewer.this, view);
@@ -641,6 +642,23 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.location_map_viewer, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    /* Called whenever we call invalidateOptionsMenu() */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+        boolean drawerOpen = this.bookmarkListOverlay.isBookmarkListVisible();
+
+        if (cmdShowMenu != null) {
+            cmdShowMenu.setVisibility((drawerOpen) ? View.INVISIBLE : View.VISIBLE );
+        }
+
+        menu.findItem(R.id.cmd_bookmark_list).setVisible(!drawerOpen);
+        menu.findItem(R.id.cmd_settings).setVisible(!drawerOpen);
+        menu.findItem(R.id.cmd_help).setVisible(!drawerOpen);
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     /** called by options/actionBar-menu */

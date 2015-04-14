@@ -19,12 +19,15 @@
 
 package de.k3b.android.locationMapViewer.geobmp;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.View;
@@ -32,6 +35,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import de.k3b.android.locationMapViewer.R;
+import de.k3b.android.locationMapViewer.constants.Constants;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
 
@@ -39,8 +43,9 @@ import de.k3b.geo.api.IGeoPointInfo;
  * Handles BookmarkList as part of the mapview
  * Created by k3b on 13.04.2015.
  */
-public class BookmarkListOverlay implements IGeoInfoHandler {
+public class BookmarkListOverlay implements IGeoInfoHandler, Constants {
     private final AdditionalPoints additionalPointProvider;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     public interface AdditionalPoints {
         GeoBmpDto[] getAdditionalPoints();
@@ -71,7 +76,7 @@ public class BookmarkListOverlay implements IGeoInfoHandler {
         });
 
         this.context = context;
-        createButtons(context);
+        createButtons();
     }
 
     protected void onSelChanged(GeoBmpDto newSelection) {
@@ -80,14 +85,14 @@ public class BookmarkListOverlay implements IGeoInfoHandler {
         cmdDelete.setEnabled(sel && BookmarkUtil.isBookmark(newSelection));
     }
 
-    private void createButtons(Activity context) {
+    private void createButtons() {
         mDrawerLayout = (DrawerLayout) context.findViewById(R.id.drawer_layout);
         fragmentBookmarkList = context.findViewById(R.id.fragment_bookmark_list);
         cmdShowFavirites = (ImageButton) context.findViewById(R.id.cmd_unhide_bookmark_list);
         cmdShowFavirites.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showFavorites(true);
+                setBookmarkListVisible(true);
             }
         });
 
@@ -95,11 +100,11 @@ public class BookmarkListOverlay implements IGeoInfoHandler {
         cmdHideFavirites.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showFavorites(false);
+                setBookmarkListVisible(false);
             }
         });
 
-        showFavorites(false);
+        setBookmarkListVisible(false);
         cmdEdit = (ImageButton) context.findViewById(R.id.cmd_edit);
         cmdDelete = (ImageButton) context.findViewById(R.id.cmd_delete);
 
@@ -116,9 +121,47 @@ public class BookmarkListOverlay implements IGeoInfoHandler {
                 deleteConfirm();
             }
         });
+
+        mDrawerToggle = new ActionBarDrawerToggle(this.context, mDrawerLayout, R.drawable.ic_action_important,
+                R.string.title_bookmark_list, R.string.title_close) {
+
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                cmdShowFavirites.setVisibility(View.VISIBLE);
+                if (USE_ACTIONBAR) {
+                    invalidateOptionsMenu();
+                }
+            }
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                cmdShowFavirites.setVisibility(View.INVISIBLE);
+                if (USE_ACTIONBAR) {
+                    invalidateOptionsMenu();
+                }
+            }
+        };
+
+        // Set the drawer toggle as the DrawerListener
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
-    public BookmarkListOverlay showFavorites(boolean visible) {
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public void invalidateOptionsMenu() {
+        // getActionBar().setTitle(mTitle);
+
+        // creates call to onPrepareOptionsMenu()
+        context.invalidateOptionsMenu();
+    }
+
+    public boolean isBookmarkListVisible() {
+        return mDrawerLayout.isDrawerOpen(this.fragmentBookmarkList);
+    }
+
+    public BookmarkListOverlay setBookmarkListVisible(boolean visible) {
         cmdShowFavirites.setVisibility((!visible) ? View.VISIBLE : View.INVISIBLE);
         // fragmentBookmarkList.setVisibility((visible) ? View.VISIBLE : View.INVISIBLE);
         if (visible) {

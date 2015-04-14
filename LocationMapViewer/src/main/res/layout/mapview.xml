@@ -98,28 +98,16 @@
                 style="@style/AppTheme.ImageButton"
                 />
 
-            <ImageButton android:id="@+id/cmd_save_as"
-                android:src="@drawable/ic_action_important"
-                android:contentDescription="@string/title_save_as"
-                style="@style/AppTheme.ImageButton"
-                />
-
             <ImageButton android:id="@+id/cmd_delete"
                 android:src="@drawable/ic_action_delete"
                 android:contentDescription="@string/title_delete"
                 style="@style/AppTheme.ImageButton"
                 />
 
-            <ImageButton android:id="@+id/cmd_help"
-                android:src="@drawable/ic_action_help"
-                android:contentDescription="@string/title_help"
-                style="@style/AppTheme.ImageButton"
-                />
-
             <!-- hide fragment -->
             <ImageButton android:id="@+id/cmd_cancel"
                 android:src="@drawable/ic_action_cancel"
-                android:contentDescription="@string/title_help"
+                android:contentDescription="@string/title_close"
                 style="@style/AppTheme.ImageButton"
                 />
 

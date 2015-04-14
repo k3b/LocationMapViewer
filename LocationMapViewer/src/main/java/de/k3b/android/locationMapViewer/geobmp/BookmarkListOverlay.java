@@ -54,9 +54,7 @@ public class BookmarkListOverlay implements IGeoInfoHandler {
     private View fragmentBookmarkList;
     private DrawerLayout mDrawerLayout = null;
     private ImageButton cmdEdit     = null;
-    private ImageButton cmdSaveAs   = null;
     private ImageButton cmdDelete   = null;
-    private ImageButton cmdHelp     = null;
     private ImageButton cmdShowFavirites;
     private ImageButton cmdHideFavirites;
 
@@ -78,8 +76,7 @@ public class BookmarkListOverlay implements IGeoInfoHandler {
 
     protected void onSelChanged(GeoBmpDto newSelection) {
         final boolean sel = (newSelection != null);
-        cmdEdit.setEnabled(sel && BookmarkUtil.isBookmark(newSelection));
-        cmdSaveAs.setEnabled(sel && !BookmarkUtil.isBookmark(newSelection));
+        cmdEdit.setEnabled(sel);
         cmdDelete.setEnabled(sel && BookmarkUtil.isBookmark(newSelection));
     }
 
@@ -104,21 +101,12 @@ public class BookmarkListOverlay implements IGeoInfoHandler {
 
         showFavorites(false);
         cmdEdit = (ImageButton) context.findViewById(R.id.cmd_edit);
-        cmdSaveAs = (ImageButton) context.findViewById(R.id.cmd_save_as);
         cmdDelete = (ImageButton) context.findViewById(R.id.cmd_delete);
-        cmdHelp = (ImageButton) context.findViewById(R.id.cmd_help);
 
         cmdEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showGeoPointEditDialog(bookMarkController.getCurrentItem());
-            }
-        });
-
-        cmdSaveAs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showGeoPointEditDialog(BookmarkUtil.createBookmark(bookMarkController.getCurrentItem()));
             }
         });
 
@@ -128,13 +116,6 @@ public class BookmarkListOverlay implements IGeoInfoHandler {
                 deleteConfirm();
             }
         });
-
-        cmdHelp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            }
-        });
-
     }
 
     public BookmarkListOverlay showFavorites(boolean visible) {
@@ -152,10 +133,14 @@ public class BookmarkListOverlay implements IGeoInfoHandler {
         return this;
     }
 
-    public void showGeoPointEditDialog(final GeoBmpDto geoPointInfo) {
+    public void showGeoPointEditDialog(GeoBmpDto geoPointInfo) {
         if (this.edit == null) {
             this.edit = new GeoBmpEditDialog(this.context, this, R.layout.geobmp_edit_name);
             this.edit.setTitle(context.getString(R.string.title_bookmark_edit));
+        }
+
+        if (!BookmarkUtil.isBookmark(geoPointInfo)) {
+            geoPointInfo = BookmarkUtil.createBookmark(geoPointInfo);
         }
         this.edit.onGeoInfo(geoPointInfo);
         this.context.showDialog(EDIT_MENU_ID);

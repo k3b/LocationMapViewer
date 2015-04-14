@@ -63,15 +63,11 @@ public class BookmarkListActivity extends ListActivity implements
 
     private ImageButton cmdZoomTo   = null;
     private ImageButton cmdEdit     = null;
-    private ImageButton cmdSaveAs   = null;
     private ImageButton cmdDelete   = null;
-    private ImageButton cmdHelp     = null;
 
     private MenuItem menuItemZoomTo  = null ;
     private MenuItem menuItemEdit    = null ;
-    private MenuItem menuItemSaveAs  = null ;
     private MenuItem menuItemDelete  = null ;
-    private MenuItem menuItemHelp    = null ;
 
     private GeoBmpEditDialog edit = null;
 
@@ -132,9 +128,7 @@ public class BookmarkListActivity extends ListActivity implements
     private void createButtons() {
         cmdZoomTo = (ImageButton) findViewById(R.id.cmd_zoom_to);
         cmdEdit = (ImageButton) findViewById(R.id.cmd_edit);
-        cmdSaveAs = (ImageButton) findViewById(R.id.cmd_save_as);
         cmdDelete = (ImageButton) findViewById(R.id.cmd_delete);
-        cmdHelp = (ImageButton) findViewById(R.id.cmd_help);
 
         cmdZoomTo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,26 +146,12 @@ public class BookmarkListActivity extends ListActivity implements
             }
         });
 
-        cmdSaveAs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                BookmarkListActivity.this.showGeoPointEditDialog(BookmarkUtil.createBookmark(bookMarkController.getCurrentItem()));
-            }
-        });
-
         cmdDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 deleteConfirm();
             }
         });
-
-        cmdHelp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            }
-        });
-
     }
 
     /** called by options/actionBar-menu */
@@ -192,16 +172,8 @@ public class BookmarkListActivity extends ListActivity implements
                 BookmarkListActivity.this.showGeoPointEditDialog(bookMarkController.getCurrentItem());
                 return true;
 
-            case R.id.cmd_save_as   :
-                BookmarkListActivity.this.showGeoPointEditDialog(BookmarkUtil.createBookmark(BookmarkListActivity.this.bookMarkController.getCurrentItem()));
-                return true;
-
             case R.id.cmd_delete    :
                 deleteConfirm();
-                return true;
-
-            case R.id.cmd_help:
-                // this.showDialog(R.id.cmd_help);
                 return true;
         }
         return super.onMenuItemSelected(featureId, item);
@@ -221,10 +193,7 @@ public class BookmarkListActivity extends ListActivity implements
 
             menuItemZoomTo  = menu.findItem(R.id.cmd_zoom_to)   ;
             menuItemEdit    = menu.findItem(R.id.cmd_edit)      ;
-            menuItemSaveAs  = menu.findItem(R.id.cmd_save_as)   ;
             menuItemDelete  = menu.findItem(R.id.cmd_delete)    ;
-            menuItemHelp    = menu.findItem(R.id.cmd_help)      ;
-
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -237,8 +206,7 @@ public class BookmarkListActivity extends ListActivity implements
             onActionIconsChanged();
         } else if (cmdZoomTo != null) {
             cmdZoomTo.setEnabled(sel);
-            cmdEdit.setEnabled(sel && BookmarkUtil.isBookmark(newSelection));
-            cmdSaveAs.setEnabled(sel && !BookmarkUtil.isBookmark(newSelection));
+            cmdEdit.setEnabled(sel);
             cmdDelete.setEnabled(sel && BookmarkUtil.isBookmark(newSelection));
         }
     }
@@ -261,8 +229,7 @@ public class BookmarkListActivity extends ListActivity implements
         if (menuItemZoomTo != null) {
             final boolean sel = (newSelection != null);
             enable(menuItemZoomTo, true, sel);
-            enable(menuItemEdit, true, sel && BookmarkUtil.isBookmark(newSelection));
-            enable(menuItemSaveAs, true, sel && !BookmarkUtil.isBookmark(newSelection));
+            enable(menuItemEdit, true, sel);
             enable(menuItemDelete, false, sel && BookmarkUtil.isBookmark(newSelection));
         }
     }
@@ -301,10 +268,13 @@ public class BookmarkListActivity extends ListActivity implements
         return null;
     }
 
-    public void showGeoPointEditDialog(final GeoBmpDto geoPointInfo) {
+    public void showGeoPointEditDialog(GeoBmpDto geoPointInfo) {
         if (this.edit == null) {
             this.edit = new GeoBmpEditDialog(this, this, R.layout.geobmp_edit_name);
             this.edit.setTitle(getString(R.string.title_bookmark_edit));
+        }
+        if (!BookmarkUtil.isBookmark(geoPointInfo)) {
+            geoPointInfo = BookmarkUtil.createBookmark(geoPointInfo);
         }
         this.edit.onGeoInfo(geoPointInfo);
         this.showDialog(BookmarkListActivity.EDIT_MENU_ID);

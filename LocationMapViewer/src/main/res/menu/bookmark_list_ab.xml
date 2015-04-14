@@ -38,22 +38,9 @@
         android:showAsAction="always"
         />
 
-    <item android:id="@+id/cmd_save_as"
-        android:icon="@drawable/ic_action_important"
-        android:title="@string/title_save_as"
-        android:showAsAction="always"
-        />
-
     <item android:id="@+id/cmd_delete"
         android:icon="@drawable/ic_action_delete"
         android:title="@string/title_delete"
         android:showAsAction="ifRoom"
         />
-
-    <item android:id="@+id/cmd_help"
-        android:icon="@drawable/ic_action_help"
-        android:title="@string/title_help"
-        android:showAsAction="ifRoom"
-        />
-
 </menu>

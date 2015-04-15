@@ -1,7 +1,19 @@
 D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
-resource tests
+bug "LMV is associated with all file types #2"
 
+
+map rechts unten "(c) OpenStreetmap. Tiles Courtesy of MapQuest"
+
+map menu share current location as geo: as http:-OSM
+
+map menu remove BookmarkListActivity
+
+bookmarks menu save/load 
+
+bugreport satsat wrong last fix date (german "letzte positionsbestimmung") shows 5:39 my local time is 6:39 cest (central european summertime = utc + 2)
+this is uk-summertime (utc+1) but neither utc (which has no summer timer) nor local time.
+ 
 
 LocationMapViewer-Todo
 >	next

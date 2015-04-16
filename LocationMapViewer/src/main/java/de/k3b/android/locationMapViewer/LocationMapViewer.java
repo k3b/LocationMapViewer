@@ -169,6 +169,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = this.getIntent();
+
         GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
 
         mUsePicker = (Intent.ACTION_PICK.equals(intent.getAction()));

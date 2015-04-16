@@ -1,5 +1,16 @@
 D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
+
+https://github.com/k3b/LocationMapViewer/issues/2
+https://github.com/k3b/LocationMapViewer/milestones/v0.3
+
+Planed changes:
+
+* Bugfix #2 
+* New Feature #3 : Bookmark overlay to remember named geo-locations with zoom for quick navigation
+* Serbian and german translations
+
+
 bug "LMV is associated with all file types #2"
 
 
@@ -17,10 +28,34 @@ this is uk-summertime (utc+1) but neither utc (which has no summer timer) nor lo
 
 LocationMapViewer-Todo
 >	next
+		> hardcoded colors from resources
+			http://stackoverflow.com/questions/22094125/colors-in-android/22094211#22094211
+				res/values/colors.xml
+				<?xml version="1.0" encoding="utf-8"?>
+				<resources>
+				   <color name="opaque_red">#f00</color>
+				   <color name="translucent_red">#80ff0000</color>
+				</resources>
+			
+				Resources res = getResources();
+				int color = res.getColor(R.color.opaque_red);
+			
+		
+		> update user doku/wiki
+			https://help.github.com/articles/adding-images-to-wikis/
+				![](https://github.com/github/training-kit/blob/master/images/professortocat.png)
+				
+			http://stackoverflow.com/questions/10045517/embedding-images-inside-a-github-wiki-gollum-repository
+				![Eye of Sauron](eye.jpg)
+			bookmark
+				...similar to "webbrowser bookmark" with link to wikipedia
+				...implemented as "navigation drawer" with link to google-style-guide
+				
         map-picker
             ? on tap: move current selection
 		v map-view icons for settings and bookmarkes
 		bookmarkeList
+			* "<" instead of "x" to close
 		    ? logpress -> zoomTo
 		    ??? fav-help
 				html-with images from res:

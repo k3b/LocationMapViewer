@@ -77,7 +77,6 @@ import java.util.List;
 
 import de.k3b.android.GeoUtil;
 import de.k3b.android.locationMapViewer.constants.Constants;
-import de.k3b.android.locationMapViewer.geobmp.BookmarkListActivity;
 import de.k3b.android.locationMapViewer.geobmp.BookmarkListOverlay;
 import de.k3b.android.locationMapViewer.geobmp.BookmarkUtil;
 import de.k3b.android.locationMapViewer.geobmp.GeoBmpDto;
@@ -655,7 +654,6 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
             cmdShowMenu.setVisibility((drawerOpen) ? View.INVISIBLE : View.VISIBLE );
         }
 
-        menu.findItem(R.id.cmd_bookmark_list).setVisible(!drawerOpen);
         menu.findItem(R.id.cmd_settings).setVisible(!drawerOpen);
         menu.findItem(R.id.cmd_help).setVisible(!drawerOpen);
 
@@ -676,11 +674,6 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         switch (item.getItemId()) {
             case R.id.cmd_help:
                 this.showDialog(R.id.cmd_help);
-                return true;
-
-            case R.id.cmd_bookmark_list:
-                GeoBmpDto[] additionalPoints = getAdditionalPoints();
-                BookmarkListActivity.show(this, R.id.cmd_bookmark_list, additionalPoints);
                 return true;
 
             case R.id.cmd_settings: {
@@ -738,18 +731,6 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
                     saveLastXYZ(); // otherwhise onResume() would overwrite the new values
                 }
 
-                break;
-            case R.id.cmd_bookmark_list:
-                if (data != null) {
-                    RestoreXYZ(); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
-
-                    IGeoPointInfo newCenterZoom = new GeoUri(GeoUri.OPT_DEFAULT).fromUri(data.getData().toString());
-                    if (newCenterZoom != null) {
-                        setDelayedCenterZoom(newCenterZoom);
-                        saveLastXYZ(); // otherwhise onResume() would overwrite the new values
-                    }
-
-                }
                 break;
         }
     }

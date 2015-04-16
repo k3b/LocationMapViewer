@@ -19,10 +19,6 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/cmd_bookmark_list"
-        android:icon="@drawable/ic_action_important"
-        android:title="@string/title_bookmark_list"
-        android:showAsAction="always"/>
     <item android:id="@+id/cmd_settings"
         android:icon="@drawable/ic_action_settings"
         android:title="@string/title_activity_settings"

@@ -159,14 +159,7 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
-        <activity
-            android:name=".geobmp.BookmarkListActivity"
-            android:label="@string/title_bookmark_list"
-            />
-        <activity
-            android:name=".geobmp.GeoBmpEditActivity"
-            android:label="@string/title_activity_geopoint_edit" >
-        </activity>
+        <activity android:name=".geobmp.GeoBmpEditActivity" android:label="@string/title_activity_geopoint_edit"/>
     </application>
 
 </manifest>

@@ -1,8 +1,5 @@
 D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
-issues
-    back-button should close bookmark-overlay and not the app
-
 v https://github.com/k3b/LocationMapViewer/issues/2
     bug "LMV was associated with all file types #2"
 

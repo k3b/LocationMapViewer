@@ -23,6 +23,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.BitmapDrawable;
@@ -205,7 +206,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
 
         mUseClusterPoints = mPrefs.getBoolean(PREFS_CLUSTER_POINTS, true);
 
-        mPOIOverlayNonCluster = (mUseClusterPoints) ? null : new FolderOverlay(this);
+        mPOIOverlayNonCluster = (mUseClusterPoints) ? null : createNonClusterOverlay(overlays);
         mPOIOverlayCluster = (mUseClusterPoints) ? createPointOfInterestOverlay(overlays) : null;
 
         final IGeoInfoHandler pointCollector = (mUseClusterPoints)
@@ -286,6 +287,13 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         // else html a-href-links do not work.
         TextView t2 = (TextView) findViewById(R.id.cright_osm);
         t2.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    private FolderOverlay createNonClusterOverlay(List<Overlay> overlays) {
+        FolderOverlay result = new FolderOverlay(this);
+        overlays.add(result);
+
+        return result;
     }
 
     @Override
@@ -388,7 +396,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         if (BookmarkUtil.isNotEmpty(description) || BookmarkUtil.isNotEmpty(aGeoPoint.getUri())) {
             poiMarker.setIcon(mPoiIconWithData);
             // 7.
-            poiMarker.setInfoWindow(new CustomInfoWindow(map));
+            poiMarker.setInfoWindow(new GeoPointMarkerInfoWindow(map));
         } else {
             poiMarker.setIcon(mPoiIconWithoutData);
             poiMarker.setInfoWindow(null);
@@ -417,7 +425,9 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         poiMarkers.mTextAnchorU = 0.70f;
         poiMarkers.mTextAnchorV = 0.27f;
         //end of 11.
-        overlays.add(poiMarkers);
+        if (overlays != null) {
+            overlays.add(poiMarkers);
+        }
         return poiMarkers;
     }
 
@@ -494,7 +504,8 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         handler.onGeoInfo(new GeoPointDto(52.370816, 9.735936, "Hannover", "Tiny SampleDescription"));
         handler.onGeoInfo(new GeoPointDto(52.518333, 13.408333, "Berlin", "This is a relatively short SampleDescription."));
         handler.onGeoInfo(new GeoPointDto(38.895000, -77.036667, "Washington",
-                "This SampleDescription is a pretty long one. Almost as long as a the great wall in china."));
+                "This SampleDescription is a pretty long one. Almost as long as a the great wall in china.")
+                .setUri("geo:0,0?q=38.895000,-77.036667(Washington)"));
         handler.onGeoInfo(new GeoPointDto(37.779300, -122.419200, "San Francisco", "SampleDescription"));
     }
 
@@ -570,12 +581,13 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
             List<Overlay> overlays = mMapView.getOverlays();
             if (useClusterPoints) {
                 mPOIOverlayNonCluster.closeAllInfoWindows();
-                mPOIOverlayCluster = new RadiusMarkerClustererWithInfo(this);
+                mPOIOverlayCluster = createPointOfInterestOverlay(null);
                 for (Overlay item : mPOIOverlayNonCluster.getItems()) {
                     mPOIOverlayCluster.add((Marker) item);
                 }
                 int oldPos = overlays.indexOf(mPOIOverlayNonCluster);
                 overlays.remove(oldPos);
+
                 overlays.add(oldPos, mPOIOverlayCluster);
                 mPOIOverlayNonCluster.getItems().clear();;
                 mPOIOverlayNonCluster = null;
@@ -956,44 +968,4 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         }
 
      }
-
-    //7. Customizing the bubble behaviour
-    class CustomInfoWindow extends MarkerInfoWindow {
-        GeoBmpDto mSelectedPoi;
-
-        public CustomInfoWindow(MapView mapView) {
-            super(R.layout.bubble_geo_point_dto, mapView);
-            Button btn = (Button) (mView.findViewById(R.id.bubble_moreinfo));
-            btn.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View view) {
-                    if (mSelectedPoi.getUri() != null) {
-                        Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mSelectedPoi.getUri()));
-                        view.getContext().startActivity(myIntent);
-                    } else {
-                        Toast.makeText(view.getContext(), "Button clicked", Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
-        }
-
-        @Override
-        public void onOpen(Object item) {
-            super.onOpen(item);
-            mView.findViewById(R.id.bubble_moreinfo).setVisibility(View.VISIBLE);
-            Marker marker = (Marker) item;
-            mSelectedPoi = (GeoBmpDto) marker.getRelatedObject();
-            TextView description = (TextView) mView.findViewById(R.id.bubble_description);
-            if (mSelectedPoi != null) {
-                description.setText(mSelectedPoi.getDescription());
-/* !!!
-            //8. put thumbnail image in bubble, fetching the thumbnail in background:
-            if (mSelectedPoi.mThumbnailPath != null){
-                ImageView imageView = (ImageView)mView.findViewById(R.id.bubble_image);
-                mSelectedPoi.fetchThumbnailOnThread(imageView);
-            }
-            */
-            }
-        }
-    }
-
 }

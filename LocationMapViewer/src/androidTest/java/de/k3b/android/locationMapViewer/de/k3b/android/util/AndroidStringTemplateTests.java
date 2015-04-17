@@ -114,8 +114,6 @@ public class AndroidStringTemplateTests extends ActivityTestCase {
         R.string.title_delete,
         R.string.title_bookmark_edit,
         R.string.title_bookmark_list,
-        R.string.title_map,
-        R.string.title_rename,
         R.string.help_bookmarks
         };
     }

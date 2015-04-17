@@ -64,6 +64,7 @@ public class BookmarkListOverlay implements IGeoInfoHandler, Constants {
     private ImageButton cmdHideFavirites;
 
     private GeoBmpEditDialog edit = null;
+    public CharSequence oldTitle = null;
 
     public BookmarkListOverlay(Activity context, AdditionalPoints additionalPointProvider) {
         this.additionalPointProvider = additionalPointProvider;
@@ -130,6 +131,9 @@ public class BookmarkListOverlay implements IGeoInfoHandler, Constants {
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
                 cmdShowFavirites.setVisibility(View.VISIBLE);
+                if (oldTitle != null) {
+                    context.setTitle(oldTitle);
+                }
                 if (USE_ACTIONBAR) {
                     invalidateOptionsMenu();
                 }
@@ -139,6 +143,13 @@ public class BookmarkListOverlay implements IGeoInfoHandler, Constants {
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 cmdShowFavirites.setVisibility(View.INVISIBLE);
+                oldTitle = context.getTitle();
+                if ((oldTitle != null) && (oldTitle.length() > 0)) {
+                    context.setTitle(R.string.title_bookmark_list);
+                } else {
+                    oldTitle = null;
+                }
+
                 if (USE_ACTIONBAR) {
                     invalidateOptionsMenu();
                 }

@@ -54,14 +54,12 @@ GeoIntentDemo.java</a>) or through html links similar to <a href="geo:0,0?q=53.0
     <!-- added in version 0.3.* -->
     <string name="title_bookmark_list">Bookmarks</string>
     <string name="title_bookmark_edit">Bookmark</string>
-    <string name="no_items_found">No items Found</string>
     <string name="cmd_save"> Save </string>
     <string name="cmd_cancel"> Cancel </string>
     <string name="title_activity_geopoint_edit">Edit</string>
     <string name="title_rename">Rename</string>
     <string name="title_delete">Delete</string>
     <string name="title_close">Close</string>
-    <string name="title_map">Show in Map</string>
 
     <string name="title_confirm_delete">"Confirm Delete "</string>
     <string name="format_question_delete">"Are you sure you want to permanently delete \n\n %1$s ? \n\n This is NOT undoable.</string>

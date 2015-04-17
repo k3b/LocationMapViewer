@@ -288,6 +288,17 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         t2.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
+    @Override
+    public void onBackPressed() {
+        // back should close the overlay if active
+        if (this.bookmarkListOverlay.isBookmarkListVisible()) {
+            this.bookmarkListOverlay.setBookmarkListVisible(false);
+        } else {
+            // close the activity
+            super.onBackPressed();
+        }
+    }
+
     private void setNoTitle() {
         if (USE_ACTIONBAR) {
             setNoActionbar();

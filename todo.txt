@@ -12,20 +12,14 @@ Planed changes:
 * New Feature #3 : Bookmark overlay to remember named geo-locations with zoom for quick navigation
 * Serbian and german translations
 
-* overlay > setTitle/restoreTitle
 
-
-map rechts unten "(c) OpenStreetmap. Tiles Courtesy of MapQuest"
+map rechts unten "Map Tiles Courtesy of OpenStreetmap"
 
 map menu share current location as geo: as http:-OSM
 
 map menu remove BookmarkListActivity
 
 bookmarks menu save/load 
-
-bugreport satsat wrong last fix date (german "letzte positionsbestimmung") shows 5:39 my local time is 6:39 cest (central european summertime = utc + 2)
-this is uk-summertime (utc+1) but neither utc (which has no summer timer) nor local time.
- 
 
 LocationMapViewer-Todo
 >	next
@@ -44,7 +38,7 @@ LocationMapViewer-Todo
             ? on tap: move current selection
 		v map-view icons for settings and bookmarkes
 		bookmarkeList
-			* "<" instead of "x" to close
+			v "<" instead of "x" to close
 		    ? logpress -> zoomTo
 		    ??? fav-help
 				html-with images from res:
@@ -107,7 +101,7 @@ v       about-box
 v           resourcen anpassen von toGoZip
 		
 	Guesture ddrag
->		wie funktioniert drag-MapMove in MapViewer wo die karte sich sofort verschiebt?
+v		wie funktioniert drag-MapMove in MapViewer wo die karte sich sofort verschiebt?
 			als vorbild für ddrag-move
 			??  v.setBackgroundResource(null); v.setBackgroundResource(...my drawable...); aus http://stackoverflow.com/questions/4748336/how-to-force-android-view-to-redraw-its-background-drawable-probably-an-anim
 			oder view.setWillNotDraw(false) aus http://stackoverflow.com/questions/17595546/why-ondraw-is-not-called-after-invalidate
@@ -130,16 +124,11 @@ v		todo in guestre-detector (wenn drag dist kleiner als 10) zoom mit center=tap-
 v		fileformat: zeilen von geo-uri-s mit datei-Endung "*.txt"
 v       fovorite-thumbnail
 		bookmarke-Marker der den Ausschnitt als blaues quadrat anzeigt
->		listactivity zum auswählen des bookmarks
-			v darstellung minitaturansichtder karte (thubnail) in der liste
-			- bei select (vor OK) entweder drunterligende karte sofort zoomen
-			- oder in darunterligender karte bookmarke-Marker (mit ausschnitt) anzeigen markieren
-	        v Edit name
-	
+
 v	Zoom-level slider in map
 	
 	Menue
->		bookmarkes
+v		bookmarkes
 v		Settings
 v		about
 		
@@ -185,8 +174,8 @@ v mit/ohne title je nachdem, ob Intent.EXTRA_TITLE`gesetzt ist oder nicht
 v ok nur wenn activity-picker
 - onLongPress => set current pos
 ? icon/detailview nur wenn detail data available
-- guesture long-drag: move&zoom.
-    - visual feedback
+v guesture long-drag: move&zoom.
+    v visual feedback
 
 v convert cluser <-> nonCluster from settings
 

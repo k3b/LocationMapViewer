@@ -31,6 +31,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -281,6 +282,10 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
                 }
             }
         };
+
+        // else html a-href-links do not work.
+        TextView t2 = (TextView) findViewById(R.id.cright_osm);
+        t2.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     private void setNoTitle() {

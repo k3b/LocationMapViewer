@@ -69,4 +69,5 @@ GeoIntentDemo.java</a>) or through html links similar to <a href="geo:0,0?q=53.0
     <string name="bookmark_template_initial">[Inital Window] </string>
     <string name="bookmark_template_gps">"[GPS] "</string>
 
+    <string name="title_cright_osm">"Map Tiles (c) <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> Contributors"</string>
 </resources>

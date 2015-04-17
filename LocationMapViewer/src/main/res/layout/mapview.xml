@@ -28,18 +28,50 @@
         android:id="@+id/parent_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <!-- own block necessary for Navigation Drawer overlay
+         [btn cmd_unhide_bookmark_list]     {[btn cmd_menu]}
+
+         [map mapview]
+
+         {[btn OK]}
+         [bar zoomBar]
+         [txt cright_osm]
+         -->
+        <TextView
+            android:id="@+id/cright_osm"
+            android:text="@string/title_cright_osm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:linksClickable="true"
+            android:background="@android:color/white"
+            />
 
         <org.osmdroid.views.MapView
             android:id="@+id/mapview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_above="@id/cright_osm"
+            />
+			
+        <!-- to show fragment_bookmark_list which is normally hidden -->
         <ImageButton
+            android:id="@+id/cmd_unhide_bookmark_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_important"
+            android:visibility="gone"
+            android:layout_alignParentLeft="true"
+            />
+			
+        <!-- replacement for hidden title/actionbar to show popup menu -->
+        <ImageButton
+            android:id="@+id/cmd_menu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
             android:src="@android:drawable/ic_menu_more"
-            android:id="@+id/cmd_menu"
-
             android:layout_alignParentRight="true"
             />
 
@@ -47,10 +79,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/zoomBar"
-            android:layout_alignParentBottom="true"
+            android:layout_above="@id/cright_osm"
             android:layout_alignParentRight="true"
             android:layout_alignParentLeft="true"
             />
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -60,18 +93,6 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_above="@id/zoomBar"
-            />
-
-
-        <!-- to show fragment_bookmark_list which is normally hidden -->
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_important"
-            android:id="@+id/cmd_unhide_bookmark_list"
-            android:visibility="gone"
-
-            android:layout_alignParentLeft="true"
             />
     </RelativeLayout>
 

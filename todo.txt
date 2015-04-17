@@ -12,7 +12,7 @@ Planed changes:
 * New Feature #3 : Bookmark overlay to remember named geo-locations with zoom for quick navigation
 * Serbian and german translations
 
-
+* overlay > setTitle/restoreTitle
 
 
 map rechts unten "(c) OpenStreetmap. Tiles Courtesy of MapQuest"
@@ -29,19 +29,7 @@ this is uk-summertime (utc+1) but neither utc (which has no summer timer) nor lo
 
 LocationMapViewer-Todo
 >	next
-		> hardcoded colors from resources
-			http://stackoverflow.com/questions/22094125/colors-in-android/22094211#22094211
-				res/values/colors.xml
-				<?xml version="1.0" encoding="utf-8"?>
-				<resources>
-				   <color name="opaque_red">#f00</color>
-				   <color name="translucent_red">#80ff0000</color>
-				</resources>
-			
-				Resources res = getResources();
-				int color = res.getColor(R.color.opaque_red);
-			
-		
+		v Moved hardcoded colors to colors.xml
 		> update user doku/wiki
 			https://help.github.com/articles/adding-images-to-wikis/
 				![](https://github.com/github/training-kit/blob/master/images/professortocat.png)

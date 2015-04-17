@@ -20,20 +20,15 @@
 package de.k3b.android.locationMapViewer.geobmp;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.List;
-import java.util.Locale;
 
 import de.k3b.android.locationMapViewer.R;
-import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.api.IGeoRepository;
 
 /** Adapter to display IGeoPointInfo in a ListView. */
@@ -51,10 +46,15 @@ class GeoBmpListAdapter extends
     private final int viewId;
     private GeoBmpDto currentSelecion;
 
+    private int colorSelected;
+    private int colorNotSelected;
+
     private GeoBmpListAdapter(final Context context,
                               final int textViewResourceId, final List<GeoBmpDto> items) {
         super(context, textViewResourceId, items);
         this.viewId = textViewResourceId;
+        colorSelected = context.getResources().getColor(R.color.list_overlay_selected);
+        colorNotSelected = context.getResources().getColor(R.color.list_overlay_not_selected);
     }
 
     public static ArrayAdapter<GeoBmpDto> createAdapter(
@@ -102,7 +102,7 @@ class GeoBmpListAdapter extends
         if (dto != null) {
             GeoBmpBinder.toGui(itemView, dto);
 
-            final int backgroundColor = ((this.currentSelecion == dto)) ? Color.LTGRAY : Color.TRANSPARENT;
+            final int backgroundColor = ((this.currentSelecion == dto)) ? colorSelected : colorNotSelected;
             itemView.setBackgroundColor(backgroundColor);
         }
     }

@@ -92,6 +92,13 @@
             android:layout_height="wrap_content" android:orientation="horizontal"
             >
 
+            <!-- hide fragment -->
+            <ImageButton android:id="@+id/cmd_cancel"
+                android:src="@drawable/ic_action_previous_item"
+                android:contentDescription="@string/title_close"
+                style="@style/AppTheme.ImageButton"
+                />
+
             <ImageButton android:id="@+id/cmd_edit"
                 android:src="@drawable/ic_action_edit"
                 android:contentDescription="@string/title_rename"
@@ -101,13 +108,6 @@
             <ImageButton android:id="@+id/cmd_delete"
                 android:src="@drawable/ic_action_delete"
                 android:contentDescription="@string/title_delete"
-                style="@style/AppTheme.ImageButton"
-                />
-
-            <!-- hide fragment -->
-            <ImageButton android:id="@+id/cmd_cancel"
-                android:src="@drawable/ic_action_cancel"
-                android:contentDescription="@string/title_close"
                 style="@style/AppTheme.ImageButton"
                 />
 

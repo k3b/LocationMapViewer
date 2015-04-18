@@ -215,7 +215,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
                 @Override
                 public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
                     if (aGeoPoint != null) {
-                        mPOIOverlayCluster.add(createMarker(mMapView, aGeoPoint));
+                        mPOIOverlayCluster.add(createMarker(mMapView, aGeoPoint.clone()));
                     }
                     return true;
                 }
@@ -224,7 +224,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
                 @Override
                 public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
                     if (aGeoPoint != null) {
-                        mPOIOverlayNonCluster.add(createMarker(mMapView, aGeoPoint));
+                        mPOIOverlayNonCluster.add(createMarker(mMapView, aGeoPoint.clone()));
                     }
                     return true;
                 }

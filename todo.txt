@@ -5,6 +5,9 @@ v https://github.com/k3b/LocationMapViewer/issues/2
 
 https://github.com/k3b/LocationMapViewer/milestones/v0.3
 
+bug : on cluster-bubble-click
+bug: zoom-buttons above zoom-slider
+
 Planed changes:
 
 * Bugfix #2 

@@ -49,6 +49,7 @@ import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
+import org.osmdroid.bonuspack.clustering.StaticCluster;
 import org.osmdroid.bonuspack.overlays.FolderOverlay;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.MarkerInfoWindow;
@@ -413,7 +414,17 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
 
     private RadiusMarkerClusterer createPointOfInterestOverlay(List<Overlay> overlays) {
         //10. Marker Clustering
-        RadiusMarkerClusterer poiMarkers = new RadiusMarkerClustererWithInfo(this);
+        RadiusMarkerClusterer poiMarkers = new RadiusMarkerClustererWithInfo(this) {
+            @Override
+            public Marker buildClusterMarker(StaticCluster cluster, MapView mapView) {
+                Marker result = super.buildClusterMarker(cluster,mapView);
+                if (cluster.getSize() > 0) {
+                    // show data of the first object in cluster
+                    result.setRelatedObject(cluster.getItem(0).getRelatedObject());
+                }
+                return result;
+            }
+        };
 
         Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_red_empty);
         poiMarkers.setIcon(((BitmapDrawable) clusterIconD).getBitmap());

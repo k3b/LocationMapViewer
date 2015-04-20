@@ -59,11 +59,17 @@
 			</Point>
 		</Placemark>
 
-		<!-- this is de.k3b.geo internal format geo-uri parts-->
+		<!-- this is de.k3b.geo internal format from xml attributes (which are the same as the geo-uri-fields -->
 		<poi ll="52.8,9.8" n="theName(internal)" uri="theLink(internal)" d="theDesc(internal)" t="2015-02-10T08:04:45Z"
-				z="5" z2="7" />
+				z="5" z2="7" id="42" />
 
-		<!-- the parser can infer loc, name and time from description 'd=...'-->
+		<!-- this is de.k3b.geo internal format used by parsing geo-uri where the fields are url-encoded-->
+		<poi geoUri="geo:52.6,9?q=(the+Name)&amp;d=the+Desc+with+emedded+extra+chars" />
+
+		<!-- this is de.k3b.geo internal format used by parsing geo-uri where the fields are NOT url-encoded (but xml encoded since we use xml) -->
+		<poi geoUri="geo:52,9.8?q=(the Name)&amp;d=the Desc with emedded extra chars" />
+		
+		<!-- the parser can infer loc, name and time from description 'd=...'. Note there is not t=... or ll=... -->
 		<poi infer="1" geoUri="geo:?d=the Descr contain (theName infered from descr), loc 52.7,9.7 and time 2015-02-10T08:04:45Z" />
 				 
 	</nonGPX>

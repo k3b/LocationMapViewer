@@ -13,17 +13,16 @@
     <Placemark geoUri="geo:52,9?q=(theName)&amp;uri=theLink&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z"
 	         id="geo:52,9?q=(theName)&amp;uri=theLink&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z" />
 			 
-	<!-- this is de.k3b.geo internal format via geo-uri -->
+	<!-- this is de.k3b.geo internal format from an interpreted geo-uri -->
     <poi geoUri="geo:52,9?q=(theName)&amp;uri=theLink&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z"
 	         id="geo:52,9?q=(theName)&amp;uri=theLink&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z" />
 			 
-	<!-- this is de.k3b.geo internal format geo-uri parts-->
+	<!-- this is de.k3b.geo internal format from xml attributes -->
     <poi ll="52,9" n="theName" uri="theLink" d="theDesc" t="2015-02-10T08:04:45Z"
 			z="5" z2="7"
-	         id="geo:52,9?q=(theName)&amp;z=5&amp;z2=7&amp;uri=theLink&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z" />
+			id="geo:52,9?q=(theName)&amp;z=5&amp;z2=7&amp;uri=theLink&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z" />
 
 	<!-- the parser can infer loc, name and time from description -->
     <poi infer="1" geoUri="geo:?d=the Descr contain (theName), loc 52.1,9.2 and time 2015-02-10T08:04:45Z"
-	         id="geo:52.1,9.2?q=(theName)&amp;d=the+Descr+contain+%28theName%29%2C+loc+52.1%2C9.2+and+time+2015-02-10T08%3A04%3A45Z&amp;t=2015-02-10T08:04:45Z" />
-			 
+	         id="geo:52.1,9.2?q=(theName)&amp;d=the+Descr+contain+%28theName%29%2C+loc+52.1%2C9.2+and+time+2015-02-10T08%3A04%3A45Z&amp;t=2015-02-10T08:04:45Z" />			 
 </someRoot>

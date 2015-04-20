@@ -31,7 +31,7 @@ import de.k3b.geo.io.GeoFileRepository;
 /**
  * Created by k3b on 24.03.2015.
  */
-public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDto> {
+public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDto, GeoBmpDto> {
     private final File iconDir;
 
     /**

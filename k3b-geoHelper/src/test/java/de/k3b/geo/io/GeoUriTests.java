@@ -35,7 +35,7 @@ public class GeoUriTests {
      * geo:{lat{,lon{,hight_ignore}}}{?q={lat{,lon{,hight_ignore}}}{(name)}{|uri{|id}|}{description}}{&z={{zmin}-zmax}}
      * */
     @Test
-    public void ShouldFormat() throws Exception {
+    public void shouldFormat() throws Exception {
         GeoUri sut = new GeoUri(GeoUri.OPT_DEFAULT);
         GeoUri sutRedundant = new GeoUri(GeoUri.OPT_FORMAT_REDUNDANT_LAT_LON);
 
@@ -49,7 +49,7 @@ public class GeoUriTests {
     }
 
     @Test
-    public void ShouldParse() throws Exception {
+    public void shouldParse() throws Exception {
         GeoUri sut = new GeoUri(GeoUri.OPT_DEFAULT);
 
         String original = sut.toUriString(createTestGeoPoint());
@@ -60,7 +60,18 @@ public class GeoUriTests {
     }
 
     @Test
-    public void ParseShouldNotInfer() throws Exception {
+    public void sholdParseMinimal() throws Exception {
+        GeoUri sut = new GeoUri(GeoUri.OPT_DEFAULT);
+
+        String uri = "geo:1,2";
+
+        GeoPointDto parsed = (GeoPointDto)sut.fromUri(uri);
+
+        Assert.assertEquals(1, parsed.getLatitude(), 0.002);
+    }
+
+    @Test
+    public void parseShouldNotInfer() throws Exception {
         GeoUri sut = new GeoUri(GeoUri.OPT_DEFAULT);
 
         String uri = "geo:?d=I was in (Hamburg) located at 53,10 on 1991-03-03T04:05:06Z";
@@ -72,7 +83,7 @@ public class GeoUriTests {
     }
 
     @Test
-    public void ParseShouldInfer() throws Exception {
+    public void parseShouldInfer() throws Exception {
         GeoUri sut = new GeoUri(GeoUri.OPT_PARSE_INFER_MISSING);
 
         String uri = "geo:?d=I was in (Hamburg) located at 53,10 on 1991-03-03T04:05:06Z";
@@ -84,7 +95,7 @@ public class GeoUriTests {
     }
 
     @Test
-    public void ClearedDtoShouldFormatEmpty() throws Exception {
+    public void clearedDtoShouldFormatEmpty() throws Exception {
         GeoUri formatter = new GeoUri(GeoUri.OPT_DEFAULT);
 
         final GeoPointDto testGeoPoint = createTestGeoPoint();

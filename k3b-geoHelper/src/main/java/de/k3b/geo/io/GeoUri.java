@@ -70,7 +70,7 @@ public class GeoUri {
      * Default for url-encoding.
      */
     private static final String DEFAULT_ENCODING = "UTF-8";
-    private static final String GEO_SCHEME = "geo:";
+    public static final String GEO_SCHEME = "geo:";
 
     /* regular expressions used by the parser.<br/>
        '(?:"+something+")"' is a non capturing group; "\s" white space */
@@ -140,6 +140,11 @@ public class GeoUri {
             if (parseResult.getName() == null) {
                 parseResult.setName(parmLookup.get(GeoUriDef.NAME));
             }
+        } else {
+            // no query parameter
+            ArrayList<String> whereToSearch = new ArrayList<String>();
+            whereToSearch.add(uri);
+            parseLatOrLon(parseResult, whereToSearch);
         }
         return parseResult;
     }

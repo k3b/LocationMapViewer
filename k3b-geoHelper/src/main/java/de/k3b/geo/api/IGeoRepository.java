@@ -26,19 +26,19 @@ import java.util.List;
  *
  * Created by k3b on 17.03.2015.
  */
-public interface IGeoRepository<T extends GeoPointDto> {
+public interface IGeoRepository<R extends IGeoPointInfo> {
 
     /** (cached) load from repository
      *
      * @return data loaded
      */
-    List<T> load();
+    List<R> load();
 
     /** uncached, fresh load from repository
      *
      * @return data loaded
      */
-    List<T> reload();
+    List<R> reload();
 
     /** save back to repository
      *
@@ -51,5 +51,5 @@ public interface IGeoRepository<T extends GeoPointDto> {
 
     /** removes item from repository.
      * @return true if successful */
-    boolean delete(T item);
+    boolean delete(R item);
 }

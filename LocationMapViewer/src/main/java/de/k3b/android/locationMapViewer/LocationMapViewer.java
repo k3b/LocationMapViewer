@@ -88,6 +88,7 @@ import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.GeoUri;
+import de.k3b.geo.io.gpx.GeoXmlOrTextParser;
 import de.k3b.geo.io.gpx.GpxReaderBase;
 import microsoft.mappoint.TileSystem;
 
@@ -241,6 +242,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         }
 
         loadGeoPointDtosFromFile(intent, pointCollector);
+        loadGeoPointDtosFromExtra(intent.getStringExtra("de.k3b.POIS"), pointCollector);
 
         AbstractList<? extends Overlay> items = (mUseClusterPoints) ? mPOIOverlayCluster.getItems() : mPOIOverlayNonCluster.getItems();
         final int zoom = (geoPointFromIntent != null) ? geoPointFromIntent.getZoomMin() : GeoPointDto.NO_ZOOM;
@@ -288,6 +290,18 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         // else html a-href-links do not work.
         TextView t2 = (TextView) findViewById(R.id.cright_osm);
         t2.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    private void loadGeoPointDtosFromExtra(String pois, IGeoInfoHandler pointCollector) {
+        if (pois != null) {
+            List<GeoBmpDto> result = new GeoXmlOrTextParser<GeoBmpDto>().get(new GeoBmpDto(), pois);
+
+            if (result != null) {
+                for(GeoBmpDto item : result) {
+                    pointCollector.onGeoInfo(item);
+                }
+            }
+        }
     }
 
     private FolderOverlay createNonClusterOverlay(List<Overlay> overlays) {

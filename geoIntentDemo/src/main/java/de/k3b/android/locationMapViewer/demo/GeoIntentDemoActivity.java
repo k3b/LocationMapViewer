@@ -21,6 +21,7 @@ public class GeoIntentDemoActivity extends Activity {
     private EditText editMime;
     private EditText editUri;
     private EditText editTitle;
+    private EditText editPois;
 
     /** Greate the gui to enter the parameters for LocationMapViewer. */
     @Override
@@ -34,6 +35,7 @@ public class GeoIntentDemoActivity extends Activity {
         editMime = (EditText) findViewById(R.id.editMime);
         editUri = (EditText) findViewById(R.id.editUri);
         editTitle = (EditText) findViewById(R.id.editTitle);
+        editPois = (EditText) findViewById(R.id.editPOIs);
 
         rundDemoPick.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,8 +57,9 @@ public class GeoIntentDemoActivity extends Activity {
         String mimeString = editMime.getText().toString(); // null or */*
         if ((mimeString != null) && (mimeString.length() == 0)) mimeString = null;
         String title = editTitle.getText().toString(); // Example "where did you take the photo"
+        String pois = editPois.getText().toString().trim();
 
-        startDemo(uriString, mimeString, action, title);
+        startDemo(uriString, mimeString, action, title, pois);
     }
 
     /**
@@ -66,7 +69,7 @@ public class GeoIntentDemoActivity extends Activity {
      * @param action i.e. "android.intent.action.VIEW" or "android.intent.action.PICK"
      * @param title i.e. "where did you take the photo" or null
      */
-    private void startDemo(String uriString, String mimeString, String action, String title) {
+    private void startDemo(String uriString, String mimeString, String action, String title, String pois) {
         Uri uri = Uri.parse(uriString);
         Intent demo = new Intent();
         if (action != null) {
@@ -76,6 +79,11 @@ public class GeoIntentDemoActivity extends Activity {
         if ((title != null) && (title.length() > 0)) {
             demo.putExtra(Intent.EXTRA_TITLE, title);
         }
+
+        if ((pois != null) && (pois.length() > 0)) {
+            demo.putExtra("de.k3b.POIS", pois);
+        }
+
         demo.setDataAndType(uri, mimeString);
         Toast.makeText(this, appName + "Starting " + uriString + "-" + demo.getType(), Toast.LENGTH_SHORT).show();
         try {

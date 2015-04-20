@@ -120,6 +120,7 @@
                 <data android:scheme="file" />
                 <data android:pathPattern=".*\\.gpx" />
                 <data android:pathPattern=".*\\.kml" />
+                <data android:pathPattern=".*\\.poi" />
             </intent-filter>
 			
             <!-- version with host and without host -->
@@ -137,6 +138,7 @@
                 <data android:mimeType="application/vnd.google-earth.kml+xml" />
                 <data android:mimeType="application/xml+kml" />
                 <data android:mimeType="application/xml+gpx" />
+                <data android:mimeType="application/xml+poi" />
                 <data android:host="*" />
             </intent-filter>
             <intent-filter><!-- android:label="LMV#6"> -->
@@ -154,6 +156,7 @@
                 <data android:mimeType="application/vnd.google-earth.kml+xml" />
                 <data android:mimeType="application/xml+kml" />
                 <data android:mimeType="application/xml+gpx" />
+                <data android:mimeType="application/xml+poi" />
             </intent-filter>
         </activity>
         <activity

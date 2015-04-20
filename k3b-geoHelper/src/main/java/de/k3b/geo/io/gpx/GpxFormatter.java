@@ -66,9 +66,14 @@ public class GpxFormatter {
         if (description != null) {
             addElement(result, GpxDef_11.DESC, description);
         }
-        if (uri != null) {
-            addElement(result, GpxDef_11.LINK, uri);
-        }
+        result.append("<" +
+                GpxDef_11.LINK +
+                " " +
+                GpxDef_11.ATTR_LINK +
+                "='")
+                .append(uri)
+                .append("' />");
+
         result.append("</" +
                 GpxDef_11.TRKPT +
                 ">\n");

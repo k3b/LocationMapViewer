@@ -28,7 +28,7 @@ import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoPointInfo;
 
 /**
- * Created by EVE on 13.01.2015.
+ * Created by k3b on 13.01.2015.
  */
 public class GeoUriTests {
     /**

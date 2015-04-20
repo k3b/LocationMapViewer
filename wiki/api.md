@@ -1,5 +1,26 @@
 #LocationMapViewer Intent API
 
+### uri
+
+LocationMapViewer currently supports these uri formats:
+
+* geo:[lat](api#lat),[lon](api#lon)?q=([name](api#name))
+* example geo:[53.0](api#lat),[8.0](api#lon)?q=([Hannover](api#name))
+* geo:0,0?q=[lat](api#lat),[lon](api#lon)([name](api#name))
+* example geo:0,0?q=[53.0](api#lat),[8.0](api#lon)([Hannover](api#name))
+
+For more details see [geo uri](http://tools.ietf.org/html/draft-mayrhofer-geo-uri-00)
+
+### <a name='lat'>lat</a> Latitude, in degrees north.  <a name='lon'>lon</a> Longitude, in degrees east.
+
+* in [map](map): navigate to this location.
+* uri: geo:[lat](api#lat),[lon](api#lon)
+* example geo:[53.0](api#lat),[8.0](api#lon)
+* uri: geo:0,0?q=[lat](api#lat),[lon](api#lon)
+* example geo:0,0?q=[53.0](api#lat),[8.0](api#lon)
+* in file://...filename.gpx : &lt;wpt lat='53.0' lon='8.0' /> or &lt;trkpt lat='53.0' lon='8.0' />
+* in file://...filename.kml : &lt;coordinates>53.0,8.0&lt;/coordinates>
+
 Other Android apps can use LocationMapViewer through an Intent interface to display Informations in
 a geografic map.
 
@@ -33,3 +54,5 @@ LocationMapViewer is designed to be used by other apps. This means in Terms of [
 that uses the Intent-Iterface [is not considered a Derived Work.](https://en.wikipedia.org/wiki/GPL_v3#Point_of_view:_linking_is_irrelevant)
 
 In other words: you can used LocationMapViewer as a [driver for your non gpl/non opensource app.](http://www.rosenlaw.com/lj19.htm).
+
+

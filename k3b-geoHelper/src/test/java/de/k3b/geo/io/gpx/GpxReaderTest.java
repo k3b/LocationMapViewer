@@ -38,7 +38,7 @@ public class GpxReaderTest {
     String xmlMinimal_gpx_v10 = "<wpt lat='53.1099972' lon='8.7178206'><time>2014-12-19T21:13:21Z</time><name>262:3:562:54989</name><desc>type: cell, accuracy: 1640, confidence: 75</desc><url>geo:0,0?q=12.34,56.78(name)</url></wpt>\n";
 
     /** format for gpx v1.1 */
-    String xmlMinimal_gpx_v11 = "<trkpt lat='53.1099972' lon='8.7178206'><time>2014-12-19T21:13:21Z</time><name>262:3:562:54989</name><desc>type: cell, accuracy: 1640, confidence: 75</desc><link>geo:0,0?q=12.34,56.78(name)</link></trkpt>\n";
+    String xmlMinimal_gpx_v11 = "<trkpt lat='53.1099972' lon='8.7178206'><time>2014-12-19T21:13:21Z</time><name>262:3:562:54989</name><desc>type: cell, accuracy: 1640, confidence: 75</desc><link href='geo:0,0?q=12.34,56.78(name)' /></trkpt>\n";
     String xmlFull_gpx_v11 = "<gpx xmlns='http://www.topografix.com/GPX/1/1' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' version='1.1' xsi:schemaLocation='http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd' creator='Location Cache Map'>"+
             "<trk><trkseg>" + xmlMinimal_gpx_v11 + "</trkseg></trk></gpx>";
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"
+		xmlns:atom="http://www.w3.org/2005/Atom"
+		xmlns:gx="http://www.google.com/kml/ext/2.2">
+	<Document>
+	<!-- this is what i assume to be valid kml-2.2 content
+	    except that kml-2.2 has no id attribute that is used for regression-testing 
+		
+		?? where to get link "&amp;uri=theLink" from ???
+		-->
+		<Placemark
+			        id="geo:52,9?q=(theName)&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z">
+			<description>theDesc</description>
+			<name>theName</name>
+			<Point>
+				<coordinates>9,52</coordinates>
+				<when>2015-02-10T08:04:45.000Z</when>
+			</Point>
+		</Placemark>
+	</Document>
+</kml>

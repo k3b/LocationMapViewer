@@ -116,16 +116,16 @@ public class GeoUri {
             for (String param : params) {
                 parseAddQueryParamToMap(parmLookup, param);
             }
-            parseResult.setDescription(parmLookup.get("d"));
-            parseResult.setUri(parmLookup.get("uri"));
-            parseResult.setId(parmLookup.get("id"));
-            parseResult.setZoomMin(GeoFormatter.parseZoom(parmLookup.get("z")));
-            parseResult.setZoomMax(GeoFormatter.parseZoom(parmLookup.get("z2")));
-
+            parseResult.setDescription(parmLookup.get(GeoUriDef.DESCRIPTION));
+            parseResult.setUri(parmLookup.get(GeoUriDef.LINK));
+            parseResult.setId(parmLookup.get(GeoUriDef.ID));
+            parseResult.setZoomMin(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM)));
+            parseResult.setZoomMax(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM_MAX)));
             // parameters from standard value and/or infered
             ArrayList<String> whereToSearch = new ArrayList<String>();
-            whereToSearch.add(parmLookup.get("q")); // lat lon from q have precedence over url-path
+            whereToSearch.add(parmLookup.get(GeoUriDef.QUERY)); // lat lon from q have precedence over url-path
             whereToSearch.add(uri);
+            whereToSearch.add(parmLookup.get(GeoUriDef.LAT_LON));
 
             if (isSet(GeoUri.OPT_PARSE_INFER_MISSING)) {
                 whereToSearch.add(parseResult.getDescription());
@@ -133,15 +133,32 @@ public class GeoUri {
             }
 
             parseResult.setName(parseFindFromPattern(patternName, parseResult.getName(), whereToSearch));
-            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parmLookup.get("t"), whereToSearch));
+            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parmLookup.get(GeoUriDef.TIME), whereToSearch));
 
             parseLatOrLon(parseResult, whereToSearch);
+
+            if (parseResult.getName() == null) {
+                parseResult.setName(parmLookup.get(GeoUriDef.NAME));
+            }
         }
         return parseResult;
     }
 
+    private static ArrayList<String> toStringArray(String[] whereToSearch) {
+        ArrayList<String> arrayList = new ArrayList<String>();
+        for (String candidate : whereToSearch) {
+            arrayList.add(candidate);
+        }
+        return arrayList;
+    }
+
     /** parsing helper: set first finding of lat and lon to parseResult */
-    private void parseLatOrLon(GeoPointDto parseResult, ArrayList<String> whereToSearch) {
+    public static void parseLatOrLon(GeoPointDto parseResult, String... whereToSearch) {
+        parseLatOrLon(parseResult, toStringArray(whereToSearch));
+    }
+
+    /** parsing helper: set first finding of lat and lon to parseResult */
+    private static void parseLatOrLon(GeoPointDto parseResult, ArrayList<String> whereToSearch) {
         Matcher m = parseFindWithPattern(patternLatLonAlt, whereToSearch);
 
         if (m != null) {
@@ -182,12 +199,14 @@ public class GeoUri {
     }
 
     /** parsing helper: returns the match of the first finding of pattern in whereToSearch. */
-    private Matcher parseFindWithPattern(Pattern pattern, List<String> whereToSearch) {
-        for (String candidate : whereToSearch) {
-            if (candidate != null) {
-                Matcher m = pattern.matcher(candidate);
-                while (m.find() && (m.groupCount() > 0)) {
-                    return m;
+    private static Matcher parseFindWithPattern(Pattern pattern, List<String> whereToSearch) {
+        if (whereToSearch != null) {
+            for (String candidate : whereToSearch) {
+                if (candidate != null) {
+                    Matcher m = pattern.matcher(candidate);
+                    while (m.find() && (m.groupCount() > 0)) {
+                        return m;
+                    }
                 }
             }
         }
@@ -222,14 +241,14 @@ public class GeoUri {
         formatLatLon(result, geoPoint);
 
         delim = "?";
-        appendQueryParameter(result, "q", formatQuery(geoPoint), false);
-        appendQueryParameter(result, "z", geoPoint.getZoomMin());
-        appendQueryParameter(result, "z2", geoPoint.getZoomMax());
-        appendQueryParameter(result, "uri", geoPoint.getUri(), true);
-        appendQueryParameter(result, "d", geoPoint.getDescription(), true);
-        appendQueryParameter(result, "id", geoPoint.getId(), true);
+        appendQueryParameter(result, GeoUriDef.QUERY, formatQuery(geoPoint), false);
+        appendQueryParameter(result, GeoUriDef.ZOOM, geoPoint.getZoomMin());
+        appendQueryParameter(result, GeoUriDef.ZOOM_MAX, geoPoint.getZoomMax());
+        appendQueryParameter(result, GeoUriDef.LINK, geoPoint.getUri(), true);
+        appendQueryParameter(result, GeoUriDef.DESCRIPTION, geoPoint.getDescription(), true);
+        appendQueryParameter(result, GeoUriDef.ID, geoPoint.getId(), true);
         if (geoPoint.getTimeOfMeasurement() != null) {
-            appendQueryParameter(result, "t", GeoFormatter.formatDate(geoPoint.getTimeOfMeasurement()), false);
+            appendQueryParameter(result, GeoUriDef.TIME, GeoFormatter.formatDate(geoPoint.getTimeOfMeasurement()), false);
         }
 
         return result.toString();

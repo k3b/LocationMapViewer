@@ -39,7 +39,7 @@ public class GeoXmlOrTextParserTests {
         String data = "<?xml version='1.0' encoding='UTF-8'?>\n" +
                 "<root><poi ll='52.2,9.2'/><poi ll='52.1,9.1'/></root>";
 
-        List<IGeoPointInfo> result = new GeoXmlOrTextParser<GeoPointDto>().get(new GeoPointDto(), data);
+        List<IGeoPointInfo> result = new GeoXmlOrTextParser<IGeoPointInfo>().get(new GeoPointDto(), data);
         Assert.assertEquals(2, result.size());
     }
 
@@ -47,7 +47,7 @@ public class GeoXmlOrTextParserTests {
     public void parseXmlFragment()  {
         String data = "<poi ll='52.2,9.2'/><poi ll='52.1,9.1'/>";
 
-        List<IGeoPointInfo> result = new GeoXmlOrTextParser<GeoPointDto>().get(new GeoPointDto(), data);
+        List<IGeoPointInfo> result = new GeoXmlOrTextParser<IGeoPointInfo>().get(new GeoPointDto(), data);
         Assert.assertEquals(2, result.size());
     }
 
@@ -57,7 +57,7 @@ public class GeoXmlOrTextParserTests {
             "geo:52.1,9.1\n" +
             "geo:52.2,9.2\n";
 
-        List<IGeoPointInfo> result = new GeoXmlOrTextParser<GeoPointDto>().get(new GeoPointDto(), data);
+        List<IGeoPointInfo> result = new GeoXmlOrTextParser<IGeoPointInfo>().get(new GeoPointDto(), data);
         Assert.assertEquals(2, result.size());
     }
 

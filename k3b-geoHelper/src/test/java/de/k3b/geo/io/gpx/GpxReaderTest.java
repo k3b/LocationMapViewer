@@ -52,7 +52,7 @@ public class GpxReaderTest {
 
     @Test
     public void parseFormatGpx11ShortTest() throws IOException {
-        GpxReader reader = new GpxReader(null);
+        GpxReader<IGeoPointInfo> reader = new GpxReader<IGeoPointInfo>(null);
         IGeoPointInfo location = reader.getTracks(new InputSource(new StringReader(xmlMinimal_gpx_v11))).get(0);
         String formatted = GpxFormatter.toGpx(new StringBuffer(), location, location.getDescription(), location.getUri()).toString();
 
@@ -61,7 +61,7 @@ public class GpxReaderTest {
 
     @Test
     public void parseFormatGpx11FullTest() throws IOException {
-        GpxReader reader = new GpxReader(null);
+        GpxReader<IGeoPointInfo> reader = new GpxReader<IGeoPointInfo>(null);
         IGeoPointInfo location = reader.getTracks(new InputSource(new StringReader(xmlFull_gpx_v11))).get(0);
         String formatted = GpxFormatter.toGpx(new StringBuffer(), location, location.getDescription(), location.getUri()).toString();
 
@@ -70,7 +70,7 @@ public class GpxReaderTest {
 
     @Test
     public void parseFormatGpx11WithNamespaceTest() throws IOException {
-        GpxReader reader = new GpxReader(null);
+        GpxReader<IGeoPointInfo> reader = new GpxReader<IGeoPointInfo>(null);
         IGeoPointInfo location = reader.getTracks(new InputSource(new StringReader(xmlFull_gpx_v11withNS))).get(0);
         String formatted = GpxFormatter.toGpx(new StringBuffer(), location, location.getDescription(), location.getUri()).toString();
 
@@ -79,7 +79,7 @@ public class GpxReaderTest {
 
     @Test
     public void parseFormatGpx10ShortTest() throws IOException {
-        GpxReader reader = new GpxReader(null);
+        GpxReader<IGeoPointInfo> reader = new GpxReader<IGeoPointInfo>(null);
         IGeoPointInfo location = reader.getTracks(new InputSource(new StringReader(xmlMinimal_gpx_v10))).get(0);
         String formatted = GpxFormatter.toGpx(new StringBuffer(), location, location.getDescription(), location.getUri()).toString();
 

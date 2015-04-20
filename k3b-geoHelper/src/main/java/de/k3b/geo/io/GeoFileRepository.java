@@ -42,7 +42,7 @@ import de.k3b.geo.api.IGeoRepository;
  *
  * Created by k3b on 17.03.2015.
  */
-public class GeoFileRepository<T extends GeoPointDto, R extends IGeoPointInfo> implements IGeoRepository<R> {
+public class GeoFileRepository<T extends IGeoPointInfo> implements IGeoRepository<T> {
     private static final Logger logger = LoggerFactory.getLogger(GeoFileRepository.class);
 
     /** used to translate between {@link de.k3b.geo.api.IGeoPointInfo} and uri string */
@@ -51,13 +51,13 @@ public class GeoFileRepository<T extends GeoPointDto, R extends IGeoPointInfo> i
 
     /** where data is loaded from/saved to */
     private final File file;
-    private final T factory;
+    private final GeoPointDto factory;
 
     /** the content of the repository */
-    private List<R> data = null;
+    private List<T> data = null;
 
     /** connect repository to file */
-    public GeoFileRepository(File file, T factory) {
+    public GeoFileRepository(File file, GeoPointDto factory) {
         this.file = file;
         this.factory = factory;
     }
@@ -66,7 +66,7 @@ public class GeoFileRepository<T extends GeoPointDto, R extends IGeoPointInfo> i
      *
      * @return data loaded
      */
-    public List<R> load() {
+    public List<T> load() {
         if (data == null) {
             data = new ArrayList<>();
             if (this.file.exists()) {
@@ -91,7 +91,7 @@ public class GeoFileRepository<T extends GeoPointDto, R extends IGeoPointInfo> i
      * @return data loaded
      */
     @Override
-    public List<R> reload() {
+    public List<T> reload() {
         this.data = null;
         return load();
     }
@@ -108,7 +108,7 @@ public class GeoFileRepository<T extends GeoPointDto, R extends IGeoPointInfo> i
      * @return true if successful
      */
     @Override
-    public boolean delete(R item) {
+    public boolean delete(T item) {
         if ((item != null) && load().remove(item)) {
             save();
             return true;
@@ -144,41 +144,41 @@ public class GeoFileRepository<T extends GeoPointDto, R extends IGeoPointInfo> i
 
     // load(new InputStreamReader(inputStream, "UTF-8"))
     /** load points from reader */
-    public void load(List<R> result, Reader reader) throws IOException {
+    public void load(List<T> result, Reader reader) throws IOException {
         String line;
         BufferedReader br = new BufferedReader(reader);
         while ((line = br.readLine()) != null) {
             line = line.trim();
             if ((line.length() > 0) && (!line.startsWith(COMMENT))) {
-                T geo = loadItem(line);
+                GeoPointDto geo = loadItem(line);
                 final boolean valid = isValid(geo);
                 if (logger.isDebugEnabled()) {
                     logger.debug("load(" + line + "): " + ((valid) ? "loaded" : "ignored"));
                 }
 
-                if (valid) result.add((R) geo);
+                if (valid) result.add((T) geo);
             }
         }
         br.close();
     }
 
-    protected T loadItem(String line) {
+    protected GeoPointDto loadItem(String line) {
         return converter.fromUri(line, create());
     }
 
-    protected T create() {
-        return (T) factory.clone().clear();
+    protected GeoPointDto create() {
+        return (GeoPointDto) factory.clone().clear();
     }
 
     /** save points to writer */
-    void save(List<R> source, Writer writer) throws IOException {
-        for (R geo : source) {
+    void save(List<T> source, Writer writer) throws IOException {
+        for (T geo : source) {
             saveItem(writer, geo);
         }
         writer.close();
     }
 
-    protected boolean saveItem(Writer writer, R geo) throws IOException {
+    protected boolean saveItem(Writer writer, T geo) throws IOException {
         final boolean valid = isValid(geo);
 
         final String line = converter.toUriString(geo);

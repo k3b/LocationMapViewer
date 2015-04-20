@@ -36,20 +36,20 @@ import de.k3b.geo.io.GeoUri;
  * gets geoItems from text.
  * Created by k3b on 20.04.2015.
  */
-public class GeoXmlOrTextParser<T extends GeoPointDto> {
-    public List<IGeoPointInfo> get(T baseItem, String src) {
+public class GeoXmlOrTextParser<T extends IGeoPointInfo> {
+    public List<T> get(GeoPointDto baseItem, String src) {
         if (src == null) return null;
 
         if (src.startsWith(GeoFileRepository.COMMENT) || src.startsWith(GeoUri.GEO_SCHEME)) {
             // lines of comments "#.." or geo-uris seperated by cr/lf
-            GeoFileRepository<T, IGeoPointInfo> parser = new GeoFileRepository<T, IGeoPointInfo>(null, baseItem) {
+            GeoFileRepository<T> parser = new GeoFileRepository<T>(null, baseItem) {
                 @Override
                 protected boolean isValid(IGeoPointInfo geo) {
                     return true;
                 }
             };
             StringReader rd = new StringReader(src);
-            ArrayList<IGeoPointInfo> result = new ArrayList<IGeoPointInfo>();
+            ArrayList<T> result = new ArrayList<T>();
 
             try {
                 parser.load(result, rd);
@@ -63,9 +63,9 @@ public class GeoXmlOrTextParser<T extends GeoPointDto> {
                 // to allow xml-fragments without xml-root element
                 src = "<xml>" + src + "</xml>";
             }
-            GpxReader parser = new GpxReader(baseItem);
+            GpxReader<T> parser = new GpxReader<T>(baseItem);
             StringReader rd = new StringReader(src);
-            List<IGeoPointInfo> result = null;
+            List<T> result = null;
 
             try {
                 result = parser.getTracks(new InputSource(rd));

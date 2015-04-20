@@ -28,7 +28,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.List;
 
 import de.k3b.geo.api.GeoPointDto;
@@ -97,7 +96,7 @@ public class GeoPointDtoRegressionTests {
 
     private void checkStream(Integer expectedNumberOfPois, InputStream xmlStream) {
         try {
-            GpxReader parser = new GpxReader(null);
+            GpxReader<IGeoPointInfo> parser = new GpxReader<IGeoPointInfo>(null);
             List<IGeoPointInfo> pois = parser.getTracks(new InputSource(xmlStream));
             if (expectedNumberOfPois != pois.size()) {
                 addError("Expected " + expectedNumberOfPois +" but got " + pois.size());

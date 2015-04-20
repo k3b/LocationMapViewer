@@ -31,7 +31,7 @@ import de.k3b.geo.io.GeoFileRepository;
 /**
  * Created by k3b on 24.03.2015.
  */
-public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDto, GeoBmpDto> {
+public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDto> {
     private final File iconDir;
 
     /**
@@ -46,7 +46,7 @@ public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDto, GeoBmpDto
     }
 
     protected GeoBmpDto loadItem(String line) {
-        GeoBmpDto geo = super.loadItem(line);
+        GeoBmpDto geo = (GeoBmpDto) super.loadItem(line);
         File bmpFile = getBmpFile(geo);
 
         if ((bmpFile != null) && (bmpFile.exists())) {

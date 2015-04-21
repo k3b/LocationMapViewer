@@ -2,13 +2,13 @@ D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
 open:
 
->   app can load *.poi files with internal <poi/> xml format.
+?   app can load *.poi files with internal <poi/> xml format.
 -   lib can save *.poi with internal  <poi/> xml format.
 v   app extras with <poi/> xml format for additional points in map
     v GeoXmlOrTextParser() as intent-extra interpreter
     v add to app and to demo
 
-app test if loading *.gpx/kml/poi from internet works
+?   app test if loading *.gpx/kml/poi from internet works
 
 
 

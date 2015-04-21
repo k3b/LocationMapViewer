@@ -4,8 +4,6 @@
 		creator="k3b. Data from Wikipedia. Format from 'My Tracks' for android"
 		xmlns="http://www.topografix.com/GPX/1/1"
 		xmlns:topografix="http://www.topografix.com/GPX/Private/TopoGrafix/0/1"
-		
-		xmlns:other
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.topografix.com/GPX/Private/TopoGrafix/0/1 http://www.topografix.com/GPX/Private/TopoGrafix/0/1/topografix.xsd">
 
@@ -36,23 +34,24 @@
 			<name>Test</name>
 			<desc>This is no valid gpx11 content but will be understood by the parser</desc>
 			<time>2015-02-10T08:06:45+02:00</time>
-			<link>http://en.wikipedia.org/wiki/Hannover</link>
+			<link>https://github.com/k3b/LocationMapViewer/</link>
 		</trkpt>
 		
 		<!-- similar to gpx-1.0 -->
 		<wpt lat="52.4" lon="9.4"
 				<time>2009-10-16T00:00:00Z</time>
-				<url>theLink gpx10</url>
+				<url>https://github.com/k3b/LocationMapViewer/</url>
 				<name>theName gpx10</name>
 				<desc>theDesc gpx10</desc>
 				<time>2015-02-10T08:04:45.000Z</time>
 		</wpt>
 
 		
-		<!-- similar to kml-2.2 -->
-		<Placemark >
+		<!-- similar to kml-2.2 with atom -->
+		<Placemark xmlns:atom="http://www.w3.org/2005/Atom">
 			<description>theDesc kml</description>
 			<name>theName kml</name>
+			<atom:link href="https://github.com/k3b/LocationMapViewer/" />
 			<Point>
 				<coordinates>9.3,52.3</coordinates>
 				<when>2015-02-10T08:04:45.000Z</when>
@@ -60,7 +59,7 @@
 		</Placemark>
 
 		<!-- this is de.k3b.geo internal format from xml attributes (which are the same as the geo-uri-fields -->
-		<poi ll="52.8,9.8" n="theName(internal)" uri="theLink(internal)" d="theDesc(internal)" t="2015-02-10T08:04:45Z"
+		<poi ll="52.8,9.8" n="theName(internal)" uri="https://github.com/k3b/LocationMapViewer/" d="theDesc(internal)" t="2015-02-10T08:04:45Z"
 				z="5" z2="7" id="42" />
 
 		<!-- this is de.k3b.geo internal format used by parsing geo-uri where the fields are url-encoded-->

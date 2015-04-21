@@ -27,9 +27,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,11 +41,20 @@ import de.k3b.geo.io.GeoUriDef;
 import de.k3b.util.IsoDateTimeParser;
 
 /**
- * Parser for http://www.topografix.com/GPX/1/1/ and http://www.topografix.com/GPX/1/0/
- * and a little bit of http://www.opengis.net/kml/2.2.
+ * Parser for xml-geo formats implemented for
+ *  - gpx-1.1 http://www.topografix.com/GPX/1/1/ and
+ *  - gpx-1.0 http://www.topografix.com/GPX/1/0/ and
+ *  - poi (de.k3b.geo internal format compatible with geo-uri format)
+ *  - kml-2.2 (a little bit of http://www.opengis.net/kml/2.2).
  *
- * This parser is not acurate: it might pick elements from wrong namespace.
- * 
+ * This parser is not acurate: it might pick elements from wrong namespaces.
+ *
+ * Note: if you change/add features to this xml parser
+ * ...\LocationMapViewer\k3b-geoHelper\src\main\java\de.k3b.geo.io.gpx.GpxReaderBase.java
+ * please also update regression test-data and prog at
+ * ...\LocationMapViewer\k3b-geoHelper\src\test\resources\de\k3b\geo\io\regressionTests\*.*
+ * ...\LocationMapViewer\k3b-geoHelper\src\test\java\de.k3b.geo.io.GeoPointDtoRegressionTests.java
+ *
  * Created by k3b on 20.01.2015.
  */
 public class GpxReaderBase extends DefaultHandler {
@@ -194,7 +200,7 @@ public class GpxReaderBase extends DefaultHandler {
                             + name +"=" + buf.toString());
                 }
 
-            } else if (name.equals(KmlDef_22.COORDINATES)) {
+            } else if (name.equals(KmlDef_22.COORDINATES) || name.equals(KmlDef_22.COORDINATES2)) {
                 // <coordinates>lon,lat,height blank lon,lat,height ...</coordinates>
                 try {
                     String parts[] = buf.toString().split("[,\\s]");

@@ -62,7 +62,7 @@ public class GeoPointDtoRegressionTests {
     }
 
     private void checkStream(String expectedNumberOfPois, String resourceName) {
-        checkStream(Integer.valueOf(expectedNumberOfPois), getStream(resourceName));
+        checkStream(Integer.valueOf(expectedNumberOfPois), getStream(resourceName), resourceName);
     }
 
     private InputStream getStream(String _resourceName) {
@@ -94,7 +94,7 @@ public class GeoPointDtoRegressionTests {
         return result;
     }
 
-    private void checkStream(Integer expectedNumberOfPois, InputStream xmlStream) {
+    private void checkStream(Integer expectedNumberOfPois, InputStream xmlStream, String resourceName) {
         try {
             GpxReader<IGeoPointInfo> parser = new GpxReader<IGeoPointInfo>(null);
             List<IGeoPointInfo> pois = parser.getTracks(new InputSource(xmlStream));
@@ -103,9 +103,10 @@ public class GeoPointDtoRegressionTests {
             }
             checkPois(pois);
             xmlStream.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            addError("cannot load: " + e.getMessage() + "\n" + e.getStackTrace());
+            addError("cannot load  " +
+                    resourceName + ": " + e.getMessage() + "\n" + e.getStackTrace());
         }
     }
 

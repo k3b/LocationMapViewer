@@ -191,6 +191,8 @@ public class GpxReaderBase extends DefaultHandler {
                 this.current.setDescription(buf.toString());
             } else if ((null == this.current.getUri()) && (name.equals(GpxDef_11.LINK) || name.equals(GpxDef_10.URL))) {
                 this.current.setUri(buf.toString());
+            } else if (name.equals(GeoUriDef.ID)) {
+                this.current.setId(buf.toString());
             } else if (name.equals(GpxDef_11.TIME) || name.equals(KmlDef_22.TIMESTAMP_WHEN) || name.equals(KmlDef_22.TIMESPAN_BEGIN)) {
                 final Date dateTime = IsoDateTimeParser.parse(buf.toString());
                 if (dateTime != null) {

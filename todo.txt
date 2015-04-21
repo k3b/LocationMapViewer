@@ -1,6 +1,11 @@
 D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
+-	bug regression why does lmv open *.json file which is also oct-stream although file pattern does not match
+		?? only one file pattern allowed???
+
 open:
+-	regression-tests with <k3b:id>...
+-	create k3b-geo-xsd
 
 ?   app can load *.poi files with internal <poi/> xml format.
 -   lib can save *.poi with internal  <poi/> xml format.
@@ -9,7 +14,6 @@ v   app extras with <poi/> xml format for additional points in map
     v add to app and to demo
 
 ?   app test if loading *.gpx/kml/poi from internet works
-
 
 
 v https://github.com/k3b/LocationMapViewer/issues/2

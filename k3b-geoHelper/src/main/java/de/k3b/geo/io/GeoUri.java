@@ -112,7 +112,7 @@ public class GeoUri {
             }
             parseResult.setDescription(parmLookup.get(GeoUriDef.DESCRIPTION));
             parseResult.setLink(parmLookup.get(GeoUriDef.LINK));
-            parseResult.setIconUrl(parmLookup.get(GeoUriDef.ICON));
+            parseResult.setSymbol(parmLookup.get(GeoUriDef.SYMBOL));
             parseResult.setId(parmLookup.get(GeoUriDef.ID));
             parseResult.setZoomMin(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM)));
             parseResult.setZoomMax(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM_MAX)));
@@ -245,7 +245,7 @@ public class GeoUri {
         appendQueryParameter(result, GeoUriDef.ZOOM, geoPoint.getZoomMin());
         appendQueryParameter(result, GeoUriDef.ZOOM_MAX, geoPoint.getZoomMax());
         appendQueryParameter(result, GeoUriDef.LINK, geoPoint.getLink(), true);
-        appendQueryParameter(result, GeoUriDef.ICON, geoPoint.getIconUrl(), true);
+        appendQueryParameter(result, GeoUriDef.SYMBOL, geoPoint.getSymbol(), true);
         appendQueryParameter(result, GeoUriDef.DESCRIPTION, geoPoint.getDescription(), true);
         appendQueryParameter(result, GeoUriDef.ID, geoPoint.getId(), true);
         if (geoPoint.getTimeOfMeasurement() != null) {

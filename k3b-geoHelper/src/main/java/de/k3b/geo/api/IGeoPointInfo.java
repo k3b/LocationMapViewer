@@ -92,9 +92,9 @@ public interface IGeoPointInfo extends ILocation, Cloneable  {
      * */
     String getLink();
     /** Optional: if not null: icon-url belonging to this item.<br/>
-     * persistet in geo-uri as geo:...&icon=https://path/to/file.png
+     * persistet in geo-uri as geo:...&s=https://path/to/file.png
      * */
-    String getIconUrl();
+    String getSymbol();
 
     IGeoPointInfo clone();
 }

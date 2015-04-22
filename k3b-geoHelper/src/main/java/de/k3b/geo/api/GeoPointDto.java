@@ -74,9 +74,9 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
     private String link = null;
 
     /** Optional: if not null: url to an icon belonging to this item.<br/>
-     * persistet in geo-uri as geo:...&icon=https://path/to/file.html
+     * persistet in geo-uri as geo:...&s=https://path/to/file.html
      * */
-    private String iconUrl = null;
+    private String symbol = null;
 
     public GeoPointDto() {
     }
@@ -87,14 +87,14 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
     }
 
     public GeoPointDto(double latitude, double longitude,
-                       String name, String link, String iconUrl,
+                       String name, String link, String symbol,
                        String id,
                        String description, int zoomMin, int zoomMax, Date timeOfMeasurement) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.name = name;
         this.link = link;
-        this.iconUrl = iconUrl;
+        this.symbol = symbol;
         this.id = id;
         this.description = description;
         this.zoomMin = zoomMin;
@@ -108,7 +108,7 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
             this.longitude = src.getLongitude();
             this.name = src.getName();
             this.link = src.getLink();
-            this.iconUrl = src.getIconUrl();
+            this.symbol = src.getSymbol();
             this.id = src.getId();
             this.description = src.getDescription();
             this.zoomMin = src.getZoomMin();
@@ -255,18 +255,18 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
     }
 
     /** Optional: if not null: icon-url belonging to this item.<br/>
-     * persistet in geo-uri as geo:...&icon=https://path/to/file.png
+     * persistet in geo-uri as geo:...&s=https://path/to/file.png
      * */
     @Override
-    public String getIconUrl() {
-        return iconUrl;
+    public String getSymbol() {
+        return symbol;
     }
 
     /** Optional: if not null: icon-url belonging to this item.<br/>
-     * persistet in geo-uri as geo:...&icon=https://path/to/file.png
+     * persistet in geo-uri as geo:...&s=https://path/to/file.png
      * */
-    public GeoPointDto setIconUrl(String iconUrl) {
-        this.iconUrl = iconUrl;
+    public GeoPointDto setSymbol(String symbol) {
+        this.symbol = symbol;
         return this;
     }
 
@@ -280,7 +280,7 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         this.longitude = GeoPointDto.NO_LAT_LON;
         this.name = null;
         this.link = null;
-        this.iconUrl = null;
+        this.symbol = null;
         this.id = null;
         this.description = null;
         this.zoomMin = NO_ZOOM;

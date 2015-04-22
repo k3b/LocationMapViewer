@@ -4,8 +4,10 @@ D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 		?? only one file pattern allowed???
 
 open:
--	regression-tests with <k3b:id>...
+>	rename icon(Url)=... to s(ymbol)=....
 -	create k3b-geo-xsd
+		inline doc
+		=> generate api doc out of it?
 
 ?   app can load *.poi files with internal <poi/> xml format.
 -   lib can save *.poi with internal  <poi/> xml format.

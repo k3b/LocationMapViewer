@@ -8,7 +8,7 @@
 	    except that kml-2.2 has no id attribute that is used for regression-testing 
 		-->
 		<Placemark>
-          <expectedTestResult:id>geo:52,9?q=(theName)&amp;uri=theLink&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z</expectedTestResult:id>
+          <expectedTestResult:id>geo:52,9?q=(theName)&amp;link=theLink&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z</expectedTestResult:id>
 			<description>theDesc</description>
 			<name>theName</name>
 			<!-- link found at https://github.com/kubark42/libkml/blob/master/testdata/atom/atom-all.kml -->

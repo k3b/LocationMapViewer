@@ -123,16 +123,16 @@
 
     <TextView
         android:layout_below="@id/time"
-        android:id="@+id/label_uri"
-        android:text="uri:"
+        android:id="@+id/label_link"
+        android:text="link:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         />
     <EditText
-        android:id="@+id/uri"
+        android:id="@+id/link"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/label_uri"
+        android:layout_below="@id/label_link"
         android:text="" />
 
 	<Button
@@ -140,14 +140,14 @@
 	    android:text="@string/cmd_save" 
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content"
-        android:layout_below="@id/uri"
+        android:layout_below="@id/link"
 		android:textSize="20sp"/>
 	<Button 
 		android:id="@+id/cmd_cancel"
 	    android:text="@string/cmd_cancel" 
 	    android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-        android:layout_below="@id/uri"
+        android:layout_below="@id/link"
         android:layout_toRightOf="@+id/cmd_save"
         android:textSize="20sp"
 		android:layout_gravity="left"/>

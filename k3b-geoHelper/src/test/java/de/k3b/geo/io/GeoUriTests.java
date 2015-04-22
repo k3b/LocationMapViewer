@@ -32,7 +32,7 @@ import de.k3b.geo.api.IGeoPointInfo;
  */
 public class GeoUriTests {
     /**
-     * geo:{lat{,lon{,hight_ignore}}}{?q={lat{,lon{,hight_ignore}}}{(name)}{|uri{|id}|}{description}}{&z={{zmin}-zmax}}
+     * geo:{lat{,lon{,hight_ignore}}}{?q={lat{,lon{,hight_ignore}}}{(name)}{|link{|id}|}{description}}{&z={{zmin}-zmax}}
      * */
     @Test
     public void shouldFormat() throws Exception {
@@ -107,6 +107,6 @@ public class GeoUriTests {
 
 
     private GeoPointDto createTestGeoPoint() {
-        return new GeoPointDto(12.345, -56.78901234, "name", "uri", "id", "description", 5, 7, new Date(91, 2, 3, 4, 5, 6));
+        return new GeoPointDto(12.345, -56.78901234, "name", "link", "id", "description", 5, 7, new Date(91, 2, 3, 4, 5, 6));
     }
 }

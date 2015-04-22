@@ -23,7 +23,7 @@ package de.k3b.geo.io;
 public class GeoUriDef {
 
     public static final String DESCRIPTION = "d";
-    public static final String LINK = "uri";
+    public static final String LINK = "link";
     public static final String QUERY = "q";
     public static final String ZOOM = "z";
     public static final String ZOOM_MAX = "z2";

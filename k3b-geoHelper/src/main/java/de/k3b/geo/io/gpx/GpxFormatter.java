@@ -38,14 +38,14 @@ public class GpxFormatter {
         TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
     public static StringBuffer toGpx(StringBuffer result, ILocation location,
-                                     String description, String uri) {
+                                     String description, String link) {
         return toGpx(result, location.getLatitude(), location.getLongitude(),
-                location.getTimeOfMeasurement(), location.toString(),description, uri);
+                location.getTimeOfMeasurement(), location.toString(),description, link);
     }
 
     private static StringBuffer toGpx(StringBuffer result, double latitude, double longitude,
                                       Date timeOfMeasurement, String name,
-                                      String description, String uri) {
+                                      String description, String link) {
         result.append("<" +
                 GpxDef_11.TRKPT +
                 " " +
@@ -71,7 +71,7 @@ public class GpxFormatter {
                 " " +
                 GpxDef_11.ATTR_LINK +
                 "='")
-                .append(uri)
+                .append(link)
                 .append("' />");
 
         result.append("</" +

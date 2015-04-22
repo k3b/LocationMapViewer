@@ -24,7 +24,6 @@ import android.net.Uri;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.MarkerInfoWindow;
@@ -44,8 +43,8 @@ class GeoPointMarkerInfoWindow extends MarkerInfoWindow implements View.OnClickL
 
     // View.OnClickListener
     public void onClick(View view) {
-        if ((mSelectedPoi != null) && (mSelectedPoi.getUri() != null)) {
-            Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mSelectedPoi.getUri()));
+        if ((mSelectedPoi != null) && (mSelectedPoi.getLink() != null)) {
+            Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mSelectedPoi.getLink()));
             view.getContext().startActivity(myIntent);
         }
     }
@@ -59,7 +58,7 @@ class GeoPointMarkerInfoWindow extends MarkerInfoWindow implements View.OnClickL
             setText(R.id.bubble_title, mSelectedPoi.getName());
             setText(R.id.bubble_description, mSelectedPoi.getDescription());
 
-            if (mSelectedPoi.getUri() != null) {
+            if (mSelectedPoi.getLink() != null) {
                 Button btn = (Button) (mView.findViewById(R.id.bubble_moreinfo));
                 btn.setVisibility(View.VISIBLE);
                 btn.setOnClickListener(this);

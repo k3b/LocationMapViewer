@@ -140,7 +140,7 @@ public class GpxReaderBase extends DefaultHandler {
         if (value != null) result.setId(value);
 
         value = attributes.getValue(GeoUriDef.LINK);
-        if (value != null) result.setUri(value);
+        if (value != null) result.setLink(value);
 
         value = attributes.getValue(GeoUriDef.ZOOM);
         if (value != null) result.setZoomMin(GeoFormatter.parseZoom(value));
@@ -169,7 +169,7 @@ public class GpxReaderBase extends DefaultHandler {
         } else if ((name.equals(KmlDef_22.PLACEMARK)) || (name.equals(GeoUriDef.XML_ELEMENT_POI))) {
             this.current = this.newInstance(attributes);
         } else if ((this.current != null) && (name.equals(GpxDef_11.LINK) || name.equals(GpxDef_10.URL))) {
-            this.current.setUri(attributes.getValue(GpxDef_11.ATTR_LINK));
+            this.current.setLink(attributes.getValue(GpxDef_11.ATTR_LINK));
         }
 		if (this.current != null) {
 			buf.setLength(0);
@@ -189,8 +189,8 @@ public class GpxReaderBase extends DefaultHandler {
                 this.current.setName(buf.toString());
             } else if (name.equals(GpxDef_11.DESC) || name.equals(KmlDef_22.DESCRIPTION)) {
                 this.current.setDescription(buf.toString());
-            } else if ((null == this.current.getUri()) && (name.equals(GpxDef_11.LINK) || name.equals(GpxDef_10.URL))) {
-                this.current.setUri(buf.toString());
+            } else if ((null == this.current.getLink()) && (name.equals(GpxDef_11.LINK) || name.equals(GpxDef_10.URL))) {
+                this.current.setLink(buf.toString());
             } else if (name.equals(GeoUriDef.ID)) {
                 this.current.setId(buf.toString());
             } else if (name.equals(GpxDef_11.TIME) || name.equals(KmlDef_22.TIMESTAMP_WHEN) || name.equals(KmlDef_22.TIMESPAN_BEGIN)) {

@@ -51,46 +51,46 @@ public interface IGeoPointInfo extends ILocation, Cloneable  {
      * In geo data: filter - this item is only shown if current zoom-level is >= this value.<br/>
      * NO_LAT_LON if not set.<br/>
      * NO_ZOOM means no lower bound.<br/>
-     * persistet in uri as geo:...&z=4
+     * persistet in geo-uri as geo:...&z=4
      * */
     int getZoomMin();
 
     /** Optional in geo data as filter criteria: this item is only shown
      * if current zoom-level is <= this value. NO_ZOOM means no upper bound.<br/>
-     * persistet in uri as geo:...&z2=6
+     * persistet in geo-uri as geo:...&z2=6
      * */
     int getZoomMax();
 
     /** Optional: Date when the measurement was taken. Null if unknown.<br/>
      * This may be shown in a map as an alternative label<br/>
      * or used as a filter to include only geopoints of a certain date range.<br/>
-     * persistet in uri as geo:...&t=2015-03-24T15:39:52z  */
+     * persistet in geo-uri as geo:...&t=2015-03-24T15:39:52z  */
     Date getTimeOfMeasurement();
 
     /** Optional: Short non-unique text used as marker label. <br/>
      * Null if not set.<br/>
      * In show view after clicking on a marker: Caption/Title in the bubble.<br/>
-     * persistet in uri as geo:?q=...(name)
+     * persistet in geo-uri as geo:?q=...(name)
      * */
     String getName();
 
     /** Optional: Detailed description of the point displayed in popup on long-click.<br/>
      * Null if not set.<br/>
      * In show view after clicking on a marker: Text in the bubble.<br/>
-     * persistet in uri as geo:...&d=someDescription
+     * persistet in geo-uri as geo:...&d=someDescription
      * */
     String getDescription();
 
     /** Optional: if not null: a unique id for this item.<br/>
-     * persistet in uri as geo:...&id=4711
+     * persistet in geo-uri as geo:...&id=4711
      * */
     String getId();
 
-    /** Optional: if not null: uri belonging to this item.<br/>
-     * In show view after clicking on a marker: clock on button ">" opens this uri.<br/>
-     * persistet in uri as geo:...&uri=file://path/to/file.jpg
+    /** Optional: if not null: link-url that belonging to this item.<br/>
+     * In show view after clicking on a marker: clock on button ">" opens this url.<br/>
+     * persistet in geo-uri as geo:...&link=https://path/to/file.html
      * */
-    String getUri();
+    String getLink();
 
     IGeoPointInfo clone();
 }

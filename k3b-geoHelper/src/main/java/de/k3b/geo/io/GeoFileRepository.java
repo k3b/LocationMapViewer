@@ -45,7 +45,7 @@ import de.k3b.geo.api.IGeoRepository;
 public class GeoFileRepository<T extends IGeoPointInfo> implements IGeoRepository<T> {
     private static final Logger logger = LoggerFactory.getLogger(GeoFileRepository.class);
 
-    /** used to translate between {@link de.k3b.geo.api.IGeoPointInfo} and uri string */
+    /** used to translate between {@link de.k3b.geo.api.IGeoPointInfo} and geo-uri string */
     private static final GeoUri converter = new GeoUri(GeoUri.OPT_DEFAULT);
     public static final java.lang.String COMMENT = "#";
 

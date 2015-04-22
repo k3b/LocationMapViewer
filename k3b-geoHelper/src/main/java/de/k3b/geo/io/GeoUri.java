@@ -22,17 +22,11 @@ package de.k3b.geo.io;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -117,7 +111,7 @@ public class GeoUri {
                 parseAddQueryParamToMap(parmLookup, param);
             }
             parseResult.setDescription(parmLookup.get(GeoUriDef.DESCRIPTION));
-            parseResult.setUri(parmLookup.get(GeoUriDef.LINK));
+            parseResult.setLink(parmLookup.get(GeoUriDef.LINK));
             parseResult.setId(parmLookup.get(GeoUriDef.ID));
             parseResult.setZoomMin(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM)));
             parseResult.setZoomMax(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM_MAX)));
@@ -249,7 +243,7 @@ public class GeoUri {
         appendQueryParameter(result, GeoUriDef.QUERY, formatQuery(geoPoint), false);
         appendQueryParameter(result, GeoUriDef.ZOOM, geoPoint.getZoomMin());
         appendQueryParameter(result, GeoUriDef.ZOOM_MAX, geoPoint.getZoomMax());
-        appendQueryParameter(result, GeoUriDef.LINK, geoPoint.getUri(), true);
+        appendQueryParameter(result, GeoUriDef.LINK, geoPoint.getLink(), true);
         appendQueryParameter(result, GeoUriDef.DESCRIPTION, geoPoint.getDescription(), true);
         appendQueryParameter(result, GeoUriDef.ID, geoPoint.getId(), true);
         if (geoPoint.getTimeOfMeasurement() != null) {

@@ -85,7 +85,7 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="&lt;poi ll='53.1,8.9'/>\n&lt;poi ll='53.3,8.7' n='Name' \n uri='https://github.com/k3b/LocationMapViewer/' \n d='Here is some comment' />"
+            android:text="&lt;poi ll='53.1,8.9'/>\n&lt;poi ll='53.3,8.7' n='Name' \n link='https://github.com/k3b/LocationMapViewer/' \n d='Here is some comment' />"
             android:id="@+id/editPOIs"
             android:layout_below="@id/labelPOIs"
             android:layout_alignParentLeft="true"

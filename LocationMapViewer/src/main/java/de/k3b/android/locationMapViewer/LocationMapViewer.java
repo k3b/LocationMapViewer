@@ -23,7 +23,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.BitmapDrawable;
@@ -52,7 +51,6 @@ import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.clustering.StaticCluster;
 import org.osmdroid.bonuspack.overlays.FolderOverlay;
 import org.osmdroid.bonuspack.overlays.Marker;
-import org.osmdroid.bonuspack.overlays.MarkerInfoWindow;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
@@ -408,7 +406,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         poiMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         poiMarker.setPosition(toOsmGeoPoint(aGeoPoint));
 
-        if (BookmarkUtil.isNotEmpty(description) || BookmarkUtil.isNotEmpty(aGeoPoint.getUri())) {
+        if (BookmarkUtil.isNotEmpty(description) || BookmarkUtil.isNotEmpty(aGeoPoint.getLink())) {
             poiMarker.setIcon(mPoiIconWithData);
             // 7.
             poiMarker.setInfoWindow(new GeoPointMarkerInfoWindow(map));
@@ -530,7 +528,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         handler.onGeoInfo(new GeoPointDto(52.518333, 13.408333, "Berlin", "This is a relatively short SampleDescription."));
         handler.onGeoInfo(new GeoPointDto(38.895000, -77.036667, "Washington",
                 "This SampleDescription is a pretty long one. Almost as long as a the great wall in china.")
-                .setUri("geo:0,0?q=38.895000,-77.036667(Washington)"));
+                .setLink("geo:0,0?q=38.895000,-77.036667(Washington)"));
         handler.onGeoInfo(new GeoPointDto(37.779300, -122.419200, "San Francisco", "SampleDescription"));
     }
 

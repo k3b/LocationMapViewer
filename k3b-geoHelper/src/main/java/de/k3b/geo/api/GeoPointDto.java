@@ -67,10 +67,11 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
      */
     private String id = null;
 
-    /**
-     * if not null: uri belonging to this item.
-     */
-    private String uri = null;
+    /** Optional: if not null: link-url that belonging to this item.<br/>
+     * In show view after clicking on a marker: clock on button ">" opens this url.<br/>
+     * persistet in geo-uri as geo:...&link=https://path/to/file.html
+     * */
+    private String link = null;
 
     public GeoPointDto() {
     }
@@ -81,13 +82,13 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
     }
 
     public GeoPointDto(double latitude, double longitude,
-                       String name, String uri,
+                       String name, String link,
                        String id,
                        String description, int zoomMin, int zoomMax, Date timeOfMeasurement) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.name = name;
-        this.uri = uri;
+        this.link = link;
         this.id = id;
         this.description = description;
         this.zoomMin = zoomMin;
@@ -100,7 +101,7 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
             this.latitude = src.getLatitude();
             this.longitude = src.getLongitude();
             this.name = src.getName();
-            this.uri = src.getUri();
+            this.link = src.getLink();
             this.id = src.getId();
             this.description = src.getDescription();
             this.zoomMin = src.getZoomMin();
@@ -228,16 +229,21 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         return this;
     }
 
-    /**
-     * if not null: uri belonging to this item.
-     */
+    /** Optional: if not null: link-url that belonging to this item.<br/>
+     * In show view after clicking on a marker: clock on button ">" opens this url.<br/>
+     * persistet in geo-uri as geo:...&link=https://path/to/file.html
+     * */
     @Override
-    public String getUri() {
-        return uri;
+    public String getLink() {
+        return link;
     }
 
-    public GeoPointDto setUri(String uri) {
-        this.uri = uri;
+    /** Optional: if not null: link-url that belonging to this item.<br/>
+     * In show view after clicking on a marker: clock on button ">" opens this url.<br/>
+     * persistet in geo-uri as geo:...&link=https://path/to/file.html
+     * */
+    public GeoPointDto setLink(String link) {
+        this.link = link;
         return this;
     }
 
@@ -250,7 +256,7 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         this.latitude = GeoPointDto.NO_LAT_LON;
         this.longitude = GeoPointDto.NO_LAT_LON;
         this.name = null;
-        this.uri = null;
+        this.link = null;
         this.id = null;
         this.description = null;
         this.zoomMin = NO_ZOOM;

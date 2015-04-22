@@ -61,8 +61,8 @@ public class GeoBmpBinder {
         textView = (TextView) gui.findViewById(R.id.description);
         if (textView != null) textView.setText(item.getDescription());
 
-        textView = (TextView) gui.findViewById(R.id.uri);
-        if (textView != null) textView.setText(item.getUri());
+        textView = (TextView) gui.findViewById(R.id.link);
+        if (textView != null) textView.setText(item.getLink());
 
         textView = (TextView) gui.findViewById(R.id.id);
         if (textView != null) textView.setText(item.getId());
@@ -98,8 +98,8 @@ public class GeoBmpBinder {
         textView = (EditText) gui.findViewById(R.id.description);
         if (textView != null) currentItem.setDescription(getStringOrNull(textView));
 
-        textView = (EditText) gui.findViewById(R.id.uri);
-        if (textView != null) currentItem.setUri(getStringOrNull(textView));
+        textView = (EditText) gui.findViewById(R.id.link);
+        if (textView != null) currentItem.setLink(getStringOrNull(textView));
 
         textView = (EditText) gui.findViewById(R.id.latitude);
         if (textView != null) currentItem.setLatitude(getLatLon(textView));

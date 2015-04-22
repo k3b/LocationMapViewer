@@ -59,8 +59,8 @@
 		</Placemark>
 
 		<!-- this is de.k3b.geo internal format from xml attributes (which are the same as the geo-uri-fields -->
-		<poi ll="52.8,9.8" n="theName(internal)" uri="https://github.com/k3b/LocationMapViewer/" d="theDesc(internal)" t="2015-02-10T08:04:45Z"
-				z="5" z2="7" id="42" />
+		<poi ll="52.8,9.8" n="theName(internal)" link="https://github.com/k3b/LocationMapViewer/" d="theDesc(internal)" t="2015-02-10T08:04:45Z"
+				z="5" z2="7" id="42" icon="https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/main/res/drawable/ic_launcher.png" />
 
 		<!-- this is de.k3b.geo internal format used by parsing geo-uri where the fields are url-encoded-->
 		<poi geoUri="geo:52.6,9?q=(the+Name)&amp;d=the+Desc+with+emedded+extra+chars" />

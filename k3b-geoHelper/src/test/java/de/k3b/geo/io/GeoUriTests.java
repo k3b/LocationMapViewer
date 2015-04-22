@@ -107,6 +107,6 @@ public class GeoUriTests {
 
 
     private GeoPointDto createTestGeoPoint() {
-        return new GeoPointDto(12.345, -56.78901234, "name", "link", "id", "description", 5, 7, new Date(91, 2, 3, 4, 5, 6));
+        return new GeoPointDto(12.345, -56.78901234, "name", "link", "icon", "id", "description", 5, 7, new Date(91, 2, 3, 4, 5, 6));
     }
 }

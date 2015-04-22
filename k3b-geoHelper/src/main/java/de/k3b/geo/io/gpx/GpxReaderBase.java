@@ -142,6 +142,9 @@ public class GpxReaderBase extends DefaultHandler {
         value = attributes.getValue(GeoUriDef.LINK);
         if (value != null) result.setLink(value);
 
+        value = attributes.getValue(GeoUriDef.ICON);
+        if (value != null) result.setIconUrl(value);
+
         value = attributes.getValue(GeoUriDef.ZOOM);
         if (value != null) result.setZoomMin(GeoFormatter.parseZoom(value));
 

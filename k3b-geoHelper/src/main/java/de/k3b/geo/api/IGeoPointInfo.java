@@ -86,11 +86,15 @@ public interface IGeoPointInfo extends ILocation, Cloneable  {
      * */
     String getId();
 
-    /** Optional: if not null: link-url that belonging to this item.<br/>
+    /** Optional: if not null: link-url belonging to this item.<br/>
      * In show view after clicking on a marker: clock on button ">" opens this url.<br/>
      * persistet in geo-uri as geo:...&link=https://path/to/file.html
      * */
     String getLink();
+    /** Optional: if not null: icon-url belonging to this item.<br/>
+     * persistet in geo-uri as geo:...&icon=https://path/to/file.png
+     * */
+    String getIconUrl();
 
     IGeoPointInfo clone();
 }

@@ -108,5 +108,11 @@ public class GeoUriTests {
 
     private GeoPointDto createTestGeoPoint() {
         return new GeoPointDto(12.345, -56.78901234, "name", "link", "icon", "id", "description", 5, 7, new Date(91, 2, 3, 4, 5, 6));
+        /*
+        return new GeoPointDto(179.345, -86.78901234, "name, title or caption",
+                "https://link/to/additional/info.htm",
+                "https://link/to/symbol.png", "id", "Some description of the location",
+                5, 7, new Date(91, 2, 3, 4, 5, 6));
+        */
     }
 }

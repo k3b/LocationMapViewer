@@ -27,7 +27,7 @@ import java.util.Date;
  * Created by k3b on 13.01.2015.
  */
 public interface IGeoPointInfo extends ILocation, Cloneable  {
-    public static final double NO_LAT_LON = Double.MIN_VALUE;
+    public static final double NO_LAT_LON = Double.MAX_VALUE;
     public static final int NO_ZOOM = -1;
 
     /** Mandatory: Latitude, in degrees north. <br/>

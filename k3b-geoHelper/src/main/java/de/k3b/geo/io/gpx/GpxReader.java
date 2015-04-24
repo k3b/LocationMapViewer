@@ -19,16 +19,9 @@
 package de.k3b.geo.io.gpx;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
@@ -39,8 +32,8 @@ import de.k3b.geo.api.IGeoPointInfo;
  *
  * inspired by http://stackoverflow.com/questions/672454/how-to-parse-gpx-files-with-saxreader
  */
-public class GpxReader extends GpxReaderBase implements IGeoInfoHandler {
-    private List<IGeoPointInfo> track;
+public class GpxReader<T extends IGeoPointInfo> extends GpxReaderBase implements IGeoInfoHandler {
+    private List<T> track;
 
     /**
      * Creates a new GpxReader
@@ -51,20 +44,21 @@ public class GpxReader extends GpxReaderBase implements IGeoInfoHandler {
         this.onGotNewWaypoint = this; // cannot do this in constructor
     }
 
-    public List<IGeoPointInfo> getTracks(InputSource in) throws IOException {
-        track = new ArrayList<IGeoPointInfo>();
+    public List<T> getTracks(InputSource in) throws IOException {
+        track = new ArrayList<T>();
         parse(in);
         return track;
     }
 
     /** is called for every completed gpx-trackpoint */
     @Override
-    public void onGeoInfo(IGeoPointInfo geoInfo) {
+    public boolean onGeoInfo(IGeoPointInfo geoInfo) {
         if (mReuse != null) {
-            track.add(mReuse.clone());
+            track.add((T) mReuse.clone());
         } else {
-            track.add(this.current);
+            track.add((T) this.current);
         }
+        return true;
     }
 
 }

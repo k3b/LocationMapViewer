@@ -21,7 +21,6 @@ package de.k3b.android.locationMapViewer;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.view.MotionEvent;
@@ -48,9 +47,11 @@ public class GuestureOverlay extends OverlayDebug {
     // private Rect mRect = null;
     private boolean mRectVisible = false;
     private Paint mPaint;
+    private int colorDragTo;
 
     public GuestureOverlay(Context ctx) {
         super(ctx);
+        colorDragTo = ctx.getResources().getColor(R.color.drag_to);
     }
 
     @Override public boolean 	onDoubleTap(MotionEvent ev, MapView mapView) {
@@ -67,7 +68,7 @@ public class GuestureOverlay extends OverlayDebug {
                     this.mStart = new Point((int) ev.getX(), (int) ev.getY());
                     this.mEnd = new Point();
                     this.mPaint = new Paint();
-                    this.mPaint.setColor(Color.BLUE);
+                    this.mPaint.setColor(colorDragTo);
                     this.mPaint.setStrokeWidth(3);
                     setEndPoint("onDoubleTapEvent-ACTION_DOWN", ev, mapView);
                     break;

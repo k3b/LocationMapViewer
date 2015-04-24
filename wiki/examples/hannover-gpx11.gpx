@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx
+		version="1.1"
+		creator="k3b. Data from Wikipedia. Format from 'My Tracks' for android"
+		xmlns="http://www.topografix.com/GPX/1/1"
+		xmlns:topografix="http://www.topografix.com/GPX/Private/TopoGrafix/0/1"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.topografix.com/GPX/Private/TopoGrafix/0/1 http://www.topografix.com/GPX/Private/TopoGrafix/0/1/topografix.xsd">
+
+	<!-- this is valid gpx-1.1 content -->
+	<trk>
+		<trkseg>
+			<trkpt lat="52.366667" lon="9.716667">
+				<name>Hannover(gpx)</name>
+				<desc>
+						With a population of 518,000, Hanover is a major centre of 
+						Northern Germany and the country's thirteenth largest city. Hanover also 
+						hosts annual commercial trade fairs such as the Hanover Fair and the CeBIT.
+				</desc>
+				<time>2015-02-10T08:04:45.000Z</time>
+				<link href='http://en.wikipedia.org/wiki/Hannover' />
+				<!-- non-standard understood by parser: 
+				<link>http://en.wikipedia.org/wiki/Hannover</link>
+				-->
+			</trkpt>
+		</trkseg>
+	</trk>
+	
+	<nonGPX xmlns="uri:some/uri/that/doesnt/matter">
+
+		<!-- non-gpx11-standard understood by parser: -->
+		<!-- <gpx>, <trk> and <trkseg> are not neccessary. <trkpt> can be anywhere in xml (with any namespace) -->	
+		<trkpt xmlns="http://illegal/nameSpace" lat="53.5" lon="8.5" someAttribute="willBeIgnored" >
+			<name>Test</name>
+			<desc>This is no valid gpx11 content but will be understood by the parser</desc>
+			<time>2015-02-10T08:06:45+02:00</time>
+			<link>https://github.com/k3b/LocationMapViewer/</link>
+		</trkpt>
+		
+		<!-- similar to gpx-1.0 -->
+		<wpt lat="52.4" lon="9.4"
+				<time>2009-10-16T00:00:00Z</time>
+				<url>https://github.com/k3b/LocationMapViewer/</url>
+				<name>theName gpx10</name>
+				<desc>theDesc gpx10</desc>
+				<time>2015-02-10T08:04:45.000Z</time>
+		</wpt>
+
+		
+		<!-- similar to kml-2.2 with atom -->
+		<Placemark xmlns:atom="http://www.w3.org/2005/Atom">
+			<description>theDesc kml</description>
+			<name>theName kml</name>
+			<atom:link href="https://github.com/k3b/LocationMapViewer/" />
+			<Point>
+				<coordinates>9.3,52.3</coordinates>
+				<when>2015-02-10T08:04:45.000Z</when>
+			</Point>
+		</Placemark>
+
+		<!-- this is de.k3b.geo internal format from xml attributes (which are the same as the geo-uri-fields -->
+		<poi ll="52.8,9.8" n="theName(internal)" link="https://github.com/k3b/LocationMapViewer/" d="theDesc(internal)" t="2015-02-10T08:04:45Z"
+				z="5" z2="7" id="42" s="https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/main/res/drawable/ic_launcher.png" />
+
+		<!-- this is de.k3b.geo internal format used by parsing geo-uri where the fields are url-encoded-->
+		<poi geoUri="geo:52.6,9?q=(the+Name)&amp;d=the+Desc+with+emedded+extra+chars" />
+
+		<!-- this is de.k3b.geo internal format used by parsing geo-uri where the fields are NOT url-encoded (but xml encoded since we use xml) -->
+		<poi geoUri="geo:52,9.8?q=(the Name)&amp;d=the Desc with emedded extra chars" />
+		
+		<!-- the parser can infer loc, name and time from description 'd=...'. Note there is not t=... or ll=... -->
+		<poi infer="1" geoUri="geo:?d=the Descr contain (theName infered from descr), loc 52.7,9.7 and time 2015-02-10T08:04:45Z" />
+				 
+	</nonGPX>
+</gpx>5

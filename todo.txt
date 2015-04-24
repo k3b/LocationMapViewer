@@ -1,17 +1,87 @@
 D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
+-	bug regression why does lmv open *.json file which is also oct-stream although file pattern does not match
+		?? only one file pattern allowed???
+
+doku
+	http://www.topografix.com/gpx.asp
+	http://www.topografix.com/GPX/1/0/
+	http://www.topografix.com/GPX/1/1/
+	
+	
+	https://developers.google.com/kml/documentation/kmlreference?csw=1
+	http://wiki.openstreetmap.org/wiki/KML	
+	example from http://tools.wmflabs.org/kmlexport/?article=Puerto_de_la_Cruz&linksfrom=1
+	
+	
+open:
+>	rename icon(Url)=... to s(ymbol)=....
+-	create k3b-geo-xsd
+		inline doc
+		=> generate api doc out of it?
+
+?   app can load *.poi files with internal <poi/> xml format.
+-   lib can save *.poi with internal  <poi/> xml format.
+v   app extras with <poi/> xml format for additional points in map
+    v GeoXmlOrTextParser() as intent-extra interpreter
+    v add to app and to demo
+
+?   app test if loading *.gpx/kml/poi from internet works
+
+
+v https://github.com/k3b/LocationMapViewer/issues/2
+    bug "LMV was associated with all file types #2"
+
+https://github.com/k3b/LocationMapViewer/milestones/v0.3
+
+Planed changes:
+
+* Bugfix #2 
+* New Feature #3 : Bookmark overlay to remember named geo-locations with zoom for quick navigation
+* Serbian and german translations
+
+
+map menu share current location as geo: as http:-OSM
+
+map menu remove BookmarkListActivity
+
+bookmarks menu save/load 
+
 LocationMapViewer-Todo
+>	next
+		> update user doku/wiki
+			https://help.github.com/articles/adding-images-to-wikis/
+				![](https://github.com/github/training-kit/blob/master/images/professortocat.png)
+				
+			http://stackoverflow.com/questions/10045517/embedding-images-inside-a-github-wiki-gollum-repository
+				![Eye of Sauron](eye.jpg)
+			bookmark
+				...similar to "webbrowser bookmark" with link to wikipedia
+				...implemented as "navigation drawer" with link to google-style-guide
+				
+        map-picker
+            ? on tap: move current selection
+		bookmarkeList
+			v "<" instead of "x" to close
+			pseudobookmarks
+			    via intent
+v				inital
+v				currentSel
+v				currentGps
+
+		?? Fav-Share
+
 v   icon
 	Settings
 V		anzeige/edit current center,current zoomlevel.
 V		Text-summary anzeige der aktuellen einstellung (android 2.2. ok aber nicht android 4.4)
-		Button add to favorites
+?		Button add to bookmarkes
 v		checkbox: enable guesture-debug
 v       about-box
 v           resourcen anpassen von toGoZip
 		
 	Guesture ddrag
->		wie funktioniert drag-MapMove in MapViewer wo die karte sich sofort verschiebt?
+v		wie funktioniert drag-MapMove in MapViewer wo die karte sich sofort verschiebt?
 			als vorbild für ddrag-move
 			??  v.setBackgroundResource(null); v.setBackgroundResource(...my drawable...); aus http://stackoverflow.com/questions/4748336/how-to-force-android-view-to-redraw-its-background-drawable-probably-an-anim
 			oder view.setWillNotDraw(false) aus http://stackoverflow.com/questions/17595546/why-ondraw-is-not-called-after-invalidate
@@ -30,22 +100,25 @@ v			==> disabled via GuestureOverlay.onDoubleTap(MotionEvent ev, MapView mapView
 v		todo in guestre-detector (wenn drag dist kleiner als 10) zoom mit center=tap-point
 		?? Tripple tap to zoom in 2 stufen, quad-tap 3 stufen .....
 		
-	Favoriten-liste mit name, geocenter, zoomlevel 
-		fileformat: zeilen von geo-uri-s mit datei-Endung "*.lmv.fav"
-		Favorite-Marker der den Ausschnitt als blaues quadrat anzeigt
-		dialog zum auswählen des favoriten
-			- bei select (vor OK) entweder drunterligende karte sofort zoomen
-			- oder in darunterligender karte Favorite-Marker (mit ausschnitt) anzeigen markieren
-		? Edit
-	
+>	bookmarks-liste mit name, geocenter, zoomlevel 
+v		fileformat: zeilen von geo-uri-s mit datei-Endung "*.txt"
+v       fovorite-thumbnail
+		bookmarke-Marker der den Ausschnitt als blaues quadrat anzeigt
+
 v	Zoom-level slider in map
 	
 	Menue
-		Favorites (add/select)
-		Settings
-		about
+v		bookmarkes
+v		Settings
+v		about
 		
 v	Ok in map für picker
+
+?	umstellung api8+appcompat+fragmente
+		map
+		map+bookmarkeList (selchange in list=>update map zoom)
+		bookmarkeList+bookmarkeDetails
+		?settings
 
 ----------------------
 
@@ -81,8 +154,8 @@ v mit/ohne title je nachdem, ob Intent.EXTRA_TITLE`gesetzt ist oder nicht
 v ok nur wenn activity-picker
 - onLongPress => set current pos
 ? icon/detailview nur wenn detail data available
-- guesture long-drag: move&zoom.
-    - visual feedback
+v guesture long-drag: move&zoom.
+    v visual feedback
 
 v convert cluser <-> nonCluster from settings
 

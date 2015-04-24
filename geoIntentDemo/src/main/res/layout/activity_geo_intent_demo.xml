@@ -1,92 +1,122 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".GeoIntentDemoActivity">
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Uri:"
-        android:id="@+id/labelUri"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/editMime"
-        android:layout_alignEnd="@+id/editMime" />
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="geo:53.2,8.8?q=(name)&amp;z=11"
-        android:id="@+id/editUri"
-        android:layout_below="@id/labelUri"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".GeoIntentDemoActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mime (empty means null) :"
-        android:id="@+id/labelMime"
-        android:layout_below="@id/editUri"
-        android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/editUri"
-        android:layout_alignEnd="@+id/editUri" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Uri:"
+            android:id="@+id/labelUri"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignRight="@+id/editMime"
+            android:layout_alignEnd="@+id/editMime" />
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="geo:53.2,8.8?q=(name)&amp;z=11"
+            android:id="@+id/editUri"
+            android:layout_below="@id/labelUri"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:id="@+id/editMime"
-        android:layout_below="@id/labelMime"
-        android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/labelMime"
-        android:layout_alignEnd="@+id/labelMime" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mime (empty means null) :"
+            android:id="@+id/labelMime"
+            android:layout_below="@id/editUri"
+            android:layout_alignParentLeft="true"
+            android:layout_alignRight="@+id/editUri"
+            android:layout_alignEnd="@+id/editUri" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Title (empty means none) :"
-        android:id="@+id/labelTitle"
-        android:layout_below="@id/editMime"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/editUri"
-        android:layout_alignEnd="@+id/editUri" />
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:id="@+id/editMime"
+            android:layout_below="@id/labelMime"
+            android:layout_alignParentLeft="true"
+            android:layout_alignRight="@+id/labelMime"
+            android:layout_alignEnd="@+id/labelMime" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:id="@+id/editTitle"
-        android:layout_below="@id/labelTitle"
-        android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/labelTitle"
-        android:layout_alignEnd="@+id/labelTitle" />
-    <Button android:text="Demo" android:id="@+id/runDemo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/editTitle"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-    <Button android:text="Pick" android:id="@+id/runDemoPick"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/runDemo"
-        android:layout_alignRight="@+id/labelTitle"
-        android:layout_alignEnd="@+id/labelTitle" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Title (empty means none) :"
+            android:id="@+id/labelTitle"
+            android:layout_below="@id/editMime"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignRight="@+id/editUri"
+            android:layout_alignEnd="@+id/editUri" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/labelLastResult"
-        android:text="result"
-        android:layout_below="@+id/runDemo"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/editTitle"
-        android:layout_alignEnd="@+id/editTitle" />
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Where did you take the photo?"
+            android:id="@+id/editTitle"
+            android:layout_below="@id/labelTitle"
+            android:layout_alignParentLeft="true"
+            android:layout_alignRight="@+id/labelTitle"
+            android:layout_alignEnd="@+id/labelTitle" />
 
-</RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="de.k3b.POIS (empty means none) :"
+            android:id="@+id/labelPOIs"
+            android:layout_below="@id/editTitle"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignRight="@+id/editUri"
+            android:layout_alignEnd="@+id/editUri" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="&lt;poi ll='53.1,8.9'/>\n&lt;poi ll='53.3,8.7' n='Name' \n link='https://github.com/k3b/LocationMapViewer/' \n d='Here is some comment' />"
+            android:id="@+id/editPOIs"
+            android:layout_below="@id/labelPOIs"
+            android:layout_alignParentLeft="true"
+            android:layout_alignRight="@+id/labelPOIs"
+            android:layout_alignEnd="@+id/labelPOIs"
+            android:scrollbars="horizontal"
+            android:lines="4" />
+
+        <Button android:text="Demo" android:id="@+id/runDemo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/editPOIs"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+        <Button android:text="Pick" android:id="@+id/runDemoPick"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/runDemo"
+            android:layout_alignRight="@+id/labelTitle"
+            android:layout_alignEnd="@+id/labelTitle" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/labelLastResult"
+            android:text="result"
+            android:layout_below="@+id/runDemo"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignRight="@+id/editTitle"
+            android:layout_alignEnd="@+id/editTitle" />
+
+    </RelativeLayout>
+</ScrollView>

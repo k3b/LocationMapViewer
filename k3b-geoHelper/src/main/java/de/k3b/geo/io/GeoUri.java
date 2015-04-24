@@ -22,17 +22,11 @@ package de.k3b.geo.io;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,7 +64,7 @@ public class GeoUri {
      * Default for url-encoding.
      */
     private static final String DEFAULT_ENCODING = "UTF-8";
-    private static final String GEO_SCHEME = "geo:";
+    public static final String GEO_SCHEME = "geo:";
 
     /* regular expressions used by the parser.<br/>
        '(?:"+something+")"' is a non capturing group; "\s" white space */
@@ -83,10 +77,6 @@ public class GeoUri {
     private final static String regexpLatLonAlt = regexpDouble + regexpCommaDouble + regexpCommaDoubleOptional;
     private final static Pattern patternLatLonAlt = Pattern.compile(regexpLatLonAlt);
     private final static Pattern patternTime = Pattern.compile("([12]\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ)");
-    /* converter for Datatypes */
-    private static final DecimalFormat latLonFormatter = new DecimalFormat("#.#######", new DecimalFormatSymbols(Locale.ENGLISH));
-    private static final DateFormat timeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
     /* current state */
 
     /** formating/parsing options */
@@ -95,9 +85,6 @@ public class GeoUri {
     /** for uri-formatter: next delimiter for a parameter. can be "?" or "&"  */
     private String delim;
 
-    static {
-        timeFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
     /** create wit options from OPT_xxx */
     public GeoUri(int options) {
         this.options = options;
@@ -123,16 +110,17 @@ public class GeoUri {
             for (String param : params) {
                 parseAddQueryParamToMap(parmLookup, param);
             }
-            parseResult.setDescription(parmLookup.get("d"));
-            parseResult.setUri(parmLookup.get("uri"));
-            parseResult.setId(parmLookup.get("id"));
-            parseResult.setZoomMin(parseZoom(parmLookup.get("z")));
-            parseResult.setZoomMax(parseZoom(parmLookup.get("z2")));
-
+            parseResult.setDescription(parmLookup.get(GeoUriDef.DESCRIPTION));
+            parseResult.setLink(parmLookup.get(GeoUriDef.LINK));
+            parseResult.setSymbol(parmLookup.get(GeoUriDef.SYMBOL));
+            parseResult.setId(parmLookup.get(GeoUriDef.ID));
+            parseResult.setZoomMin(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM)));
+            parseResult.setZoomMax(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM_MAX)));
             // parameters from standard value and/or infered
             ArrayList<String> whereToSearch = new ArrayList<String>();
-            whereToSearch.add(parmLookup.get("q")); // lat lon from q have precedence over url-path
+            whereToSearch.add(parmLookup.get(GeoUriDef.QUERY)); // lat lon from q have precedence over url-path
             whereToSearch.add(uri);
+            whereToSearch.add(parmLookup.get(GeoUriDef.LAT_LON));
 
             if (isSet(GeoUri.OPT_PARSE_INFER_MISSING)) {
                 whereToSearch.add(parseResult.getDescription());
@@ -140,33 +128,50 @@ public class GeoUri {
             }
 
             parseResult.setName(parseFindFromPattern(patternName, parseResult.getName(), whereToSearch));
-            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parmLookup.get("t"), whereToSearch));
+            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parmLookup.get(GeoUriDef.TIME), whereToSearch));
 
+            parseLatOrLon(parseResult, whereToSearch);
+
+            if (parseResult.getName() == null) {
+                parseResult.setName(parmLookup.get(GeoUriDef.NAME));
+            }
+        } else {
+            // no query parameter
+            ArrayList<String> whereToSearch = new ArrayList<String>();
+            whereToSearch.add(uri);
             parseLatOrLon(parseResult, whereToSearch);
         }
         return parseResult;
     }
 
+    private static ArrayList<String> toStringArray(String[] whereToSearch) {
+        ArrayList<String> arrayList = new ArrayList<String>();
+        for (String candidate : whereToSearch) {
+            arrayList.add(candidate);
+        }
+        return arrayList;
+    }
+
     /** parsing helper: set first finding of lat and lon to parseResult */
-    private void parseLatOrLon(GeoPointDto parseResult, ArrayList<String> whereToSearch) {
+    public static void parseLatOrLon(GeoPointDto parseResult, String... whereToSearch) {
+        parseLatOrLon(parseResult, toStringArray(whereToSearch));
+    }
+
+    /** parsing helper: set first finding of lat and lon to parseResult */
+    private static void parseLatOrLon(GeoPointDto parseResult, ArrayList<String> whereToSearch) {
         Matcher m = parseFindWithPattern(patternLatLonAlt, whereToSearch);
 
         if (m != null) {
             try {
                 final String val = m.group(1);
-                double lat = parseLatOrLon(val);
-                double lon = parseLatOrLon(m.group(2));
+                double lat = GeoFormatter.parseLatOrLon(val);
+                double lon = GeoFormatter.parseLatOrLon(m.group(2));
 
                 parseResult.setLatitude(lat).setLongitude(lon);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
-    }
-
-    /** parsing helper: converts a double value from string to double */
-    private double parseLatOrLon(String val) throws ParseException {
-        return latLonFormatter.parse(val).doubleValue();
     }
 
     /** parsing helper: Get the first finding of pattern in whereToSearch if currentValue is not set yet.
@@ -194,30 +199,18 @@ public class GeoUri {
     }
 
     /** parsing helper: returns the match of the first finding of pattern in whereToSearch. */
-    private Matcher parseFindWithPattern(Pattern pattern, List<String> whereToSearch) {
-        for (String candidate : whereToSearch) {
-            if (candidate != null) {
-                Matcher m = pattern.matcher(candidate);
-                while (m.find() && (m.groupCount() > 0)) {
-                    return m;
+    private static Matcher parseFindWithPattern(Pattern pattern, List<String> whereToSearch) {
+        if (whereToSearch != null) {
+            for (String candidate : whereToSearch) {
+                if (candidate != null) {
+                    Matcher m = pattern.matcher(candidate);
+                    while (m.find() && (m.groupCount() > 0)) {
+                        return m;
+                    }
                 }
             }
         }
         return null;
-    }
-
-    /** parsing helper: converts value into zoom compatible int */
-    private int parseZoom(String value) {
-        if (value != null) {
-            try {
-                int result = Integer.parseInt(value);
-                if ((result >= 0) && (result < 64)) {
-                    return result;
-                }
-            } catch (Exception ignore) {
-            }
-        }
-        return IGeoPointInfo.NO_ZOOM;
     }
 
     /** parsing helper: add a found query-parameter to a map for fast lookup */
@@ -248,14 +241,15 @@ public class GeoUri {
         formatLatLon(result, geoPoint);
 
         delim = "?";
-        appendQueryParameter(result, "q", formatQuery(geoPoint), false);
-        appendQueryParameter(result, "z", geoPoint.getZoomMin());
-        appendQueryParameter(result, "z2", geoPoint.getZoomMax());
-        appendQueryParameter(result, "uri", geoPoint.getUri(), true);
-        appendQueryParameter(result, "d", geoPoint.getDescription(), true);
-        appendQueryParameter(result, "id", geoPoint.getId(), true);
+        appendQueryParameter(result, GeoUriDef.QUERY, formatQuery(geoPoint), false);
+        appendQueryParameter(result, GeoUriDef.ZOOM, geoPoint.getZoomMin());
+        appendQueryParameter(result, GeoUriDef.ZOOM_MAX, geoPoint.getZoomMax());
+        appendQueryParameter(result, GeoUriDef.LINK, geoPoint.getLink(), true);
+        appendQueryParameter(result, GeoUriDef.SYMBOL, geoPoint.getSymbol(), true);
+        appendQueryParameter(result, GeoUriDef.DESCRIPTION, geoPoint.getDescription(), true);
+        appendQueryParameter(result, GeoUriDef.ID, geoPoint.getId(), true);
         if (geoPoint.getTimeOfMeasurement() != null) {
-            appendQueryParameter(result, "t", timeFormatter.format(geoPoint.getTimeOfMeasurement()), false);
+            appendQueryParameter(result, GeoUriDef.TIME, GeoFormatter.formatDate(geoPoint.getTimeOfMeasurement()), false);
         }
 
         return result.toString();
@@ -286,11 +280,14 @@ public class GeoUri {
 
     /** formatting helper: */
     private void formatLatLon(StringBuffer result, IGeoPointInfo geoPoint) {
-        if (geoPoint.getLatitude() != IGeoPointInfo.NO_LAT_LON) {
-            result.append(latLonFormatter.format(geoPoint.getLatitude()));
-        }
-        if (geoPoint.getLongitude() != IGeoPointInfo.NO_LAT_LON) {
-            result.append(",").append(latLonFormatter.format(geoPoint.getLongitude()));
+        if (geoPoint != null) {
+            result.append(GeoFormatter.formatLatLon(geoPoint.getLatitude()));
+
+            if (geoPoint.getLongitude() != IGeoPointInfo.NO_LAT_LON) {
+                result
+                        .append(",")
+                        .append(GeoFormatter.formatLatLon(geoPoint.getLongitude()));
+            }
         }
     }
 

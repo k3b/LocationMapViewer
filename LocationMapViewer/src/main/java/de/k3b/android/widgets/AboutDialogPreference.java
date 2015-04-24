@@ -18,7 +18,10 @@
  */
 package de.k3b.android.widgets;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
@@ -50,9 +53,12 @@ public class AboutDialogPreference extends DialogPreference {
     @Override
     protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
-        WebView wv = (WebView) view.findViewById(R.id.content);
 
-        String html = this.context.getResources().getString(R.string.about_content); // "<html><body>some <b>html</b> here</body></html>";
+        setAboutText(this.context, (WebView) view.findViewById(R.id.content));
+    }
+
+    private static WebView setAboutText(Context context, WebView wv) {
+        String html = context.getResources().getString(R.string.about_content); // "<html><body>some <b>html</b> here</body></html>";
 
         final String versionName = GuiUtil.getAppVersionName(context);
         if (versionName != null) {
@@ -60,7 +66,7 @@ public class AboutDialogPreference extends DialogPreference {
         }
 
         html = html.replace("$about$",
-                this.context.getText(R.string.about_content_about));
+                context.getText(R.string.about_content_about));
 
         wv.loadData(html, "text/html", "UTF-8");
         wv.setVerticalScrollBarEnabled(true);
@@ -69,5 +75,31 @@ public class AboutDialogPreference extends DialogPreference {
         mWebSettings.setBuiltInZoomControls(true);
         wv.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
         wv.setScrollbarFadingEnabled(false);
+        return wv;
     }
+
+    public static Dialog createAboutDialog(Context context) {
+        final AlertDialog.Builder alert = new AlertDialog.Builder(context);
+        alert.setTitle(R.string.about_summary);
+        alert.setIcon(R.drawable.ic_launcher);
+        alert.setNeutralButton(R.string.cancel,
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(
+                            final DialogInterface paramDialogInterface,
+                            final int paramInt) {
+                        paramDialogInterface.cancel();
+
+                    }
+                }
+        );
+
+        final WebView wv =  setAboutText(context, new WebView(context));
+        alert.setView(wv);
+
+        return alert.create();
+    }
+
+
 }

@@ -20,8 +20,13 @@
 package de.k3b.geo.api;
 
 /**
+ * Defines callback for processing IGeoPointInfo items.
+ *
  * Created by EVE on 20.01.2015.
  */
 public interface IGeoInfoHandler {
-    void onGeoInfo(IGeoPointInfo geoInfo);
+    /**
+     * @return true if item has been consumed
+     */
+    boolean onGeoInfo(IGeoPointInfo geoInfo);
 }

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2015 by k3b.
   ~
@@ -18,10 +19,15 @@
   -->
 
 <resources>
-    <declare-styleable name="MapViewEx">
-        <attr name="exampleString" format="string" />
-        <attr name="exampleDimension" format="dimension" />
-        <attr name="exampleColor" format="color" />
-        <attr name="exampleDrawable" format="color|reference" />
-    </declare-styleable>
+
+<string name="help_bookmarks">"
+<![CDATA[
+<h1>${drawable.ic_action_important} ${string.title_bookmark_list}</h1>
+<p>${string.app_name} can store the current latitude/longitude/zoomlevel as named bookmark.
+Similar to a web browser bookmark you can return to a bookmarked latitude/longitude/zoomlevel
+by selecting it.</p>
+]]>
+"</string>
+
+
 </resources>

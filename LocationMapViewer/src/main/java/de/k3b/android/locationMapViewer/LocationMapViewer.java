@@ -18,21 +18,28 @@
  */
 package de.k3b.android.locationMapViewer;
 
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.RelativeLayout;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,9 +48,9 @@ import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
+import org.osmdroid.bonuspack.clustering.StaticCluster;
 import org.osmdroid.bonuspack.overlays.FolderOverlay;
 import org.osmdroid.bonuspack.overlays.Marker;
-import org.osmdroid.bonuspack.overlays.MarkerInfoWindow;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
@@ -69,29 +76,40 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.k3b.android.GeoUtil;
 import de.k3b.android.locationMapViewer.constants.Constants;
+import de.k3b.android.locationMapViewer.geobmp.BookmarkListOverlay;
+import de.k3b.android.locationMapViewer.geobmp.BookmarkUtil;
+import de.k3b.android.locationMapViewer.geobmp.GeoBmpDto;
+import de.k3b.android.widgets.AboutDialogPreference;
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.GeoUri;
+import de.k3b.geo.io.gpx.GeoXmlOrTextParser;
 import de.k3b.geo.io.gpx.GpxReaderBase;
 import microsoft.mappoint.TileSystem;
 
 /**
  * An app that can display geografic info in a map for Android 2.1 (Eclair, API 7) .<br/>
- * no support for actionbar and fragments.<br/>
+ * The view can be customized via intent-api. Supported intent elements
+ * - "geo:..." show this location in the map
+ * - "file:/.../*.kml" or "file:/.../*.gpx" show these in map
+ * - Supported Action
+ * - - VIEW show in map
+ * - - PICK select a position from a map and return it to the caller
+ * - extra title:
+ * - - on android >= 3.0 (honycomp) show actionbar with this tiltle and actionbar-menubar if title set. Else button for popup-menu
+ * - - on android < 3.0 show with this tiltle in titlebar if title set. Else no titlebar. Menu via the menu-key.
+ * no support for fragments.<br/>
  * The code is based on "org.osmdroid.samples.SampleWithMinimapItemizedoverlay in DemoApp OpenStreetMapViewer"
  */
-public class LocationMapViewer extends Activity implements Constants {
+public class LocationMapViewer extends Activity implements Constants, BookmarkListOverlay.AdditionalPoints  {
     private static final Logger logger = LoggerFactory.getLogger(LocationMapViewer.class);
 
     // ===========================================================
     // Constants
     // ===========================================================
-
-    private static final int MENU_SETTINGS_ID = Menu.FIRST;
-    private static final int MENU_ZOOMIN_ID = Menu.FIRST + 1;
-    private static final int MENU_ZOOMOUT_ID = MENU_ZOOMIN_ID + 2;
 
     private static final DecimalFormat LAT_LON2TEXT = new DecimalFormat("#.#########");
 
@@ -134,6 +152,12 @@ public class LocationMapViewer extends Activity implements Constants {
     private GuestureOverlay mGuesturesOverlay;
     private SeekBar mZoomBar;
 
+    /** first visible window as bookmark candidate */
+    private GeoBmpDto initialWindow = null;
+    private boolean showLocation = false;
+    private BookmarkListOverlay bookmarkListOverlay;
+    private ImageButton cmdShowMenu = null;
+
     // ===========================================================
     // Constructors
     // ===========================================================
@@ -146,12 +170,19 @@ public class LocationMapViewer extends Activity implements Constants {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = this.getIntent();
+
+        GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
+
         mUsePicker = (Intent.ACTION_PICK.equals(intent.getAction()));
 
         String extraTitle = intent.getStringExtra(Intent.EXTRA_TITLE);
+        if (extraTitle == null && (geoPointFromIntent == null)) {
+            extraTitle = getString(R.string.app_name);
+        }
         if (extraTitle == null) {
-            // must be called before this.setContentView(...) else crash
-            this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                // must be called before this.setContentView(...) else crash
+              this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -169,36 +200,47 @@ public class LocationMapViewer extends Activity implements Constants {
 
         if (extraTitle != null) {
             this.setTitle(extraTitle);
+        } else {
+            setNoTitle();
         }
-
-        GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
 
         mUseClusterPoints = mPrefs.getBoolean(PREFS_CLUSTER_POINTS, true);
 
-        mPOIOverlayNonCluster = (mUseClusterPoints) ? null : new FolderOverlay(this);
+        mPOIOverlayNonCluster = (mUseClusterPoints) ? null : createNonClusterOverlay(overlays);
         mPOIOverlayCluster = (mUseClusterPoints) ? createPointOfInterestOverlay(overlays) : null;
 
         final IGeoInfoHandler pointCollector = (mUseClusterPoints)
             ? new IGeoInfoHandler() {
                 @Override
-                public void onGeoInfo(IGeoPointInfo aGeoPoint) {
+                public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
                     if (aGeoPoint != null) {
-                        mPOIOverlayCluster.add(createMarker(mMapView, aGeoPoint));
+                        mPOIOverlayCluster.add(createMarker(mMapView, aGeoPoint.clone()));
                     }
+                    return true;
                 }
             }
             : new IGeoInfoHandler() {
                 @Override
-                public void onGeoInfo(IGeoPointInfo aGeoPoint) {
+                public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
                     if (aGeoPoint != null) {
-                        mPOIOverlayNonCluster.add(createMarker(mMapView, aGeoPoint));
+                        mPOIOverlayNonCluster.add(createMarker(mMapView, aGeoPoint.clone()));
                     }
+                    return true;
                 }
             };
 
         pointCollector.onGeoInfo(geoPointFromIntent);
 
+        if (geoPointFromIntent != null) {
+            initialWindow = new GeoBmpDto(geoPointFromIntent);
+            BitmapDrawable drawable = (BitmapDrawable) getResources().getDrawable(R.drawable.marker_no_data);
+            initialWindow.setBitmap(drawable.getBitmap());
+
+            initialWindow.setName(getString(R.string.bookmark_template_initial) + geoPointFromIntent.getName());
+        }
+
         loadGeoPointDtosFromFile(intent, pointCollector);
+        loadGeoPointDtosFromExtra(intent.getStringExtra("de.k3b.POIS"), pointCollector);
 
         AbstractList<? extends Overlay> items = (mUseClusterPoints) ? mPOIOverlayCluster.getItems() : mPOIOverlayNonCluster.getItems();
         final int zoom = (geoPointFromIntent != null) ? geoPointFromIntent.getZoomMin() : GeoPointDto.NO_ZOOM;
@@ -231,6 +273,88 @@ public class LocationMapViewer extends Activity implements Constants {
 //        if (initalMapCenterZoom != null) {
 //            setCenterZoom(initalMapCenterZoom);
 //        }
+
+        this.bookmarkListOverlay = new BookmarkListOverlay(this, this) {
+            @Override
+            protected void onSelChanged(GeoBmpDto newSelection) {
+                super.onSelChanged(newSelection);
+
+                if (newSelection != null) {
+                    setDelayedCenterZoom(newSelection);
+                }
+            }
+        };
+
+        // else html a-href-links do not work.
+        TextView t2 = (TextView) findViewById(R.id.cright_osm);
+        t2.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    private void loadGeoPointDtosFromExtra(String pois, IGeoInfoHandler pointCollector) {
+        if (pois != null) {
+            List<GeoBmpDto> result = new GeoXmlOrTextParser<GeoBmpDto>().get(new GeoBmpDto(), pois);
+
+            if (result != null) {
+                for(GeoBmpDto item : result) {
+                    pointCollector.onGeoInfo(item);
+                }
+            }
+        }
+    }
+
+    private FolderOverlay createNonClusterOverlay(List<Overlay> overlays) {
+        FolderOverlay result = new FolderOverlay(this);
+        overlays.add(result);
+
+        return result;
+    }
+
+    @Override
+    public void onBackPressed() {
+        // back should close the overlay if active
+        if (this.bookmarkListOverlay.isBookmarkListVisible()) {
+            this.bookmarkListOverlay.setBookmarkListVisible(false);
+        } else {
+            // close the activity
+            super.onBackPressed();
+        }
+    }
+
+    private void setNoTitle() {
+        if (USE_ACTIONBAR) {
+            setNoActionbar();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void setNoActionbar() {
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
+
+        // android-version < 3.0 does not need this. they use the menu key instead
+        // ImageButton as replacement for hidden action menue
+
+        final PopupMenu.OnMenuItemClickListener popUpListener = new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                return LocationMapViewer.this.onMenuItemClick(menuItem);
+            }
+        };
+
+        cmdShowMenu = (ImageButton) findViewById(R.id.cmd_menu);
+        cmdShowMenu.setVisibility(View.VISIBLE);
+        cmdShowMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupMenu popup = new PopupMenu(LocationMapViewer.this, view);
+                popup.setOnMenuItemClickListener(popUpListener);
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.location_map_viewer, popup.getMenu());
+                popup.show();
+            }
+        });
     }
 
     private void createZoomBar() {
@@ -242,7 +366,8 @@ public class LocationMapViewer extends Activity implements Constants {
         mZoomBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) mMapView.getController().setZoom(progress - mMapView.getMinZoomLevel());
+                if (fromUser)
+                    mMapView.getController().setZoom(progress - mMapView.getMinZoomLevel());
             }
 
             @Override
@@ -281,10 +406,10 @@ public class LocationMapViewer extends Activity implements Constants {
         poiMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         poiMarker.setPosition(toOsmGeoPoint(aGeoPoint));
 
-        if (notEmpty(description) || notEmpty(aGeoPoint.getUri())) {
+        if (BookmarkUtil.isNotEmpty(description) || BookmarkUtil.isNotEmpty(aGeoPoint.getLink())) {
             poiMarker.setIcon(mPoiIconWithData);
             // 7.
-            poiMarker.setInfoWindow(new CustomInfoWindow(map));
+            poiMarker.setInfoWindow(new GeoPointMarkerInfoWindow(map));
         } else {
             poiMarker.setIcon(mPoiIconWithoutData);
             poiMarker.setInfoWindow(null);
@@ -299,13 +424,19 @@ public class LocationMapViewer extends Activity implements Constants {
         return poiMarker;
     }
 
-    private boolean notEmpty(String aString) {
-        return (aString != null) && (aString.length() > 0);
-    }
-
     private RadiusMarkerClusterer createPointOfInterestOverlay(List<Overlay> overlays) {
         //10. Marker Clustering
-        RadiusMarkerClusterer poiMarkers = new RadiusMarkerClustererWithInfo(this);
+        RadiusMarkerClusterer poiMarkers = new RadiusMarkerClustererWithInfo(this) {
+            @Override
+            public Marker buildClusterMarker(StaticCluster cluster, MapView mapView) {
+                Marker result = super.buildClusterMarker(cluster,mapView);
+                if (cluster.getSize() > 0) {
+                    // show data of the first object in cluster
+                    result.setRelatedObject(cluster.getItem(0).getRelatedObject());
+                }
+                return result;
+            }
+        };
 
         Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_red_empty);
         poiMarkers.setIcon(((BitmapDrawable) clusterIconD).getBitmap());
@@ -317,7 +448,9 @@ public class LocationMapViewer extends Activity implements Constants {
         poiMarkers.mTextAnchorU = 0.70f;
         poiMarkers.mTextAnchorV = 0.27f;
         //end of 11.
-        overlays.add(poiMarkers);
+        if (overlays != null) {
+            overlays.add(poiMarkers);
+        }
         return poiMarkers;
     }
 
@@ -394,7 +527,8 @@ public class LocationMapViewer extends Activity implements Constants {
         handler.onGeoInfo(new GeoPointDto(52.370816, 9.735936, "Hannover", "Tiny SampleDescription"));
         handler.onGeoInfo(new GeoPointDto(52.518333, 13.408333, "Berlin", "This is a relatively short SampleDescription."));
         handler.onGeoInfo(new GeoPointDto(38.895000, -77.036667, "Washington",
-                "This SampleDescription is a pretty long one. Almost as long as a the great wall in china."));
+                "This SampleDescription is a pretty long one. Almost as long as a the great wall in china.")
+                .setLink("geo:0,0?q=38.895000,-77.036667(Washington)"));
         handler.onGeoInfo(new GeoPointDto(37.779300, -122.419200, "San Francisco", "SampleDescription"));
     }
 
@@ -415,7 +549,7 @@ public class LocationMapViewer extends Activity implements Constants {
     public void onPause() {
         final SharedPreferences.Editor edit = mPrefs.edit();
         edit.putString(PREFS_TILE_SOURCE, mMapView.getTileProvider().getTileSource().name());
-        edit.putBoolean(PREFS_SHOW_LOCATION, mLocationOverlay.isMyLocationEnabled());
+        edit.putBoolean(PREFS_SHOW_LOCATION, this.showLocation);
         edit.putBoolean(PREFS_SHOW_MINIMAP, mMiniMapOverlay.isEnabled());
         edit.putBoolean(PREFS_CLUSTER_POINTS, this.mUseClusterPoints);
         //edit.putBoolean(PREFS_SHOW_GUESTURES, this.mGuesturesOverlay.isEnabled());
@@ -470,12 +604,13 @@ public class LocationMapViewer extends Activity implements Constants {
             List<Overlay> overlays = mMapView.getOverlays();
             if (useClusterPoints) {
                 mPOIOverlayNonCluster.closeAllInfoWindows();
-                mPOIOverlayCluster = new RadiusMarkerClustererWithInfo(this);
+                mPOIOverlayCluster = createPointOfInterestOverlay(null);
                 for (Overlay item : mPOIOverlayNonCluster.getItems()) {
                     mPOIOverlayCluster.add((Marker) item);
                 }
                 int oldPos = overlays.indexOf(mPOIOverlayNonCluster);
                 overlays.remove(oldPos);
+
                 overlays.add(oldPos, mPOIOverlayCluster);
                 mPOIOverlayNonCluster.getItems().clear();;
                 mPOIOverlayNonCluster = null;
@@ -522,7 +657,8 @@ public class LocationMapViewer extends Activity implements Constants {
         } catch (final IllegalArgumentException e) {
             mMapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
         }
-        if (mPrefs.getBoolean(PREFS_SHOW_LOCATION, false)) {
+        this.showLocation = mPrefs.getBoolean(PREFS_SHOW_LOCATION, showLocation);
+        if (showLocation) {
             this.mLocationOverlay.enableMyLocation();
         }
 
@@ -539,6 +675,7 @@ public class LocationMapViewer extends Activity implements Constants {
             // see http://stackoverflow.com/questions/10411975/how-to-get-the-width-and-height-of-an-image-view-in-android/10412209#10412209
             this.mDelayedSetCenterZoom.execute("onWindowFocusChanged()", mMapView);
             this.mDelayedSetCenterZoom = null; // donot call it again
+
         }
     }
 
@@ -551,27 +688,46 @@ public class LocationMapViewer extends Activity implements Constants {
     // ===========================================================
 
     @Override
-    public boolean onCreateOptionsMenu(final Menu pMenu) {
-        pMenu.add(0, MENU_ZOOMIN_ID, Menu.NONE, "ZoomIn");
-        pMenu.add(0, MENU_ZOOMOUT_ID, Menu.NONE, "ZoomOut");
-
-        pMenu.add(0, MENU_SETTINGS_ID, Menu.NONE, R.string.title_activity_settings);
-
-        return true;
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.location_map_viewer, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
+    /* Called whenever we call invalidateOptionsMenu() */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+        boolean drawerOpen = this.bookmarkListOverlay.isBookmarkListVisible();
+
+        if (cmdShowMenu != null) {
+            cmdShowMenu.setVisibility((drawerOpen) ? View.INVISIBLE : View.VISIBLE );
+        }
+
+        menu.findItem(R.id.cmd_settings).setVisible(!drawerOpen);
+        menu.findItem(R.id.cmd_help).setVisible(!drawerOpen);
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    /** called by options/actionBar-menu */
     @Override
     public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
+        if (onMenuItemClick(item)) {
+            return true;
+        }
+        return super.onMenuItemSelected(featureId, item);
+    }
+
+    /** called by popup-menu */
+    public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
-            case MENU_ZOOMIN_ID:
-                this.mMapView.getController().zoomIn();
+            case R.id.cmd_help:
+                this.showDialog(R.id.cmd_help);
                 return true;
 
-            case MENU_ZOOMOUT_ID:
-                this.mMapView.getController().zoomOut();
-                return true;
-
-            case MENU_SETTINGS_ID: {
+            case R.id.cmd_settings: {
                 // set current xyz to prefs so they can be displayed/modified in the settings
                 final IGeoPoint mapCenter = mMapView.getMapCenter();
 
@@ -580,27 +736,53 @@ public class LocationMapViewer extends Activity implements Constants {
                 edit.putString(PREFS_CURRENT_NORTH, LAT_LON2TEXT.format(mapCenter.getLatitude()));
                 edit.putString(PREFS_CURRENT_EAST, LAT_LON2TEXT.format(mapCenter.getLongitude()));
                 edit.commit();
-                SettingsActivity.show(this, MENU_SETTINGS_ID);
+                SettingsActivity.show(this, R.id.cmd_settings);
                 return true;
             }
         }
         return false;
     }
 
+    /** implements interface BookmarkListOverlay.AdditionalPoints() */
+    public GeoBmpDto[] getAdditionalPoints() {
+        GeoPoint gps = (this.mLocationOverlay != null) ? this.mLocationOverlay.getMyLocation() : null;
+
+        GeoBmpDto gpsWindow = null;
+        if (gps != null) {
+            gpsWindow = new GeoBmpDto();
+            GeoUtil.createBookmark(gps, IGeoPointInfo.NO_ZOOM, getString(R.string.bookmark_template_gps), gpsWindow);
+            BitmapDrawable drawable = (BitmapDrawable) getResources().getDrawable(R.drawable.person);
+            gpsWindow.setBitmap(drawable.getBitmap());
+
+        }
+        GeoBmpDto currentWindow = getCurrentAsGeoPointDto(getString(R.string.bookmark_template_current));
+        return new GeoBmpDto[]{currentWindow, gpsWindow, initialWindow};
+    }
+
+    private GeoBmpDto getCurrentAsGeoPointDto(String name) {
+        GeoBmpDto current = new GeoBmpDto();
+        GeoUtil.createBookmark(this.mMapView.getMapCenter(), this.mMapView.getZoomLevel(), name, current);
+        current.setBitmap(GeoUtil.createBitmapFromMapView(mMapView, GeoBmpDto.WIDTH, GeoBmpDto.HEIGHT));
+        return current;
+    }
+
     /** called if a sub-activity finishes */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
         if (logger.isDebugEnabled()) logger.debug("onActivityResult(requestCode="+requestCode+", resultCode="+resultCode+", data="+data+")");
-        if (requestCode == MENU_SETTINGS_ID) {
-            RestoreXYZ(); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
+        switch (requestCode) {
+            case R.id.cmd_settings:
+                RestoreXYZ(); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
 
-            // apply xyz changes from settings back to view
-            int changes = setZoom(mPrefs.getString(PREFS_CURRENT_ZOOMLEVEL, "").trim())
-                   + setCenter(mPrefs.getString(PREFS_CURRENT_NORTH, "").trim(), mPrefs.getString(PREFS_CURRENT_EAST, "").trim());
+                // apply xyz changes from settings back to view
+                int changes = setZoom(mPrefs.getString(PREFS_CURRENT_ZOOMLEVEL, "").trim())
+                        + setCenter(mPrefs.getString(PREFS_CURRENT_NORTH, "").trim(), mPrefs.getString(PREFS_CURRENT_EAST, "").trim());
 
-           if (changes > 0) {
-               saveLastXYZ(); // otherwhise onResume() would overwrite the new values
-           }
+                if (changes > 0) {
+                    saveLastXYZ(); // otherwhise onResume() would overwrite the new values
+                }
+
+                break;
         }
     }
 
@@ -665,6 +847,11 @@ public class LocationMapViewer extends Activity implements Constants {
         setDelayedCenterZoom("setDelayedZoom", null, null, zoomLevel);
     }
 
+    /** Zoom to center / zoomLevel from bookmark. */
+    public void setDelayedCenterZoom(IGeoPointInfo bookmark) {
+        this.setDelayedCenterZoom("fromBookmark", GeoUtil.createOsmPoint(bookmark), null, bookmark.getZoomMin());
+    }
+
     /** impelementation of setDelayedXXXX() */
     private void setDelayedCenterZoom(String debugContext, final IGeoPoint min, final IGeoPoint max, final Integer zoomLevel) {
         DelayedSetCenterZoom delayedSetCenterZoom = this.mDelayedSetCenterZoom;
@@ -682,6 +869,19 @@ public class LocationMapViewer extends Activity implements Constants {
             // this.mMapView not fully initialized. do it later
             this.mDelayedSetCenterZoom = delayedSetCenterZoom;
         }
+    }
+
+    @Override
+    protected Dialog onCreateDialog(final int id) {
+        Dialog result = this.bookmarkListOverlay.onCreateDialog(id);
+        if (result != null) return result;
+
+        switch (id) {
+            case R.id.cmd_help:
+                return AboutDialogPreference.createAboutDialog(this);
+
+        }
+        return null;
     }
 
     // ===========================================================
@@ -791,45 +991,4 @@ public class LocationMapViewer extends Activity implements Constants {
         }
 
      }
-
-    //7. Customizing the bubble behaviour
-    class CustomInfoWindow extends MarkerInfoWindow {
-        GeoPointDto mSelectedPoi;
-
-        public CustomInfoWindow(MapView mapView) {
-            super(R.layout.bubble_geo_point_dto, mapView);
-            Button btn = (Button) (mView.findViewById(R.id.bubble_moreinfo));
-            btn.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View view) {
-                    if (mSelectedPoi.getUri() != null) {
-                        Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mSelectedPoi.getUri()));
-                        view.getContext().startActivity(myIntent);
-                    } else {
-                        Toast.makeText(view.getContext(), "Button clicked", Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
-        }
-
-        @Override
-        public void onOpen(Object item) {
-            super.onOpen(item);
-            mView.findViewById(R.id.bubble_moreinfo).setVisibility(View.VISIBLE);
-            Marker marker = (Marker) item;
-            mSelectedPoi = (GeoPointDto) marker.getRelatedObject();
-            TextView description = (TextView) mView.findViewById(R.id.bubble_description);
-            if (mSelectedPoi != null) {
-                description.setText(mSelectedPoi.getDescription());
-/* !!!
-            //8. put thumbnail image in bubble, fetching the thumbnail in background:
-            if (mSelectedPoi.mThumbnailPath != null){
-                ImageView imageView = (ImageView)mView.findViewById(R.id.bubble_image);
-                mSelectedPoi.fetchThumbnailOnThread(imageView);
-            }
-            */
-            }
-        }
-    }
-
-
 }

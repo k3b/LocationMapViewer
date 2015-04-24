@@ -27,7 +27,8 @@ class GpxDef_11 {
     static final String NAME = "name";
     static final String DESC = "desc";
     static final String TIME = "time";
-    static final String LINK = "link";
+    static final String LINK = "link"; // <link href=.. /> also used by atom
+    static final String ATTR_LINK = "href";
 }
 
 class GpxDef_10 {
@@ -39,7 +40,7 @@ class KmlDef_22 {
     static final String PLACEMARK = "Placemark";
     static final String DESCRIPTION = "description";
     static final String COORDINATES = "coordinates";
+    static final String COORDINATES2 = "coord";
     static final String TIMESTAMP_WHEN = "when";
     static final String TIMESPAN_BEGIN = "begin";
 }
-

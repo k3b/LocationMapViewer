@@ -1,10 +1,21 @@
-#LocationMapViewer Intent API
+#LocationMapViewer API
 
-Other Android apps can use LocationMapViewer through an Intent interface to display Informations in
+Other Android apps can use LocationMapViewer to display Informations in
 a geografic map.
 
-(For Example Android-Java code see
-[GeoIntentDemo.java](https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/main/java/de/k3b/android/locationMapViewer/demo/GeoIntentDemoActivity.java) )
+You can use LocationMapViewer
+
+* if you click in a filemanager on a file with extension [gpx](data#gpx), [kml](data#kml) or [poi](data#poi)
+* if you click in a webbrowser on a link of type [geo uri](data#geo), [gpx](data#gpx), [kml](data#kml) or [poi](data#poi)
+
+!!!!!!!!!
+
+S
+This chapter how this can be done through android#s **Intent Interface**
+
+For a working java exmaple see
+
+* geoIntentDemo/src/main/java/de.k3b.android.locationMapViewer.demo.[GeoIntentDemo.java](https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/main/java/de/k3b/android/locationMapViewer/demo/GeoIntentDemoActivity.java) )
 
 This also works with html links like &lt;a href=&quot;geo:0,0?q=53.0,8.0(Hello)&quot;&gt;geo:0,0?q=53.0,8.0(Hello)&lt;/a&gt;<br/>
 

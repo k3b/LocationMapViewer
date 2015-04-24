@@ -3,6 +3,17 @@ D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 -	bug regression why does lmv open *.json file which is also oct-stream although file pattern does not match
 		?? only one file pattern allowed???
 
+doku
+	http://www.topografix.com/gpx.asp
+	http://www.topografix.com/GPX/1/0/
+	http://www.topografix.com/GPX/1/1/
+	
+	
+	https://developers.google.com/kml/documentation/kmlreference?csw=1
+	http://wiki.openstreetmap.org/wiki/KML	
+	example from http://tools.wmflabs.org/kmlexport/?article=Puerto_de_la_Cruz&linksfrom=1
+	
+	
 open:
 >	rename icon(Url)=... to s(ymbol)=....
 -	create k3b-geo-xsd

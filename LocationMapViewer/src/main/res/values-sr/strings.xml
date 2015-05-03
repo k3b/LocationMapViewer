@@ -1,35 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+* Copyright (C) 2015 k3b
+*
+* This file is part of de.k3b.android.LocationMapViewer (https://github.com/k3b/LocationMapViewer/) .
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License
+* for more details.
+*
+* You should have received a copy of the GNU General Public License along with
+* this program. If not, see <http://www.gnu.org/licenses/>
+-->
 <resources>
     <!-- In Serbian Cyrillic translation app_name alos must be localized (translated or, if name represents a trademark, transcribed) -->
     <string name="app_name">Прегледач локација</string>
 
     <string name="label_select">У реду</string>
-
+    <string name="cancel">Одустани</string>
     <string name="title_activity_settings">Поставке</string>
     <string name="prefs_cat_overlays_title">Слојеви мапе</string>
-
     <string name="prefs_showLocation_summary">Прикажи моју локацију</string>
     <string name="prefs_showMiniMap_summary">Прикажи малу мапу</string>
     <string name="prefs_cluster_points">Тачке груписања</string>
     <string name="prefs_cluster_points_description">означена оближња тачка приказана као једна црвена тачка</string>
-
     <string name="prefs_current_header">Тренутни положај</string>
     <string name="prefs_current_north">Северно</string>
     <string name="prefs_current_east">Источно</string>
     <string name="prefs_current_zoom">Увеличање</string>
-
     <string name="prefs_header_development">Проналажење грешака/развој</string>
-    <!--
-    <string name="prefs_guestures_enable">Омогући експериментале гестуре</string>
-    <string name="prefs_guestures_enable_description">Подршка за DoubleTapDrag-ZoomToFit и DoubleTap-ZoomInCenter.</string>
-    -->
     <string name="prefs_guestures_debug_enable" >Омогући проналажење грешака гестура</string>
     <string name="prefs_guestures_debug_enable_description">Поруке проналаска грешака гестура копиране на клипборд и додате у Логкат.</string>
-
     <string name="about_summary">О Прегледачу локација</string>
-
-
-<string name="about_content_about">"<![CDATA[
+    <string name="about_content_about">"
+<![CDATA[
 <h1> Прегледач локација </h1>
 <p> Апликација која може да прикаже географске податке на мапи 
 Има подршку за <strong>gpx</strong> и <strong>kml</strong> 
@@ -41,5 +50,26 @@ href="https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/mai
 GeoIntentDemo.java</a>) или преко хтмл веза: <a href="geo:0,0?q=53.0,8.0(Hello)">geo:0,0?q=53.0,8.0(Здраво)</a>
 (&lt;a href=&quot;geo:0,0?q=53.0,8.0(Здраво)&quot;&gt;geo:0,0?q=53.0,8.0(Здраво)&lt;/a&gt;)<br />
 </p>
-]]>"</string>
+]]>
+"</string>
+
+    <!-- added in version 0.3.* -->
+    <string name="title_bookmark_list">Обележивачи</string>
+    <string name="title_bookmark_edit">Обележи</string>
+    <string name="cmd_save">Сачувај</string>
+    <string name="cmd_cancel">Одустани</string>
+    <string name="title_activity_geopoint_edit">Уреди</string>
+    <string name="title_rename">Преименуј</string>
+    <string name="title_delete">Обриши</string>
+    <string name="title_close">Затвори</string>
+
+    <string name="title_confirm_delete">"Потврда брисања"</string>
+    <string name="format_question_delete">"Желите ли заиста да обришете \n\n %1$s ? \n\n Ово НЕ МОЖЕ да се поништи.</string>
+    <string name="cmd_yes">Да</string>
+    <string name="cmd_no">Не</string>
+    <string name="bookmark_template_current">[Тренутни прозор]</string>
+    <string name="bookmark_template_initial">[Почетни прозор]</string>
+    <string name="bookmark_template_gps">"[ГПС]"</string>
+
+    <string name="title_cright_osm">"Плочице мапа (c) доприносиоци <a href='http://www.openstreetmap.org/copyright'>Опенстрит Мапе</a>"</string>
 </resources>

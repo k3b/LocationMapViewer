@@ -1,5 +1,7 @@
 # Data Formats
 
+This page is a full description of all dataformats that are supported by LocationMapViewer.
+
 <a name='toc'>Data Formats Table of content</a>
 
 * Introduction

@@ -5,7 +5,7 @@ v [home](home)
 * [geo-bookmarks](bookmarks) to remember and quickly navigate to named latitude/longitude/zoomlevel
 * Customizing LocationMapViewer: [settings](settings)
 v Supported [dataformats](data)
-* How other apps can use LocationMapViewer through the [intent api](api#intent)
+v How other apps can use LocationMapViewer through the [intent api](api#intent)
 
 --------------------------
 [home](home)

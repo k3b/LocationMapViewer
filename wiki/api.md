@@ -21,7 +21,7 @@ The intent tells LocationMapViewer
 
 ## <a name='action'>What to do: **action**</a>
 
-Currently LocationMapViewer supports these action:
+Currently LocationMapViewer supports these actions:
 
 * show a map: **Intent.ACTION_VIEW**
 * select a location from  a map: **Intent.ACTION_PICK**
@@ -32,6 +32,8 @@ Example:
 
 * Intent mapIntent = new Intent();
 * mapIntent.setAction(Intent.ACTION_VIEW);
+
+(see also [Detailed Example LocationMapViewer as a geo-picker](api#example) )
 
 ## <a name='uri'>What and where to show: **data-uri** and **data-type**</a>
 
@@ -50,8 +52,8 @@ Example:
 
 ### <a name='file'>data-uri as local file-uri "file://..." or internet-uri "http:..." or "https:..."</a>
 
-If you set the data-uri to a local file or as internet http(s) the content of the file will be loaded as a
-[point-of-interest](data#marker) in the [map](map#marker).
+If you set the data-uri to a local file or as internet http(s) the content of the file will be loaded as
+[points-of-interest](data#marker) in the [map](map#marker).
 
 The [visible region of the world](data#region) will be the center of the data and the
 [z=zoomLevel](data#z) will be be adjusted so that all points will be visible.
@@ -100,7 +102,7 @@ as the app's title.
 ## <a name='extra-pois'>Additional points-of-interest **EXTRA_POIS**</a>
 
 You can start LocationMapViewer with [intent geo data-uri](api#geo) and use EXTRA_POIS
-to put additional [point-of-interest](data#marker) into the [map](map#marker).
+to put additional [points-of-interest](data#marker) into the [map](map#marker).
 
 If the [intent geo data-uri](api#geo) does not have a [z=zoomLevel](data#z) the zoomlevel will be
 adjusted so that all points will be visible.

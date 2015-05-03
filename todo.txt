@@ -1,5 +1,6 @@
 D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
+- settings hide zoombar
 -	bug regression why does lmv open *.json file which is also oct-stream although file pattern does not match
 		?? only one file pattern allowed???
 

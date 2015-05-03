@@ -1,4 +1,21 @@
-#LocationMapViewer
+#LocationMapViewer map view
+
+map
+poi
+    green
+    red
+    yellow
+bubble
+    symbol
+    tilte
+    text
+    link
+menu
+favorites
+picker
+minimap
+zoom buttons [+] [-]
+zoom bar
 
 An app that can display geografic info in a map. It has support for **gpx** and **kml** files and [**geo-uri-s**](geo_intent_api)
 and can work offline (without internet/wifi)

@@ -1,74 +1,42 @@
-#LocationMapViewer
+#LocationMapViewer ![](https://github.com/k3b/LocationMapViewer/blob/master/LocationMapViewer/src/main/res/drawable/ic_launcher.png)
 
-An app that can display geografic info in a map. It has support for **gpx** and **kml** files and **geo-uri-s**
-and can work offline (without internet/wifi)
-once geodata is downloaded and cached.
+An android app that can display geografic info in a [map](map).
 
-Other Android apps can use LocationMapViewer through an Intent interface
-(see [GeoIntentDemo.java](https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/main/java/de/k3b/android/locationMapViewer/demo/GeoIntentDemoActivity.java) )
-or through html links like &lt;a href=&quot;geo:0,0?q=53.0,8.0(Hello)&quot;&gt;geo:0,0?q=53.0,8.0(Hello)&lt;/a&gt;<br/>
+![](https://github.com/k3b/LocationMapViewer/blob/master/wiki/png/app-map-menu.png)
 
-Minimal requirements: Android 2.1 (Eclair, API 7), internet/wifi-connection to download geodata and a SD-Card to cache geodata<br/>
+## <a name='features'>Features:</a>
 
-Licence: [GPLv3](http://www.gnu.org/licenses/gpl-3.0)<br/>
+* Support for displaying [gpx](data#gpx), [kml](data#kml) or [poi](data#poi) files
+    * Example: open a gpx or kml file in an android filemanager
+    * Example: open a link to a gpx or kml file in an android webbrowser
+* Support for [geo-uri-s](data#geo)
+    * Example: open a link to a geo uri in an android webbrowser.
+        * &lt;a href='geo:0,0?q=53.0,8.0(Hello)'><a href='geo:0,0?q=53.0,8.0(Hello)'>geo:0,0?q=53.0,8.0(Hello)</a> &lt;/a>
+* Support for [geo-bookmarks](bookmarks)
+    * to remember and quickly navigate to named latitude/longitude/zoomlevel
+* Can work offline (without internet/wifi) once geodata is downloaded and cached.
+* Other android apps can use LocationMapViewer through an [intent api](api#intent) ...
+    * ... to show a map at certain [latitude longitude zoomlevel](data#region) with [points of interest](data#marker)
+    * ... to pick a location from a map (i.e. "Where was this photo taken?")
 
-Requred permissions:
+### <a name='toc'>Table of content</a>
+
+* The [map's user ingerface](map)
+* [geo-bookmarks](bookmarks) to remember and quickly navigate to named latitude/longitude/zoomlevel
+* Customizing LocationMapViewer: [settings](settings)
+* Supported [dataformats](data)
+* How other apps can use LocationMapViewer through the [intent api](api#intent)
+
+### <a name='requirements'>Minimal requirements:</a>
+
+* Android 2.1 (Eclair, API 7),
+* internet/wifi-connection to download geodata and a SD-Card to cache geodata<br/>
+* Licence: [GPLv3](http://www.gnu.org/licenses/gpl-3.0)<br/>
+
+### <a name='permissions'>Requred permissions:</a>
 
 * INTERNET: to download map data from Open Streetmap Server
 * ACCESS_NETWORK_STATE and ACCESS_WIFI_STATE: to find out if wifi/internet is online to start downloaded geodata
-* WRITE_EXTERNAL_STORAGE
-    * to cache downloaded map data in local file system
-    * to load gpx/kml-Files to be displayed in the map
-* ACCESS_FINE_LOCATION and ACCESS_COARSE_LOCATION: to display my own location in the map, too
-
-The code uses [osmdroid library](https://github.com/osmdroid/osmdroid)
-with [osmbonuspack library](http://code.google.com/p/osmbonuspack/)
-to display maps from [Open Street Map](http://www.openstreetmap.org).
-
-##Intent Interface
-
-Other Android apps can use LocationMapViewer as plug-in/device-driver through an Intent interface
-or through html-a-href-links.
-
-Examples:
-
-* uri=geo:...  displays (and zomms to) a [geo uri](http://tools.ietf.org/html/draft-mayrhofer-geo-uri-00)
-    * geo:0,0?q=53.0,8.0(Hello)
-        * displays "hello" at the location lat=53.0 north and lon= 8.0 east.
-        * in html you can use &lt;a href=&quot;geo:0,0?q=53.0,8.0(Hello)&quot;&gt;geo:0,0?q=53.0,8.0(Hello)&lt;/a&gt;
-        * this format is compatible with google-maps for android
-    * geo:53.0,8.0?q=(Hello)
-        * displays "hello" at the location lat=53.0 north and lon= 8.0 east
-        * this format is **not** compatible with google-maps for android
-    * geo:53.0,8.0?z=6
-        * displays a pin at the location using zoomlevel "6"
-* uri=file:/path/to/waypoints.gpx
-    * displays a xml+gpx waypointfile
-* uri=file:/path/to/waypoints.kml
-    * displays a vnd.google-earth.kml+xml waypointfile
-
-LocationMapViewer is designed to be used by other apps. This means in Terms of [GPLv3](http://www.gnu.org/licenses/gpl-3.0) that your app
-that uses the Intent-Iterface [is not considered a Derived Work.](https://en.wikipedia.org/wiki/GPL_v3#Point_of_view:_linking_is_irrelevant)
-
-In other words: you can used LocationMapViewer as a [driver for your non gpl/non opensource app.](http://www.rosenlaw.com/lj19.htm).
-
-
----
-
-#LocationMapViewer
-
-An app that can display geografic info in a [[map]]. It has support for **gpx** and **kml** files and [**geo-uri-s**](geo_intent_api)
-and can work offline (without internet/wifi)
-once geodata is downloaded and cached.
-
-Minimal requirements: Android 2.1 (Eclair, API 7), internet/wifi-connection to download geodata and a SD-Card to cache geodata<br/>
-
-Licence: [GPLv3](http://www.gnu.org/licenses/gpl-3.0)<br/>
-
-Requred permissions:
-
-* INTERNET: to download map data from Open Streetmap Server
-* ACCESS_NETWORK_STATE and ACCESS_WIFI_STATE: to find out if wifi/internet is online to start downloaded geodata 
 * WRITE_EXTERNAL_STORAGE
     * to cache downloaded map data in local file system
     * to load gpx/kml-Files to be displayed in the map

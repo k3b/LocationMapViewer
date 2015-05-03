@@ -59,7 +59,17 @@ public class GeoIntentDemoActivity extends Activity {
         String title = editTitle.getText().toString(); // Example "where did you take the photo"
         String pois = editPois.getText().toString().trim();
 
+
         startDemo(uriString, mimeString, action, title, pois);
+
+
+        /*
+        startmapIntent("geo:53.2,8.8?q=(name)&z=1", null, Intent.ACTION_PICK, "where did you take the photo",
+                "<poi ll='53.1,8.9'/>\n" +
+                        "<poi ll='53.3,8.7' n='Name' \n" +
+                        " link='https://github.com/k3b/LocationMapViewer/' \n" +
+                        " d='Here is some comment' />");
+        */
     }
 
     /**
@@ -71,23 +81,23 @@ public class GeoIntentDemoActivity extends Activity {
      */
     private void startDemo(String uriString, String mimeString, String action, String title, String pois) {
         Uri uri = Uri.parse(uriString);
-        Intent demo = new Intent();
+        Intent mapIntent = new Intent();
         if (action != null) {
-            demo.setAction(action);
+            mapIntent.setAction(action);
         }
 
         if ((title != null) && (title.length() > 0)) {
-            demo.putExtra(Intent.EXTRA_TITLE, title);
+            mapIntent.putExtra(Intent.EXTRA_TITLE, title);
         }
 
         if ((pois != null) && (pois.length() > 0)) {
-            demo.putExtra("de.k3b.POIS", pois);
+            mapIntent.putExtra("de.k3b.POIS", pois);
         }
 
-        demo.setDataAndType(uri, mimeString);
-        Toast.makeText(this, appName + "Starting " + uriString + "-" + demo.getType(), Toast.LENGTH_SHORT).show();
+        mapIntent.setDataAndType(uri, mimeString);
+        Toast.makeText(this, appName + "Starting " + uriString + "-" + mapIntent.getType(), Toast.LENGTH_SHORT).show();
         try {
-            startActivityForResult(Intent.createChooser(demo,"Choose app to show location"), ACTION_ID);
+            startActivityForResult(Intent.createChooser(mapIntent,"Choose app to show location"), ACTION_ID);
         } catch (Exception e) {
             Toast.makeText(this, appName + e.getMessage(), Toast.LENGTH_SHORT).show();
             e.printStackTrace();

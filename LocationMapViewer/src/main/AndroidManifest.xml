@@ -107,22 +107,28 @@
 
                 <data android:scheme="geo" />
             </intent-filter>
-            <intent-filter><!-- android:label="LMV#4"> -->
-				<!-- executed in android4.4/2.1-tc-openWith hello.gpx. 
-					in android 2.1  also hello.kml -->
+            <intent-filter ><!-- android:label="LMV#4"> -->
+                <!-- executed in android4.4/2.1-tc-openWith hello.gpx.
+                    in android 2.1  also hello.kml -->
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:mimeType="application/octet-stream" />
-
-                <data android:scheme="file" />
-                <data android:pathPattern=".*\\.gpx" />
-                <data android:pathPattern=".*\\.kml" />
-                <data android:pathPattern=".*\\.poi" />
+                <data android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.gpx"
+                    android:scheme="file" />
+                <data android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.poi"
+                    android:scheme="file" />
+                <data android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.kml"
+                    android:scheme="file" />
             </intent-filter>
-			
+
             <!-- version with host and without host -->
             <intent-filter><!-- android:label="LMV#5"> -->
 				<!-- executed in android4.4-tc-openWith hello.kml -->

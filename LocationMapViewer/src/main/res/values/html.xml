@@ -19,7 +19,7 @@
   -->
 
 <resources>
-
+<!--
 <string name="help_bookmarks">"
 <![CDATA[
 <h1>${drawable.ic_action_important} ${string.title_bookmark_list}</h1>
@@ -28,6 +28,6 @@ Similar to a web browser bookmark you can return to a bookmarked latitude/longit
 by selecting it.</p>
 ]]>
 "</string>
-
+-->
 
 </resources>

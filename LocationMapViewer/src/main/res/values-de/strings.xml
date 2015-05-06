@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+* Copyright (C) 2015 k3b
+*
+* This file is part of de.k3b.android.LocationMapViewer (https://github.com/k3b/LocationMapViewer/) .
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License
+* for more details.
+*
+* You should have received a copy of the GNU General Public License along with
+* this program. If not, see <http://www.gnu.org/licenses/>
+-->
+<resources>
+
+    <string name="label_select">OK</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="title_activity_settings">Einstellungen</string>
+    <string name="prefs_cat_overlays_title">Map Overlays</string>
+    <string name="prefs_showLocation_summary">Meine GPS Position anzeigen</string>
+    <string name="prefs_showMiniMap_summary">Zeige Übersichtskarte</string>
+    <string name="prefs_cluster_points">Benachbarte Punkte zusammenfassen</string>
+    <string name="prefs_cluster_points_description">Benachbarte Punkte als roten Punkt zusammenfassen</string>
+    <string name="prefs_current_header">Aktueller Ausschnitt</string>
+    <string name="prefs_current_north">Nord</string>
+    <string name="prefs_current_east">Ost</string>
+    <string name="prefs_current_zoom">Zoom</string>
+    <string name="prefs_header_development">Debug/Development</string>
+    <string name="prefs_guestures_debug_enable">Gesten Debuging</string>
+    <string name="prefs_guestures_debug_enable_description">Debug Meldungen der Gestenauswertungen werden ins Clipboard und ins LogCat kopiert.</string>
+    <string name="about_summary">Über LocationMapViewer</string>
+    <string name="about_content_about">"
+<![CDATA[
+<h1> LocationMapViewer </h1>
+<p> Eine App um Geo-Informatinen in einer Landkarte darzustellen. Sie kann die Formate
+ <strong>gpx</strong>, <strong>kml</strong>, <strong>poi</strong> und <strong>geo-uri</strong>
+ darstellen und arbeitet offline
+ (ohne Internet/Wifi) sobald das Kartenmaterial geladen und gecached wurde. </p>
+<p> Andere Android Apps k&ouml;nnen LocationMapViewer mit Hilfe des
+ Intent Interfaces verwenden (see <a
+href="https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/main/java/de/k3b/android/locationMapViewer/demo/GeoIntentDemoActivity.java">
+ GeoIntentDemo.java</a>) oder durch html Links wie<br/> <a href="geo:0,0?q=53.0,8.0(Ich+bin+ein+geo+link)">geo:0,0?q=53.0,8.0(Ich bin ein geo link)</a><br/>
+ (&lt;a href=&quot;geo:0,0?q=53.0,8.0(Hello)&quot;&gt;geo:0,0?q=53.0,8.0(Ich+bin+ein+geo+link)&lt;/a&gt;)<br />
+</p>
+]]>
+"</string>
+
+    <!-- added in version 0.3.* -->
+    <string name="title_bookmark_list">Lesezeichen</string>
+    <string name="title_bookmark_edit">Lesezeichen</string>
+    <string name="cmd_save"> Speichern </string>
+    <string name="cmd_cancel"> Abbrechen </string>
+    <string name="title_activity_geopoint_edit">Bearbeiten</string>
+    <string name="title_rename">Umbenennen</string>
+    <string name="title_delete">Löschen</string>
+    <string name="title_close">Schließen</string>
+
+    <string name="title_confirm_delete">"Löschen bestätigen "</string>
+    <string name="format_question_delete">"Wollen Sie dieses wirklich dauerhaft löschen? \n\n %1$s \n\n Das Löschen kann NICHT rückgängig gemacht werden.</string>
+    <string name="cmd_yes">Ja</string>
+    <string name="cmd_no">Nein</string>
+    <string name="bookmark_template_current">[Aktueller Ausschnitt] </string>
+    <string name="bookmark_template_initial">[Ursprünglicher Ausschnitt] </string>
+    <string name="bookmark_template_gps">"[GPS] "</string>
+
+    <string name="title_cright_osm">"Karte (c) <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> Mitwirkende"</string>
+</resources>

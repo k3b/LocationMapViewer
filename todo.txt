@@ -1,8 +1,8 @@
 D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
 - settings hide zoombar
--	bug regression why does lmv open *.json file which is also oct-stream although file pattern does not match
-		?? only one file pattern allowed???
+
+v0.3.3.150506
 
 doku
 	http://www.topografix.com/gpx.asp
@@ -16,12 +16,12 @@ doku
 	
 	
 open:
->	rename icon(Url)=... to s(ymbol)=....
--	create k3b-geo-xsd
+v	rename icon(Url)=... to s(ymbol)=....
+v	create k3b-geo-xsd
 		inline doc
 		=> generate api doc out of it?
 
-?   app can load *.poi files with internal <poi/> xml format.
+v   app can load *.poi files with internal <poi/> xml format.
 -   lib can save *.poi with internal  <poi/> xml format.
 v   app extras with <poi/> xml format for additional points in map
     v GeoXmlOrTextParser() as intent-extra interpreter

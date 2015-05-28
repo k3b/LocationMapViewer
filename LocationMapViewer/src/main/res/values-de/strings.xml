@@ -42,7 +42,7 @@
  <strong>gpx</strong>, <strong>kml</strong>, <strong>poi</strong> und <strong>geo-uri</strong>
  darstellen und arbeitet offline
  (ohne Internet/Wifi) sobald das Kartenmaterial geladen und gecached wurde. </p>
-<p> Andere Android Apps k&ouml;nnen LocationMapViewer mit Hilfe des
+<p> Andere Android Apps können LocationMapViewer mit Hilfe des
  Intent Interfaces verwenden (see <a
 href="https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/main/java/de/k3b/android/locationMapViewer/demo/GeoIntentDemoActivity.java">
  GeoIntentDemo.java</a>) oder durch html Links wie<br/> <a href="geo:0,0?q=53.0,8.0(Ich+bin+ein+geo+link)">geo:0,0?q=53.0,8.0(Ich bin ein geo link)</a><br/>

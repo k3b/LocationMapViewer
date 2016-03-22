@@ -68,7 +68,7 @@ public class AndroidStringTemplateTests extends ActivityTestCase {
 
         AndroidStringTemplateEngine engine = new AndroidStringTemplateEngine(testContext);
 
-        String valueToCheck = resourcesUnderTest.getString(R.string.help_bookmarks);
+        String valueToCheck = resourcesUnderTest.getString(R.string.app_name);
         String result = engine.format(valueToCheck);
 
 
@@ -95,7 +95,6 @@ public class AndroidStringTemplateTests extends ActivityTestCase {
         R.string.bookmark_template_initial,
         R.string.format_question_delete,
         R.string.label_select,
-        R.string.no_items_found,
         R.string.prefs_cat_overlays_title,
         R.string.prefs_cluster_points,
         R.string.prefs_cluster_points_description,
@@ -113,8 +112,7 @@ public class AndroidStringTemplateTests extends ActivityTestCase {
         R.string.title_confirm_delete,
         R.string.title_delete,
         R.string.title_bookmark_edit,
-        R.string.title_bookmark_list,
-        R.string.help_bookmarks
+        R.string.title_bookmark_list
         };
     }
 

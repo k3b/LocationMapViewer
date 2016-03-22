@@ -17,7 +17,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 
-package de.k3b.android.locationMapViewer;
+package de.k3b.android.osmdroid;
 
 import android.content.Context;
 import android.graphics.Canvas;

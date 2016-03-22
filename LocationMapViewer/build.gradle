@@ -25,6 +25,8 @@ android {
 }
 
 dependencies {
+    compile project(':k3b-geoHelper')
+
     // androidTestCompile 'org.mod4j.org:junit:3.8.2'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // required by osmdroid
@@ -41,5 +43,4 @@ dependencies {
     // only error and warn
     compile 'eu.lp0.slf4j:slf4j-android:1.7.7-1@jar'
     // if you want to see debug traces, too. requires config file
-    compile project(':k3b-geoHelper')
 }

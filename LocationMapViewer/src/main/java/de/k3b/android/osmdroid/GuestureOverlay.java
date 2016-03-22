@@ -17,7 +17,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 
-package de.k3b.android.locationMapViewer;
+package de.k3b.android.osmdroid;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -30,7 +30,7 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.Projection;
 
-import de.k3b.geo.api.GeoPointDto;
+import de.k3b.android.locationMapViewer.R;
 
 /**
  * Additional Guestures for {@see org.osmdroid.views.MapView}:<br/>
@@ -107,7 +107,7 @@ public class GuestureOverlay extends OverlayDebug {
         if (ddragMode) {
             IGeoPoint start = projection.fromPixels(this.mStart.x, this.mStart.y);
             IGeoPoint end = projection.fromPixels(this.mEnd.x, this.mEnd.y);
-            ZoomUtil.zoomTo(mapView, GeoPointDto.NO_ZOOM, start, end);
+            ZoomUtil.zoomTo(mapView, ZoomUtil.NO_ZOOM, start, end);
             if (isDebugEnabled()) debug("zoom(ddrag mode)", start, "..", end,
                     "=>", mapView.getMapCenter(), "z=", mapView.getZoomLevel());
         } else {

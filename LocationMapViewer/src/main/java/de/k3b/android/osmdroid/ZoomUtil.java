@@ -17,7 +17,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 
-package de.k3b.android.locationMapViewer;
+package de.k3b.android.osmdroid;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
@@ -32,6 +32,16 @@ import microsoft.mappoint.TileSystem;
  * Created by k3b on 16.03.2015.
  */
 public class ZoomUtil {
+
+    public static final int NO_ZOOM = GeoPointDto.NO_ZOOM;
+
+    /**
+     * Similar to MapView.zoomToBoundingBox that seems to be to inexact.
+     * @param mapView
+     * @param zoom if NO_ZOOM (-1) zoom is calculated from min and max
+     * @param min
+     * @param max
+     */
     public static void zoomTo(MapView mapView, int zoom, IGeoPoint min, IGeoPoint max) {
         MapTileProviderBase tileProvider = mapView.getTileProvider();
         IMapController controller = mapView.getController();
@@ -40,12 +50,12 @@ public class ZoomUtil {
         if (max != null) {
             center = new GeoPoint((max.getLatitudeE6() + min.getLatitudeE6()) / 2, (max.getLongitudeE6() + min.getLongitudeE6()) / 2);
 
-            if (zoom == GeoPointDto.NO_ZOOM) {
+            if (zoom == NO_ZOOM) {
                 final double requiredMinimalGroundResolutionInMetersPerPixel = ((double) new GeoPoint(min.getLatitudeE6(), min.getLongitudeE6()).distanceTo(max)) / Math.min(mapView.getWidth(), mapView.getHeight());
                 zoom = calculateZoom(center.getLatitude(), requiredMinimalGroundResolutionInMetersPerPixel, tileProvider.getMaximumZoomLevel(), tileProvider.getMinimumZoomLevel());
             }
         }
-        if (zoom != GeoPointDto.NO_ZOOM) {
+        if (zoom != NO_ZOOM) {
             controller.setZoom(zoom);
         }
 
@@ -67,7 +77,7 @@ public class ZoomUtil {
                 return zoom;
         }
 
-        return GeoPointDto.NO_ZOOM;
+        return NO_ZOOM;
     }
 
 }

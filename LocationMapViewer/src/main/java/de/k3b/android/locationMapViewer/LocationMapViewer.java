@@ -81,6 +81,8 @@ import de.k3b.android.locationMapViewer.constants.Constants;
 import de.k3b.android.locationMapViewer.geobmp.BookmarkListOverlay;
 import de.k3b.android.locationMapViewer.geobmp.BookmarkUtil;
 import de.k3b.android.locationMapViewer.geobmp.GeoBmpDto;
+import de.k3b.android.osmdroid.GuestureOverlay;
+import de.k3b.android.osmdroid.ZoomUtil;
 import de.k3b.android.widgets.AboutDialogPreference;
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
@@ -173,7 +175,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
 
         GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
 
-        mUsePicker = (Intent.ACTION_PICK.equals(intent.getAction()));
+        mUsePicker = ((Intent.ACTION_PICK.equals(intent.getAction())) || (Intent.ACTION_GET_CONTENT.equals(intent.getAction())));
 
         String extraTitle = intent.getStringExtra(Intent.EXTRA_TITLE);
         if (extraTitle == null && (geoPointFromIntent == null)) {
@@ -406,7 +408,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         poiMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         poiMarker.setPosition(toOsmGeoPoint(aGeoPoint));
 
-        if (BookmarkUtil.isNotEmpty(description) || BookmarkUtil.isNotEmpty(aGeoPoint.getLink())) {
+        if (BookmarkUtil.isNotEmpty(description) || BookmarkUtil.isNotEmpty(aGeoPoint.getLink()) || BookmarkUtil.isNotEmpty(aGeoPoint.getName())) {
             poiMarker.setIcon(mPoiIconWithData);
             // 7.
             poiMarker.setInfoWindow(new GeoPointMarkerInfoWindow(map));
@@ -743,7 +745,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         return false;
     }
 
-    /** implements interface BookmarkListOverlay.AdditionalPoints() */
+    /** implements interface BookmarkListOverlay.AdditionalPoints */
     public GeoBmpDto[] getAdditionalPoints() {
         GeoPoint gps = (this.mLocationOverlay != null) ? this.mLocationOverlay.getMyLocation() : null;
 

@@ -18,6 +18,7 @@
 * this program. If not, see <http://www.gnu.org/licenses/>
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:installLocation="auto"
     package="de.k3b.android.locationMapViewer" >
 
     <supports-screens
@@ -85,6 +86,7 @@
                 <action android:name="android.intent.action.SEND" />
                 <action android:name="android.intent.action.SENDTO" />
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <action android:name="android.intent.action.GET_CONTENT" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -101,6 +103,7 @@
                 <action android:name="android.intent.action.SEND" />
                 <action android:name="android.intent.action.SENDTO" />
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <action android:name="android.intent.action.GET_CONTENT" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -164,6 +167,30 @@
                 <data android:mimeType="application/xml+gpx" />
                 <data android:mimeType="application/xml+poi" />
             </intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+				<category android:name="android.intent.category.BROWSABLE"/>
+				<data android:scheme="google.navigation"/>
+			</intent-filter>
+
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+				<category android:name="android.intent.category.BROWSABLE"/>
+				<data
+					android:host="maps.google.com"
+					android:scheme="https"/>
+			</intent-filter>
+
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+				<category android:name="android.intent.category.BROWSABLE"/>
+				<data
+					android:host="maps.google.com"
+					android:scheme="http"/>
+			</intent-filter>
         </activity>
         <activity
             android:name=".SettingsActivity"

@@ -80,6 +80,13 @@ public class GeoUri {
     private final static Pattern patternLatLonAlt = Pattern.compile(regexpLatLonAlt);
     private final static Pattern patternLatLonLatLon = Pattern.compile(regexpLatLonLatLon);
     private final static Pattern patternTime = Pattern.compile("([12]\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ)");
+
+    private final static String regexpHref = "(?:\\s*href\\s?\\=\\s?['\"]([^'\"]*)['\"])"; // i.e. href='hallo'
+    private final static Pattern patternHref = Pattern.compile(regexpHref);
+
+    private final static String regexpSrc = "(?:\\s*src\\s?\\=\\s?['\"]([^'\"]*)['\"])"; // i.e. src='hallo'
+    private final static Pattern patternSrc = Pattern.compile(regexpSrc);
+
     /* current state */
 
     /** formating/parsing options */
@@ -125,7 +132,8 @@ public class GeoUri {
             whereToSearch.add(uri);
             whereToSearch.add(parmLookup.get(GeoUriDef.LAT_LON));
 
-            if (isSet(GeoUri.OPT_PARSE_INFER_MISSING)) {
+            final boolean inferMissing = isSet(GeoUri.OPT_PARSE_INFER_MISSING);
+            if (inferMissing) {
                 whereToSearch.add(parseResult.getDescription());
                 whereToSearch.addAll(parmLookup.values());
             }
@@ -137,6 +145,10 @@ public class GeoUri {
 
             if (parseResult.getName() == null) {
                 parseResult.setName(parmLookup.get(GeoUriDef.NAME));
+            }
+            if (inferMissing) {
+                parseResult.setLink(parseFindFromPattern(patternHref, parseResult.getLink(), whereToSearch));
+                parseResult.setSymbol(parseFindFromPattern(patternSrc, parseResult.getSymbol(), whereToSearch));
             }
         } else {
             // no query parameter

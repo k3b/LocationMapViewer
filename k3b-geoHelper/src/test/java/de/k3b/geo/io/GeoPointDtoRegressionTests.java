@@ -49,7 +49,7 @@ public class GeoPointDtoRegressionTests {
 
     @Test
     public void regressionTest() {
-        check("0|empty.xml", "1|gpx11.gpx", "1|gpx10.gpx" , "2|kml22.kml", "2|gpx-similar.gpx", "6|poi.xml", "1|wikimedia.xml");
+        check("0|empty.xml", "1|gpx11.gpx", "1|gpx10.gpx" , "2|kml22.kml", "2|gpx-similar.gpx", "7|poi.xml", "1|wikimedia.xml");
         Assert.assertNull("" + this.checkResultMessage, this.checkResultMessage);
     }
 

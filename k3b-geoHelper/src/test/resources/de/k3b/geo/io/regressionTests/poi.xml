@@ -29,4 +29,10 @@
     <poi infer="1" geoUri="geo:?d=the Descr contain (theName), loc 52.1,9.2 and time 2015-02-10T08:04:45Z">
         <expectedTestResult:id>geo:52.1,9.2?q=(theName)&amp;d=the+Descr+contain+%28theName%29%2C+loc+52.1%2C9.2+and+time+2015-02-10T08%3A04%3A45Z&amp;t=2015-02-10T08:04:45Z</expectedTestResult:id>
     </poi>
+
+    <!-- the parser can infer loc, name and time from description -->
+    <poi infer="1" geoUri="geo:52,9?d= href%3D'theLink' src %3D 'theIconUrl' " >
+        <expectedTestResult:id>geo:52,9?link=theLink&amp;s=theIconUrl&amp;d=+href%3D%27theLink%27+src+%3D+%27theIconUrl%27+</expectedTestResult:id>
+    </poi>
+
 </someRoot>

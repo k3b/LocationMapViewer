@@ -1,0 +1,30 @@
+<api batchcomplete="" xmlns:expectedTestResult="uri://some/url">
+    <!-- read via wikimedia api from https://de.wikivoyage.org/w/api.php?action=query&format=xml&prop=coordinates|info|pageimages&inprop=url&piprop=thumbnail&generator=geosearch&ggscoord=28.12722|-15.43139&ggsradius=10000&ggslimit=5&pilimit=5
+        -->
+    <query>
+        <pages>
+
+            <page _idx="7445" pageid="7445" ns="0" title="theName" contentmodel="wikitext" pagelanguage="de" pagelanguagehtmlcode="de" pagelanguagedir="ltr"
+                touched="2015-02-10T08:04:45Z" lastrevid="863946" length="15496"
+                fullurl="theLink" editurl="https://de.wikivoyage.org/w/index.php?title=Las_Palmas&amp;action=edit" canonicalurl="https://de.wikivoyage.org/wiki/Las_Palmas">
+                <!-- this is what i assume to be valid wikimedia xml content
+                    except that there is no id element that is used for regression-testing
+                    -->
+                <expectedTestResult:id>geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;t=2015-02-10T08:04:45Z</expectedTestResult:id>
+                <coordinates>
+                    <co lat="52" lon="9" primary="" globe="earth"/>
+                </coordinates>
+                <thumbnail source="theIconUrl" width="50" height="38"/>
+            </page>
+
+            <!--
+            <page _idx="13691" pageid="13691" ns="0" title="Arucas" contentmodel="wikitext" pagelanguage="de" pagelanguagehtmlcode="de" pagelanguagedir="ltr" touched="2016-03-26T15:40:31Z" lastrevid="829610" length="4894" fullurl="https://de.wikivoyage.org/wiki/Arucas" editurl="https://de.wikivoyage.org/w/index.php?title=Arucas&action=edit" canonicalurl="https://de.wikivoyage.org/wiki/Arucas">
+                <coordinates>
+                    <co lat="28.1167" lon="-15.5167" primary="" globe="earth"/>
+                </coordinates>
+                <thumbnail source="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Kirche_Arucas.JPG/50px-Kirche_Arucas.JPG" width="50" height="34"/>
+            </page>
+            -->
+        </pages>
+    </query>
+</api>

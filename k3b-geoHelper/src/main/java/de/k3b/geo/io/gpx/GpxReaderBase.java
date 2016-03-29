@@ -169,8 +169,25 @@ public class GpxReaderBase extends DefaultHandler {
             if (lat != null) this.current.setLatitude(Double.parseDouble(lat));
             final String lon = attributes.getValue(GpxDef_11.ATTR_LON);
             if (lon != null) this.current.setLongitude(Double.parseDouble(lon));
+        } else if (name.equals(WikimediaDef.COORDINATE)) {
+            final String lat = attributes.getValue(GpxDef_11.ATTR_LAT);
+            if (lat != null) this.current.setLatitude(Double.parseDouble(lat));
+            final String lon = attributes.getValue(GpxDef_11.ATTR_LON);
+            if (lon != null) this.current.setLongitude(Double.parseDouble(lon));
+        } else if (name.equals(WikimediaDef.IMAGE)) {
+            final String symbol = attributes.getValue(WikimediaDef.ATTR_IMAGE);
+            if (symbol != null) this.current.setSymbol(symbol);
         } else if ((name.equals(KmlDef_22.PLACEMARK)) || (name.equals(GeoUriDef.XML_ELEMENT_POI))) {
             this.current = this.newInstance(attributes);
+        } else if (name.equals(WikimediaDef.PAGE)) {
+            this.current = this.newInstance(attributes);
+            this.current.setId(attributes.getValue(WikimediaDef.ATTR_ID));
+            this.current.setName(attributes.getValue(WikimediaDef.ATTR_TITLE));
+            this.current.setLink(attributes.getValue(WikimediaDef.ATTR_LINK));
+            final Date dateTime = IsoDateTimeParser.parse(attributes.getValue(WikimediaDef.ATTR_TIME));
+            if (dateTime != null) {
+                this.current.setTimeOfMeasurement(dateTime);
+            }
         } else if ((this.current != null) && (name.equals(GpxDef_11.LINK) || name.equals(GpxDef_10.URL))) {
             this.current.setLink(attributes.getValue(GpxDef_11.ATTR_LINK));
         }
@@ -184,7 +201,7 @@ public class GpxReaderBase extends DefaultHandler {
             throws SAXException {
         String name = getElementName(localName, qName);
         logger.debug("endElement {} {}", localName, qName);
-        if (name.equals(GpxDef_11.TRKPT) || name.equals(GpxDef_10.WPT) || name.equals(KmlDef_22.PLACEMARK) || name.equals(GeoUriDef.XML_ELEMENT_POI)) {
+        if (name.equals(GpxDef_11.TRKPT) || name.equals(GpxDef_10.WPT) || name.equals(KmlDef_22.PLACEMARK) || name.equals(GeoUriDef.XML_ELEMENT_POI) || name.equals(WikimediaDef.PAGE)) {
             this.onGotNewWaypoint.onGeoInfo(this.current);
             this.current = null;
         } else if (this.current != null) {
@@ -205,12 +222,14 @@ public class GpxReaderBase extends DefaultHandler {
                             + name +"=" + buf.toString());
                 }
 
-            } else if (name.equals(KmlDef_22.COORDINATES) || name.equals(KmlDef_22.COORDINATES2)) {
+            } else if ((name.equals(KmlDef_22.COORDINATES) || name.equals(KmlDef_22.COORDINATES2)) && buf.length() > 0) {
                 // <coordinates>lon,lat,height blank lon,lat,height ...</coordinates>
                 try {
                     String parts[] = buf.toString().split("[,\\s]");
-                    this.current.setLatitude(Double.parseDouble(parts[1]));
-                    this.current.setLongitude(Double.parseDouble(parts[0]));
+                    if ((parts != null) && (parts.length >= 2)) {
+                        this.current.setLatitude(Double.parseDouble(parts[1]));
+                        this.current.setLongitude(Double.parseDouble(parts[0]));
+                    }
                 } catch (NumberFormatException e) {
                     saxError("/kml//Placemark/Point/coordinates>Expected: 'lon,lat,...' but got "
                             + name +"=" + buf.toString());

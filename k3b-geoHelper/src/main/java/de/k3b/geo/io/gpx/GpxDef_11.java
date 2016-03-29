@@ -31,11 +31,13 @@ class GpxDef_11 {
     static final String ATTR_LINK = "href";
 }
 
+/** xml-elements for gpx version 1.0 */
 class GpxDef_10 {
     static final String WPT = "wpt"; // alias for "trkpt"
     static final String URL = "url"; // alias for "link"
 }
 
+/** xml-elements for kml */
 class KmlDef_22 {
     static final String PLACEMARK = "Placemark";
     static final String DESCRIPTION = "description";
@@ -43,4 +45,18 @@ class KmlDef_22 {
     static final String COORDINATES2 = "coord";
     static final String TIMESTAMP_WHEN = "when";
     static final String TIMESPAN_BEGIN = "begin";
+}
+
+/** xml-elements for wikimedia (i.e. wikipedia or wikivoyage) */
+class WikimediaDef {
+    static final String PAGE = "page";
+    static final String ATTR_LINK = "fullurl"; // <page fullurl=...
+    static final String ATTR_ID = "pageid";
+    static final String ATTR_TITLE = "title";
+    static final String ATTR_TIME = "touched";
+
+    static final String COORDINATE = "co";
+
+    static final String IMAGE = "thumbnail";
+    static final String ATTR_IMAGE = "source";
 }

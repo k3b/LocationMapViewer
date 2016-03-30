@@ -1,5 +1,8 @@
 <api batchcomplete="" xmlns:expectedTestResult="uri://some/url">
-    <!-- read via wikimedia api from https://de.wikivoyage.org/w/api.php?action=query&format=xml&prop=coordinates|info|pageimages&inprop=url&piprop=thumbnail&generator=geosearch&ggscoord=28.12722|-15.43139&ggsradius=10000&ggslimit=5&pilimit=5
+    <!-- read via wikimedia api from
+            https://de.wikivoyage.org/w/api.php?action=query&format=xml&prop=coordinates|info|pageimages&inprop=url&piprop=thumbnail&generator=geosearch&ggscoord=28.12722|-15.43139&ggsradius=10000&ggslimit=5&pilimit=5
+
+            LocationMapViewer can find this type of content in files *.poi (or *.gpx, *.kml)
         -->
     <query>
         <pages>

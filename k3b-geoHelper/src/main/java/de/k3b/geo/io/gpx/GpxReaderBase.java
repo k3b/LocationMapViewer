@@ -202,6 +202,7 @@ public class GpxReaderBase extends DefaultHandler {
         String name = getElementName(localName, qName);
         logger.debug("endElement {} {}", localName, qName);
         if (name.equals(GpxDef_11.TRKPT) || name.equals(GpxDef_10.WPT) || name.equals(KmlDef_22.PLACEMARK) || name.equals(GeoUriDef.XML_ELEMENT_POI) || name.equals(WikimediaDef.PAGE)) {
+            GeoUri.inferMissing(this.current, this.current.getDescription());
             this.onGotNewWaypoint.onGeoInfo(this.current);
             this.current = null;
         } else if (this.current != null) {

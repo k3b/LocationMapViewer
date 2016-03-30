@@ -28,5 +28,17 @@
 				<gx:coord>11.949285000000001 49.54479166666667 413.4</gx:coord>
 			</gx:Track>
 		</Placemark>
+
+		<!-- infer link from xml-description This is used in
+			https://tools.wmflabs.org/kmlexport/?article=Category:Gran_Canaria&linksfrom=1&l=3
+		  -->
+		<Placemark>
+			<expectedTestResult:id>geo:52,9?link=theLink&amp;d=%3Ca+href%3D%27theLink%27%3Esomething%3C%2Fa%3E</expectedTestResult:id>
+			<description>&lt;a href='theLink'>something&lt;/a></description>
+			<Point>
+				<coordinates>9,52</coordinates>
+			</Point>
+		</Placemark>
+
 	</Document>
 </kml>

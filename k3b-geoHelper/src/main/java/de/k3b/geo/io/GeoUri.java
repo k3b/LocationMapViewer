@@ -139,7 +139,7 @@ public class GeoUri {
             }
 
             parseResult.setName(parseFindFromPattern(patternName, parseResult.getName(), whereToSearch));
-            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parmLookup.get(GeoUriDef.TIME), whereToSearch));
+            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parseResult.getTimeOfMeasurement(), parmLookup.get(GeoUriDef.TIME), whereToSearch));
 
             parseLatOrLon(parseResult, whereToSearch);
 
@@ -179,6 +179,21 @@ public class GeoUri {
         return null;
     }
 
+    /** infer name,time,link,symbol from textToBeAnalysed if not already set. */
+    public static GeoPointDto inferMissing(GeoPointDto parseResult, String textToBeAnalysed) {
+
+        if (textToBeAnalysed != null) {
+            ArrayList<String> whereToSearch = new ArrayList<String>();
+            whereToSearch.add(textToBeAnalysed);
+
+            parseResult.setName(parseFindFromPattern(patternName, parseResult.getName(), whereToSearch));
+            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parseResult.getTimeOfMeasurement(), null, whereToSearch));
+            parseResult.setLink(parseFindFromPattern(patternHref, parseResult.getLink(), whereToSearch));
+            parseResult.setSymbol(parseFindFromPattern(patternSrc, parseResult.getSymbol(), whereToSearch));
+        }
+        return parseResult;
+    }
+
     private static ArrayList<String> toStringArray(String[] whereToSearch) {
         ArrayList<String> arrayList = new ArrayList<String>();
         for (String candidate : whereToSearch) {
@@ -211,7 +226,7 @@ public class GeoUri {
 
     /** parsing helper: Get the first finding of pattern in whereToSearch if currentValue is not set yet.
      * Returns currentValue or content of first matching group of pattern. */
-    private String parseFindFromPattern(Pattern pattern, String currentValue, List<String> whereToSearch) {
+    private static String parseFindFromPattern(Pattern pattern, String currentValue, List<String> whereToSearch) {
         if ((currentValue == null) || (currentValue.length() == 0)) {
             Matcher m = parseFindWithPattern(pattern, whereToSearch);
             String found = (m != null) ? m.group(1) : null;
@@ -224,13 +239,13 @@ public class GeoUri {
 
     /** parsing helper: Get the first datetime finding in whereToSearch if currentValue is not set yet.
      * Returns currentValue or finding as Date . */
-    private Date parseTimeFromPattern(String currentValue, List<String> whereToSearch) {
-        String match = parseFindFromPattern(IsoDateTimeParser.ISO8601_FRACTIONAL_PATTERN, currentValue, whereToSearch);
+    private static Date parseTimeFromPattern(Date currentValue, String stringValue, List<String> whereToSearch) {
+        String match = parseFindFromPattern(IsoDateTimeParser.ISO8601_FRACTIONAL_PATTERN, stringValue, whereToSearch);
 
         if (match != null) {
             return IsoDateTimeParser.parse(match);
         }
-        return null;
+        return currentValue;
     }
 
     /** parsing helper: returns the match of the first finding of pattern in whereToSearch. */

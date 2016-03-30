@@ -22,9 +22,9 @@ this program. If not, see <http://www.gnu.org/licenses/>
     resources that shold NOT be localized
 -->
 <resources>
-    <string name="app_name">Location Map Viewer</string>
+    <string name="app_name" translatable="false">Location Map Viewer</string>
 
-<string name="about_content"><![CDATA[ <html><body>
+<string name="about_content" translatable="false"><![CDATA[ <html><body>
 <a href="http://github.com/k3b/LocationMapViewer/wiki"><b>LocationMapViewer</b></a><br/>Version $versionName$
 <br />
 <hr />

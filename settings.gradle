@@ -5,7 +5,10 @@
 // print "has internet " + isReachable
 
 // use official maven version of osmdroid-android
-include ':LocationMapViewer', ':k3b-geoHelper', ':geoIntentDemo', ':OSMBonusPack'
+// include ':LocationMapViewer', ':k3b-geoHelper', ':geoIntentDemo', ':OSMBonusPack'
 
 // for debug use local osmdroid-android
 // include ':LocationMapViewer', ':k3b-geoHelper', ':geoIntentDemo', ':OSMBonusPack', ':osmdroid-android'
+
+// use for remote build
+include ':LocationMapViewer', ':geoIntentDemo'

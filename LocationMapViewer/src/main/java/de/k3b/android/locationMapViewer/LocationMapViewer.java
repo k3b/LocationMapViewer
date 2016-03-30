@@ -244,7 +244,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         loadGeoPointDtosFromFile(intent, pointCollector);
         loadGeoPointDtosFromExtra(intent.getStringExtra("de.k3b.POIS"), pointCollector);
 
-        AbstractList<? extends Overlay> items = (mUseClusterPoints) ? mPOIOverlayCluster.getItems() : mPOIOverlayNonCluster.getItems();
+        List<? extends Overlay> items = (mUseClusterPoints) ? mPOIOverlayCluster.getItems() : mPOIOverlayNonCluster.getItems();
         final int zoom = (geoPointFromIntent != null) ? geoPointFromIntent.getZoomMin() : GeoPointDto.NO_ZOOM;
         this.mDelayedSetCenterZoom = (items.size() > 0) ? new DelayedSetCenterZoom(items, zoom) : null;
         if (items.size() == 0) {
@@ -929,7 +929,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         }
 
         /** calculate min/max from all Markers in all overlaysWithMarkers */
-        public DelayedSetCenterZoom(AbstractList<? extends Overlay> overlaysWithMarkers, int zoomLevel) {
+        public DelayedSetCenterZoom(List<? extends Overlay> overlaysWithMarkers, int zoomLevel) {
             if (overlaysWithMarkers.size() > 0) {
                 Marker first = (Marker) overlaysWithMarkers.get(0);
                 GeoPoint min = new GeoPoint(first.getPosition().clone());

@@ -26,7 +26,7 @@ android {
 }
 
 dependencies {
-    // compile project(':k3b-geoHelper')
+    // compile project(':geo:k3b-geoHelper')
 	compile 'com.github.k3b:k3b-geoHelper:v1.1.3'
 
     // androidTestCompile 'org.mod4j.org:junit:3.8.2'

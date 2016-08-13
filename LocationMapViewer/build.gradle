@@ -2,12 +2,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'maven'
 
 android {
-    compileSdkVersion 19
+    compileSdkVersion 23
     buildToolsVersion '23.0.2'
     defaultConfig {
         applicationId 'de.k3b.android.locationMapViewer'
         minSdkVersion 10
-        targetSdkVersion 19
+        targetSdkVersion 21
         // 0.2.2.150321 (2)
         // fdroid 06.5.2015 (3) versionName "0.3.3.150506"
         // fdroid 30.3.2016 (4) versionName "0.3.4.160330"

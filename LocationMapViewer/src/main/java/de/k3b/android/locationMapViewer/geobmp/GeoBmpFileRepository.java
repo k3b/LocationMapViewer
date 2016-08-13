@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import de.k3b.android.GeoUtil;
+import de.k3b.geo.api.IGeoRepository;
 import de.k3b.geo.io.GeoFileRepository;
 
 /**
@@ -83,11 +84,12 @@ public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDto> {
      * @return true if successful
      */
     @Override
-    public boolean delete(GeoBmpDto item) {
+    public IGeoRepository<GeoBmpDto> delete(GeoBmpDto item) {
         File file = getBmpFile(item);
         if (file != null) file.delete();
 
-        return super.delete(item);
+        super.delete(item);
+        return this;
     }
 
 

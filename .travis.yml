@@ -2,10 +2,17 @@
 language: android
 android:
   components:
-    - build-tools-22.0.1
+    - build-tools-23.0.2
     - android-19
     - add-on
     - extra
 
+before_install:
+# http://stackoverflow.com/questions/33820638/travis-yml-gradlew-permission-denied
+# must execute
+# git update-index --chmod=+x gradlew
+# instead of 
+# - chmod +x gradlew
+ 
 script:
-  - gradle assemble
+  - ./gradlew assemble

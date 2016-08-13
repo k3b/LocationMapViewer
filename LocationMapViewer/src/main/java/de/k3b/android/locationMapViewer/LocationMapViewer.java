@@ -44,22 +44,20 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.clustering.StaticCluster;
-import org.osmdroid.bonuspack.overlays.FolderOverlay;
-import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.util.ResourceProxyImpl;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlay;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.MinimapOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
@@ -127,10 +125,6 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
     private ItemizedOverlay<OverlayItem> mPointOfInterestOverlay;
     private MyLocationNewOverlay mLocationOverlay;
     private MinimapOverlay mMiniMapOverlay;
-    /**
-     * where images/icons are loaded from
-     */
-    private ResourceProxy mResourceProxy;
 
     /**
      * setCenterZoom does not work in onCreate() because getHeight() and getWidth() are not calculated yet and return 0;
@@ -191,8 +185,6 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         //Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
         mPoiIconWithData = getResources().getDrawable(R.drawable.marker_green);
         mPoiIconWithoutData = getResources().getDrawable(R.drawable.marker_no_data);
-
-        mResourceProxy = new ResourceProxyImpl(getApplicationContext());
 
         this.setContentView(R.layout.mapview);
 
@@ -535,8 +527,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
     }
 
     private void createMyLocationOverlay(List<Overlay> overlays) {
-        this.mLocationOverlay = new MyLocationNewOverlay(this, new GpsMyLocationProvider(this),
-                mMapView);
+        this.mLocationOverlay = new MyLocationNewOverlay(mMapView);
         overlays.add(this.mLocationOverlay);
         mLocationOverlay.enableMyLocation(); // could be made configurable through settings
     }

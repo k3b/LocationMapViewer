@@ -25,9 +25,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.osmdroid.bonuspack.overlays.Marker;
-import org.osmdroid.bonuspack.overlays.MarkerInfoWindow;
+//import org.osmdroid.bonuspack.overlays.Marker;
+//import org.osmdroid.bonuspack.overlays.MarkerInfoWindow;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 import de.k3b.geo.api.GeoPointDto;
 

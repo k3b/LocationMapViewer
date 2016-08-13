@@ -134,8 +134,7 @@ public class BookmarkListController {
     }
 
     public void deleteCurrent() {
-        if (repository.delete(currentItem)) {
-            reloadGuiFromRepository();
-        }
+        repository.delete(currentItem);
+        reloadGuiFromRepository();
     }
 }

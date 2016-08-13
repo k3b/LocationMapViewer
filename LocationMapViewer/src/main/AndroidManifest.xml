@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-* Copyright (C) 2015 k3b
+* Copyright (C) 2015-2016 k3b
 *
 * This file is part of de.k3b.android.LocationMapViewer (https://github.com/k3b/LocationMapViewer/) .
 *
@@ -174,24 +174,42 @@
 				<data android:scheme="google.navigation"/>
 			</intent-filter>
 
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<category android:name="android.intent.category.BROWSABLE"/>
-				<data
-					android:host="maps.google.com"
-					android:scheme="https"/>
-			</intent-filter>
+            <intent-filter>
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="maps.google.com" />
+                <data android:host="maps.google.de" />
+                <data android:host="www.openstreetmap.org" />
+                <data android:host="openstreetmap.org" />
 
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
-				<category android:name="android.intent.category.BROWSABLE"/>
-				<data
-					android:host="maps.google.com"
-					android:scheme="http"/>
-			</intent-filter>
+                <data android:host="maps.yandex.ru"  />
+                <data android:host="maps.yandex.com" />
+
+                <data android:host="here.com" />
+                <data android:host="www.here.com" />
+                <data android:host="share.here.com" />
+                <data android:host="goto.here.com" />
+                <data android:host="go.here.com" />
+                <data android:host="wego.here.com" />
+
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:pathPrefix="/maps"  />
+
+                <data android:host="www.yandex.ru"  />
+                <data android:host="www.yandex.com" />
+                <data android:host="www.google.com" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
         </activity>
+
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />

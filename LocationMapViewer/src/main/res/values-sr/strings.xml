@@ -19,7 +19,6 @@
 -->
 <resources>
     <!-- In Serbian Cyrillic translation app_name alos must be localized (translated or, if name represents a trademark, transcribed) -->
-    <string name="app_name">Прегледач локација</string>
 
     <string name="label_select">У реду</string>
     <string name="cancel">Одустани</string>

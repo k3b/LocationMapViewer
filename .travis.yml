@@ -1,0 +1,22 @@
+# travis build for LocationMapViewer
+language: android
+android:
+  components:
+    # https://github.com/travis-ci/travis-ci/issues/5036
+    - tools
+
+    - build-tools-23.0.2
+    - android-23
+
+    - add-on
+    - extra
+
+before_install:
+# http://stackoverflow.com/questions/33820638/travis-yml-gradlew-permission-denied
+# must execute
+# git update-index --chmod=+x gradlew
+# instead of 
+# - chmod +x gradlew
+ 
+script:
+  - ./gradlew assemble

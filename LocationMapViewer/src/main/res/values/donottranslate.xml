@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2014 k3b
+Copyright (C) 2014-2016 k3b
 
 This file is part of de.k3b.android.toGoZip (https://github.com/k3b/ToGoZip/)
 
@@ -22,15 +22,15 @@ this program. If not, see <http://www.gnu.org/licenses/>
     resources that shold NOT be localized
 -->
 <resources>
-    <string name="app_name">Location Map Viewer</string>
+    <string name="app_name" translatable="false">Location Map Viewer</string>
 
-<string name="about_content"><![CDATA[ <html><body>
+<string name="about_content" translatable="false"><![CDATA[ <html><body>
 <a href="http://github.com/k3b/LocationMapViewer/wiki"><b>LocationMapViewer</b></a><br/>Version $versionName$
 <br />
 <hr />
 $about$
 <hr />
-<p> Minimal requirements: Android 2.1 (Eclair, API 7), 
+<p> Minimal requirements: Android 3.0 (API 10, required by osmbonuspack library),
 internet/wifi-connection to download geodata and a SD-Card to cache 
 geodata<br />
 <br />
@@ -63,27 +63,43 @@ plug-in/device-driver through an Intent interface or through html-a-href-links. 
  href="http://tools.ietf.org/html/draft-mayrhofer-geo-uri-00">geo
 uri</a>
     <ul>
-      <li> <a href="geo:0,0?q=53.0,8.0(Hello)">geo:0,0?q=53.0,8.0(Hello)</a>
+      <li> <a href="geo:0,0?q=52.3773,9.7255(Hannover)">geo:0,0?q=52.3773,9.7255(Hannover)</a>
         <ul>
-          <li> displays "hello" at the location lat=53.0 north
-and lon= 8.0 east </li>
-		  <li>in html you can use &lt;a href=&quot;geo:0,0?q=53.0,8.0(Hello)&quot;&gt;geo:0,0?q=53.0,8.0(Hello)&lt;/a&gt;</li>
+          <li> displays "Hannover" at the location lat=52.3773 north
+and lon= 9.7255 east </li>
+		  <li>in html you can use &lt;a href=&quot;geo:0,0?q=52.3773,9.7255(Hannover)&quot;&gt;geo:0,0?q=52.3773,9.7255(Hannover)&lt;/a&gt;</li>
           <li>This format is compatible with google-maps for android.</li>
         </ul>
       </li>
-      <li> <a href="geo:53.0,8.0?q=(Hello)">geo:53.0,8.0?q=(Hello)</a>
+      <li> <a href="geo:52.3773,9.7255?q=(Hannover)">geo:52.3773,9.7255?q=(Hannover)</a>
         <ul>
-          <li> displays "hello" at the location lat=53.0 north
-and lon= 8.0 east </li>
+          <li> displays "Hannover" at the location lat=52.3773 north
+and lon= 9.7255 east </li>
           <li>This format is <b>not</b> compatible with google-maps for android.</li>
         </ul>
       </li>
-      <li> <a href="geo:53.0,8.0?z=6">geo:53.0,8.0?z=6</a>
+      <li> <a href="geo:52.3773,9.7255?z=6">geo:52.3773,9.7255?z=6</a>
         <ul>
           <li> displays a pin at the location using zoomlevel "6"
           </li>
         </ul>
       </li>
+      <li> <a href="http://maps.google.com/maps?q=loc:52.3773,9.7255(Hannover)">http://maps.google.com/maps?q=loc:52.3773,9.7255(Hannover)</a></li>
+      <li> <a href="https://maps.google.de/maps?q=loc:52.3773,9.7255(Hannover)">https://maps.google.de/maps?q=loc:52.3773,9.7255(Hannover)</a></li>
+      <li> <a href="https://maps.google.com/?ll=52.3773,9.7255&z=6">https://maps.google.com/?ll=52.3773,9.7255&amp;z=6</a></li>
+      <li> <a href="https://www.google.com/maps/@52.3773,9.7255,6z">https://www.google.com/maps/@52.3773,9.7255,6z</a></li>
+      <li> <a href="http://maps.google.com/maps?q=N52.3773,E9.7255">http://maps.google.com/maps?q=N52.3773,E9.7255</a></li>
+      <li> <a href="https://www.openstreetmap.org/?#map=6/52.3773/9.7255">https://www.openstreetmap.org/?#map=6/52.3773/9.7255</a></li>
+      <li> <a href="https://www.openstreetmap.org/#map=6/52.3773/9.7255">https://www.openstreetmap.org/#map=6/52.3773/9.7255</a></li>
+      <li> <a href="https://www.openstreetmap.org/#6/52.3773/9.7255">https://www.openstreetmap.org/#6/52.3773/9.7255</a></li>
+      <li> <a href="https://wego.here.com/?map=52.3773,9.7255,6">https://wego.here.com/?map=52.3773,9.7255,6</a></li>
+      <li> <a href="https://www.here.com/?map=52.3773,9.7255,6">https://www.here.com/?map=52.3773,9.7255,6</a></li>
+      <li> <a href="https://share.here.com/52.3773,9.7255,6">https://share.here.com/52.3773,9.7255,6</a></li>
+      <li> <a href="https://www.yandex.com/maps?ll=9.7255,52.3773&z=6">https://www.yandex.com/maps?ll=9.7255,52.3773&amp;z=6</a></li>
+      <li> <a href="https://www.yandex.ru/maps/?ll=9.7255,52.3773&z=6">https://www.yandex.ru/maps/?ll=9.7255,52.3773&amp;z=6</a></li>
+      <li> <a href="https://maps.yandex.com?ll=9.7255,52.3773&z=6">https://www.yandex.com/maps?ll=9.7255,52.3773&amp;z=6</a></li>
+      <li> <a href="https://maps.yandex.ru?ll=9.7255,52.3773&z=6">https://www.yandex.ru/maps?ll=9.7255,52.3773&amp;z=6</a></li>
+
     </ul>
   </li>
   <li> uri=file:/path/to/waypoints.gpx
@@ -146,7 +162,7 @@ Initial Version v0.2.1.150116<br />
 <h2>Legal stuff</h2>
 <b>LocationMapViewer</b>&nbsp;<br />
 &nbsp;<br />
-Copyright (c) 2014-2015 by k3b<br />
+Copyright (c) 2014-2016 by k3b<br />
 Licensed under GPL, Version 3.0 or later.<br />
 <br />
 Android is a trademark of Google Inc. Use of this trademark is subject 

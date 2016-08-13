@@ -1,14 +1,19 @@
 apply plugin: 'com.android.application'
+apply plugin: 'maven'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '22.0.1'
+    compileSdkVersion 23
+    buildToolsVersion '23.0.2'
     defaultConfig {
         applicationId 'de.k3b.android.locationMapViewer'
-        minSdkVersion 7
-        targetSdkVersion 19
-        versionCode 3
-        versionName "0.3.3.150506"
+        minSdkVersion 10
+        targetSdkVersion 21
+        // 0.2.2.150321 (2)
+        // fdroid 06.5.2015 (3) versionName "0.3.3.150506"
+        // fdroid 30.3.2016 (4) versionName "0.3.4.160330"
+        // fdroid 13.8.2016 (5) versionName "0.3.5.160813"
+        versionName "0.3.5.160813"
+        versionCode 5
     }
     buildTypes {
         release {
@@ -25,15 +30,22 @@ android {
 }
 
 dependencies {
+    // compile project(':geo:k3b-geoHelper')
+    compile 'com.github.k3b:k3b-geoHelper:1.1.5'
+
     // androidTestCompile 'org.mod4j.org:junit:3.8.2'
     compile fileTree(dir: 'libs', include: ['*.jar'])
+	
     // required by osmdroid
     compile 'com.android.support:support-v4:21.0.2'
     // this is osmdroid
     // compile project(':osmdroid-android') // local copy
-    compile 'org.osmdroid:osmdroid-android:4.2'
+    compile 'org.osmdroid:osmdroid-android:5.2'
     // non local copy from repositories
-    compile project(':OSMBonusPack')
+	
+    // compile project(':OSMBonusPack')
+	compile 'com.github.MKergall.osmbonuspack:OSMBonusPack:v5.8.1'
+
     // local copy
     compile 'org.slf4j:slf4j-api:1.7.7@jar'
     // include if you want to see debug/trace logmessages
@@ -41,5 +53,4 @@ dependencies {
     // only error and warn
     compile 'eu.lp0.slf4j:slf4j-android:1.7.7-1@jar'
     // if you want to see debug traces, too. requires config file
-    compile project(':k3b-geoHelper')
 }

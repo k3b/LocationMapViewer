@@ -8,7 +8,7 @@ Other Android apps can use LocationMapViewer through an Intent interface
 (see [GeoIntentDemo.java](https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/main/java/de/k3b/android/locationMapViewer/demo/GeoIntentDemoActivity.java) )
 or through html links like &lt;a href=&quot;geo:0,0?q=53.0,8.0(Hello)&quot;&gt;geo:0,0?q=53.0,8.0(Hello)&lt;/a&gt;<br/>
 
-Minimal requirements: Android 2.1 (Eclair, API 7), internet/wifi-connection to download geodata and a SD-Card to cache geodata<br/>
+Minimal requirements: Android 2.3.7 (API 10), internet/wifi-connection to download geodata and a SD-Card to cache geodata<br/>
 
 Licence: [GPLv3](http://www.gnu.org/licenses/gpl-3.0)<br/>
 

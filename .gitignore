@@ -42,3 +42,5 @@ build/
 
 /osmdroid-third-party/libs/maps.jar
 /osmdroid-android
+/download
+/.deleted

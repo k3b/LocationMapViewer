@@ -259,8 +259,8 @@ This field is used to define
 * a [point-of-interest](data#marker) as the link button in the [map's bubble](map#bubble).
 
 ### <a name='s'>s=symbol : symbol-id or url pointing to a symbol, preview-image, icon</a>
-* [geo:](data#geo)...&link=http://link/to/some/image.png&...
-* [&lt;poi](data#poi) link='file://sdcard/copy/test.jpg' ... />
+* [geo:](data#geo)...&s=http://link/to/some/image.png&...
+* [&lt;poi](data#poi) s='file://sdcard/copy/test.jpg' ... />
 
 any kind of url is possible.
 

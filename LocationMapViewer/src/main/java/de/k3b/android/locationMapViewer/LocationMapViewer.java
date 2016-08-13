@@ -44,22 +44,20 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.clustering.StaticCluster;
-import org.osmdroid.bonuspack.overlays.FolderOverlay;
-import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.util.ResourceProxyImpl;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlay;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.MinimapOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
@@ -81,6 +79,8 @@ import de.k3b.android.locationMapViewer.constants.Constants;
 import de.k3b.android.locationMapViewer.geobmp.BookmarkListOverlay;
 import de.k3b.android.locationMapViewer.geobmp.BookmarkUtil;
 import de.k3b.android.locationMapViewer.geobmp.GeoBmpDto;
+import de.k3b.android.osmdroid.GuestureOverlay;
+import de.k3b.android.osmdroid.ZoomUtil;
 import de.k3b.android.widgets.AboutDialogPreference;
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
@@ -125,10 +125,6 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
     private ItemizedOverlay<OverlayItem> mPointOfInterestOverlay;
     private MyLocationNewOverlay mLocationOverlay;
     private MinimapOverlay mMiniMapOverlay;
-    /**
-     * where images/icons are loaded from
-     */
-    private ResourceProxy mResourceProxy;
 
     /**
      * setCenterZoom does not work in onCreate() because getHeight() and getWidth() are not calculated yet and return 0;
@@ -173,7 +169,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
 
         GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
 
-        mUsePicker = (Intent.ACTION_PICK.equals(intent.getAction()));
+        mUsePicker = ((Intent.ACTION_PICK.equals(intent.getAction())) || (Intent.ACTION_GET_CONTENT.equals(intent.getAction())));
 
         String extraTitle = intent.getStringExtra(Intent.EXTRA_TITLE);
         if (extraTitle == null && (geoPointFromIntent == null)) {
@@ -189,8 +185,6 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         //Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
         mPoiIconWithData = getResources().getDrawable(R.drawable.marker_green);
         mPoiIconWithoutData = getResources().getDrawable(R.drawable.marker_no_data);
-
-        mResourceProxy = new ResourceProxyImpl(getApplicationContext());
 
         this.setContentView(R.layout.mapview);
 
@@ -242,7 +236,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         loadGeoPointDtosFromFile(intent, pointCollector);
         loadGeoPointDtosFromExtra(intent.getStringExtra("de.k3b.POIS"), pointCollector);
 
-        AbstractList<? extends Overlay> items = (mUseClusterPoints) ? mPOIOverlayCluster.getItems() : mPOIOverlayNonCluster.getItems();
+        List<? extends Overlay> items = (mUseClusterPoints) ? mPOIOverlayCluster.getItems() : mPOIOverlayNonCluster.getItems();
         final int zoom = (geoPointFromIntent != null) ? geoPointFromIntent.getZoomMin() : GeoPointDto.NO_ZOOM;
         this.mDelayedSetCenterZoom = (items.size() > 0) ? new DelayedSetCenterZoom(items, zoom) : null;
         if (items.size() == 0) {
@@ -406,7 +400,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         poiMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         poiMarker.setPosition(toOsmGeoPoint(aGeoPoint));
 
-        if (BookmarkUtil.isNotEmpty(description) || BookmarkUtil.isNotEmpty(aGeoPoint.getLink())) {
+        if (BookmarkUtil.isNotEmpty(description) || BookmarkUtil.isNotEmpty(aGeoPoint.getLink()) || BookmarkUtil.isNotEmpty(aGeoPoint.getName())) {
             poiMarker.setIcon(mPoiIconWithData);
             // 7.
             poiMarker.setInfoWindow(new GeoPointMarkerInfoWindow(map));
@@ -533,8 +527,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
     }
 
     private void createMyLocationOverlay(List<Overlay> overlays) {
-        this.mLocationOverlay = new MyLocationNewOverlay(this, new GpsMyLocationProvider(this),
-                mMapView);
+        this.mLocationOverlay = new MyLocationNewOverlay(mMapView);
         overlays.add(this.mLocationOverlay);
         mLocationOverlay.enableMyLocation(); // could be made configurable through settings
     }
@@ -743,7 +736,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         return false;
     }
 
-    /** implements interface BookmarkListOverlay.AdditionalPoints() */
+    /** implements interface BookmarkListOverlay.AdditionalPoints */
     public GeoBmpDto[] getAdditionalPoints() {
         GeoPoint gps = (this.mLocationOverlay != null) ? this.mLocationOverlay.getMyLocation() : null;
 
@@ -927,7 +920,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         }
 
         /** calculate min/max from all Markers in all overlaysWithMarkers */
-        public DelayedSetCenterZoom(AbstractList<? extends Overlay> overlaysWithMarkers, int zoomLevel) {
+        public DelayedSetCenterZoom(List<? extends Overlay> overlaysWithMarkers, int zoomLevel) {
             if (overlaysWithMarkers.size() > 0) {
                 Marker first = (Marker) overlaysWithMarkers.get(0);
                 GeoPoint min = new GeoPoint(first.getPosition().clone());

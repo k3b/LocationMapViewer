@@ -30,7 +30,7 @@ this program. If not, see <http://www.gnu.org/licenses/>
 <hr />
 $about$
 <hr />
-<p> Minimal requirements: Android 3.0 (API 10, required by osmbonuspack library),
+<p> Minimal requirements: Android 2.3.7 (API 10, required by osmbonuspack library),
 internet/wifi-connection to download geodata and a SD-Card to cache 
 geodata<br />
 <br />

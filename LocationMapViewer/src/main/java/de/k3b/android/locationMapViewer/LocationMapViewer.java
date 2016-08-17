@@ -51,6 +51,7 @@ import org.osmdroid.bonuspack.clustering.StaticCluster;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -164,6 +165,10 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //https://github.com/osmdroid/osmdroid/issues/366
+        //super important. Many tile servers, including open street maps, will BAN applications by user
+        OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
+
         super.onCreate(savedInstanceState);
         Intent intent = this.getIntent();
 

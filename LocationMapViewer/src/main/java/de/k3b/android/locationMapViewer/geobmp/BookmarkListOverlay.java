@@ -188,16 +188,18 @@ public class BookmarkListOverlay implements IGeoInfoHandler, Constants {
     }
 
     public void showGeoPointEditDialog(GeoBmpDto geoPointInfo) {
-        if (this.edit == null) {
-            this.edit = new GeoBmpEditDialog(this.context, this, R.layout.geobmp_edit_name);
-            this.edit.setTitle(context.getString(R.string.title_bookmark_edit));
-        }
+        if (geoPointInfo != null) {
+            if (this.edit == null) {
+                this.edit = new GeoBmpEditDialog(this.context, this, R.layout.geobmp_edit_name);
+                this.edit.setTitle(context.getString(R.string.title_bookmark_edit));
+            }
 
-        if (!BookmarkUtil.isBookmark(geoPointInfo)) {
-            geoPointInfo = BookmarkUtil.createBookmark(geoPointInfo);
+            if (!BookmarkUtil.isBookmark(geoPointInfo)) {
+                geoPointInfo = BookmarkUtil.createBookmark(geoPointInfo);
+            }
+            this.edit.onGeoInfo(geoPointInfo);
+            this.context.showDialog(EDIT_MENU_ID);
         }
-        this.edit.onGeoInfo(geoPointInfo);
-        this.context.showDialog(EDIT_MENU_ID);
     }
 
     public Dialog onCreateDialog(final int id) {

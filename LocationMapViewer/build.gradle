@@ -12,8 +12,9 @@ android {
         // fdroid 06.5.2015 (3) versionName "0.3.3.150506"
         // fdroid 30.3.2016 (4) versionName "0.3.4.160330"
         // fdroid 13.8.2016 (5) versionName "0.3.5.160813"
-        versionName "0.3.5.160813"
-        versionCode 5
+        // fdroid 13.8.2016 (6) versionName "0.3.5.170911"
+        versionName "0.3.5.170911"
+        versionCode 6
     }
     buildTypes {
         release {

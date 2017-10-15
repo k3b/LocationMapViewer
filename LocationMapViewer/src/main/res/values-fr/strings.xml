@@ -42,7 +42,7 @@
  supporte les fichiers <strong>gpx</strong>, <strong>kml</strong>
  et <strong>geo-uri-s</strong> et elle peut fonctionner hors-ligne
  (sans internet/wifi) une fois que les géodonnées ont été téléchargées et mises en cache. </p>
-<p> D'autres applications Android peuvent utiliser LocationMapViewer à travers une
+<p> D\'autres applications Android peuvent utiliser LocationMapViewer à travers une
  interface dédiée (voir <a
 href="https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/main/java/de/k3b/android/locationMapViewer/demo/GeoIntentDemoActivity.java">
  GeoIntentDemo.java</a>) ou au travers de liens html semblables à <a href="geo:0,0?q=53.0,8.0(Hello)">geo:0,0?q=53.0,8.0(Hello)</a>
@@ -62,7 +62,8 @@ href="https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/mai
     <string name="title_close">Fermer</string>
 
     <string name="title_confirm_delete">"Confirmer la suppression "</string>
-    <string name="format_question_delete">"Êtes-vous sûr de vouloir supprimer définitivement \n\n %1$s ? \n\n Ce n'est PAS réversible.</string>
+    <string name="format_question_delete">"Êtes-vous sûr de vouloir supprimer définitivement \n\n %1$s ? \n\n Ce n
+        est PAS réversible.</string>
     <string name="cmd_yes">Oui</string>
     <string name="cmd_no">Non</string>
     <string name="bookmark_template_current">[Fenêtre actuelle] </string>

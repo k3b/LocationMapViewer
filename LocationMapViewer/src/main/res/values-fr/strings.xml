@@ -62,8 +62,7 @@ href="https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/mai
     <string name="title_close">Fermer</string>
 
     <string name="title_confirm_delete">"Confirmer la suppression "</string>
-    <string name="format_question_delete">"Êtes-vous sûr de vouloir supprimer définitivement \n\n %1$s ? \n\n Ce n
-        est PAS réversible.</string>
+    <string name="format_question_delete">"Êtes-vous sûr de vouloir supprimer définitivement \n\n %1$s ? \n\n Ce n\'est PAS réversible.</string>
     <string name="cmd_yes">Oui</string>
     <string name="cmd_no">Non</string>
     <string name="bookmark_template_current">[Fenêtre actuelle] </string>

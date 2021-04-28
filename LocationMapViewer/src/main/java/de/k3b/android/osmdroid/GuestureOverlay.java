@@ -22,11 +22,12 @@ package de.k3b.android.osmdroid;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Point;
+import android.graphics.PointF;
 import android.view.MotionEvent;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.Projection;
 
@@ -42,9 +43,8 @@ import de.k3b.android.locationMapViewer.R;
  * Created by k3b on 10.02.2015.
  */
 public class GuestureOverlay extends OverlayDebug {
-    private Point mStart = null;
-    private Point mEnd = null;
-    // private Rect mRect = null;
+    private PointF mStart = null;
+    private PointF mEnd = null;
     private boolean mRectVisible = false;
     private Paint mPaint;
     private int colorDragTo;
@@ -65,8 +65,8 @@ public class GuestureOverlay extends OverlayDebug {
             switch (ev.getAction() & MotionEvent.ACTION_MASK) {
                 case MotionEvent.ACTION_DOWN:
                     startRecordClipboard();
-                    this.mStart = new Point((int) ev.getX(), (int) ev.getY());
-                    this.mEnd = new Point();
+                    this.mStart = new PointF(ev.getX(), ev.getY());
+                    this.mEnd = new PointF();
                     this.mPaint = new Paint();
                     this.mPaint.setColor(colorDragTo);
                     this.mPaint.setStrokeWidth(3);
@@ -105,31 +105,27 @@ public class GuestureOverlay extends OverlayDebug {
         final Projection projection = mapView.getProjection();
         IMapController controller = mapView.getController();
         if (ddragMode) {
-            IGeoPoint start = projection.fromPixels(this.mStart.x, this.mStart.y);
-            IGeoPoint end = projection.fromPixels(this.mEnd.x, this.mEnd.y);
+
+            IGeoPoint start = new GeoPoint(this.mStart.x, this.mStart.y);
+            IGeoPoint end = new GeoPoint(this.mEnd.x, this.mEnd.y);
             ZoomUtil.zoomTo(mapView, ZoomUtil.NO_ZOOM, start, end);
             if (isDebugEnabled()) debug("zoom(ddrag mode)", start, "..", end,
-                    "=>", mapView.getMapCenter(), "z=", mapView.getZoomLevel());
+                    "=>", mapView.getMapCenter(), "z=", mapView.getZoomLevelDouble());
         } else {
-            IGeoPoint center = projection.fromPixels(this.mStart.x, this.mStart.y);
+            IGeoPoint center = new GeoPoint(this.mStart.x, this.mStart.y);
             controller.setCenter(center);
             controller.zoomIn();
             if (isDebugEnabled()) debug("zoom(to center of)", center,
-                    "=>", mapView.getMapCenter(), "z=", mapView.getZoomLevel());
+                    "=>", mapView.getMapCenter(), "z=", mapView.getZoomLevelDouble());
         }
     }
 
     private boolean setEndPoint(String context, MotionEvent ev, MapView mapView) {
-        int x = (int) ev.getX();
-        int y = (int) ev.getY();
+        float x = ev.getX();
+        float y =  ev.getY();
 
-        int dx = Math.abs(mStart.x - x);
-        int dy = Math.abs(mStart.y - y);
-        /*
-        final int minX = Math.min(mStart.x, x);
-        final int minY = Math.min(mStart.y, y);
-        this.mRect.set(minX, minY,minX + dx,minY + dy);
-        */
+        double dx = Math.abs(mStart.x - x);
+        double dy = Math.abs(mStart.y - y);
         this.mRectVisible = (dx > 10) || (dy > 10);
         this.mEnd.set(x,y);
         if (mRectVisible && isDebugEnabled()) debug(context,this, ev);
@@ -148,7 +144,7 @@ public class GuestureOverlay extends OverlayDebug {
     */
 
     @Override
-    protected void draw(Canvas c, MapView mapView, boolean shadow) {
+    public void draw(Canvas c, MapView mapView, boolean shadow) {
         super.draw(c, mapView, shadow);
         if ((!shadow) && (this.mRectVisible)) {
             drawBorder(c , this.mStart.x, this.mStart.y, this.mEnd.x, mEnd.y);
@@ -156,7 +152,7 @@ public class GuestureOverlay extends OverlayDebug {
         }
     }
 
-    private void drawBorder(Canvas c, int x1, int y1, int x2, int y2) {
+    private void drawBorder(Canvas c, float x1, float y1, float x2, float y2) {
         c.drawLine(x1, y1, x2, y1, this.mPaint);
         c.drawLine(x2, y1, x2, y2, this.mPaint);
         c.drawLine(x2, y2, x1, y2, this.mPaint);

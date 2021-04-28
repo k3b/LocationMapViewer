@@ -48,13 +48,14 @@ import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.clustering.StaticCluster;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
-import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.util.TileSystem;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlay;
@@ -62,7 +63,6 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.MinimapOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +71,6 @@ import org.xml.sax.InputSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,7 +88,6 @@ import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.GeoUri;
 import de.k3b.geo.io.gpx.GeoXmlOrTextParser;
 import de.k3b.geo.io.gpx.GpxReaderBase;
-import microsoft.mappoint.TileSystem;
 
 /**
  * An app that can display geografic info in a map for Android 2.1 (Eclair, API 7) .<br/>
@@ -167,7 +165,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
     protected void onCreate(Bundle savedInstanceState) {
         //https://github.com/osmdroid/osmdroid/issues/366
         //super important. Many tile servers, including open street maps, will BAN applications by user
-        OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
+        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
 
         super.onCreate(savedInstanceState);
         Intent intent = this.getIntent();
@@ -361,7 +359,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
 
         mZoomBar = (SeekBar) findViewById(R.id.zoomBar);
 
-        mZoomBar.setMax(mMapView.getMaxZoomLevel() - mMapView.getMinZoomLevel());
+        mZoomBar.setMax((int) (mMapView.getMaxZoomLevel() - mMapView.getMinZoomLevel()));
         mZoomBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -388,7 +386,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
 
             @Override
             public boolean onZoom(ZoomEvent event) {
-                mZoomBar.setProgress(mMapView.getZoomLevel());
+                mZoomBar.setProgress((int) mMapView.getZoomLevelDouble());
                 return false;
             }
         });
@@ -564,9 +562,9 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
 
     private void saveLastXYZ() {
         final SharedPreferences.Editor edit = mPrefs.edit();
-        edit.putInt(PREFS_SCROLL_X, mMapView.getScrollX());
-        edit.putInt(PREFS_SCROLL_Y, mMapView.getScrollY());
-        edit.putInt(PREFS_ZOOM_LEVEL, mMapView.getZoomLevel());
+        edit.putFloat(PREFS_SCROLL_X, mMapView.getScrollX());
+        edit.putFloat(PREFS_SCROLL_Y, mMapView.getScrollY());
+        edit.putFloat(PREFS_ZOOM_LEVEL, (float) mMapView.getZoomLevelDouble());
         edit.commit();
         if (logger.isDebugEnabled()) {
             logger.debug("saved LastXYZ:" + getStatusForDebug());
@@ -578,9 +576,10 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
             StringBuilder result = new StringBuilder();
             final int scrollX = mMapView.getScrollX();
             final int scrollY = mMapView.getScrollY();
-            final int zoomLevel = mMapView.getZoomLevel();
-            GeoPoint geoPoint = TileSystem.PixelXYToLatLong(scrollX, scrollY, zoomLevel, null);
-            GeoPoint geoPointLR = TileSystem.PixelXYToLatLong(scrollX + this.mMapView.getWidth(), scrollY + this.mMapView.getHeight(), zoomLevel, null);
+            final int zoomLevel = (int) mMapView.getZoomLevelDouble();
+
+            GeoPoint geoPoint = MapView.getTileSystem().getGeoFromMercator(scrollX, scrollY, TileSystem.MapSize(zoomLevel), null, true, true);
+            GeoPoint geoPointLR = MapView.getTileSystem().getGeoFromMercator(scrollX + this.mMapView.getWidth(), scrollY + this.mMapView.getHeight(), TileSystem.MapSize(zoomLevel), null, true, true);
             result.append("Current scrollXYZ:")
                     .append(scrollX).append("/").append(scrollY).append("/").append(zoomLevel)
                     .append("; screen w/h:").append(this.mMapView.getWidth()).append("/").append(this.mMapView.getHeight())
@@ -632,14 +631,14 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
     }
 
     private void RestoreXYZ() {
-        final int zoom = mPrefs.getInt(PREFS_ZOOM_LEVEL, 3);
-        final int scrollX = mPrefs.getInt(PREFS_SCROLL_X, 0);
-        final int scrollY = mPrefs.getInt(PREFS_SCROLL_Y, 0);
+        final float zoom = mPrefs.getFloat(PREFS_ZOOM_LEVEL, 3);
+        final float scrollX = mPrefs.getFloat(PREFS_SCROLL_X, 0);
+        final float scrollY = mPrefs.getFloat(PREFS_SCROLL_Y, 0);
 
         final IMapController controller = mMapView.getController();
-        controller.setZoom(mPrefs.getInt(PREFS_ZOOM_LEVEL, zoom));
+        controller.setZoom(mPrefs.getFloat(PREFS_ZOOM_LEVEL, zoom));
 
-        mMapView.scrollTo(scrollX, scrollY);
+        mMapView.scrollTo((int) scrollX, (int) scrollY);
         if (logger.isDebugEnabled()) {
             logger.debug("onResume loaded lastXYZ:" + scrollX + "/" + scrollY + "/" + zoom + " => "
                     + getStatusForDebug());
@@ -730,7 +729,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
                 final IGeoPoint mapCenter = mMapView.getMapCenter();
 
                 final SharedPreferences.Editor edit = mPrefs.edit();
-                edit.putString(PREFS_CURRENT_ZOOMLEVEL, "" + mMapView.getZoomLevel());
+                edit.putString(PREFS_CURRENT_ZOOMLEVEL, "" + (int) mMapView.getZoomLevelDouble());
                 edit.putString(PREFS_CURRENT_NORTH, LAT_LON2TEXT.format(mapCenter.getLatitude()));
                 edit.putString(PREFS_CURRENT_EAST, LAT_LON2TEXT.format(mapCenter.getLongitude()));
                 edit.commit();
@@ -759,7 +758,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
 
     private GeoBmpDto getCurrentAsGeoPointDto(String name) {
         GeoBmpDto current = new GeoBmpDto();
-        GeoUtil.createBookmark(this.mMapView.getMapCenter(), this.mMapView.getZoomLevel(), name, current);
+        GeoUtil.createBookmark(this.mMapView.getMapCenter(), (int) this.mMapView.getZoomLevelDouble(), name, current);
         current.setBitmap(GeoUtil.createBitmapFromMapView(mMapView, GeoBmpDto.WIDTH, GeoBmpDto.HEIGHT));
         return current;
     }
@@ -812,7 +811,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         if (newZoomString.length() > 0) {
             try {
                 int newZoom = Integer.parseInt(mPrefs.getString(PREFS_CURRENT_ZOOMLEVEL, "-1"));
-                if ((newZoom != -1) && (newZoom != mMapView.getZoomLevel())) {
+                if ((newZoom != -1) && (newZoom != (int) mMapView.getZoomLevelDouble())) {
                     setDelayedZoom(newZoom);
                     return 1;
                 }
@@ -901,7 +900,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
 
         /** zoomLevel, where the delayed setZoom schould go.  GeoPointDto.NO_ZOOM with set mMin and mMax: calculate from mMin,mMax.
          * GeoPointDto.NO_ZOOM without mMax: do not zoom. */
-        private int mZoomLevel = GeoPointDto.NO_ZOOM;
+        private double mZoomLevel = GeoPointDto.NO_ZOOM;
 
         DelayedSetCenterZoom() {}
 
@@ -963,17 +962,17 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
 
         /** Helper to find min/max in a range */
         private void getMinMax(GeoPoint resultMin, GeoPoint resultMax, IGeoPoint candidate) {
-            if (resultMin.getLatitudeE6() > candidate.getLatitudeE6()) {
-                resultMin.setLatitudeE6(candidate.getLatitudeE6());
+            if (resultMin.getLatitude() > candidate.getLatitude()) {
+                resultMin.setLatitude(candidate.getLatitude());
             }
-            if (resultMin.getLongitudeE6() > candidate.getLongitudeE6()) {
-                resultMin.setLongitudeE6(candidate.getLongitudeE6());
+            if (resultMin.getLongitude() > candidate.getLongitude()) {
+                resultMin.setLongitude(candidate.getLongitude());
             }
-            if (resultMax.getLatitudeE6() < candidate.getLatitudeE6()) {
-                resultMax.setLatitudeE6(candidate.getLatitudeE6());
+            if (resultMax.getLatitude() < candidate.getLatitude()) {
+                resultMax.setLatitude(candidate.getLatitude());
             }
-            if (resultMax.getLongitudeE6() < candidate.getLongitudeE6()) {
-                resultMax.setLongitudeE6(candidate.getLongitudeE6());
+            if (resultMax.getLongitude() < candidate.getLongitude()) {
+                resultMax.setLongitude(candidate.getLongitude());
             }
         }
 
@@ -984,7 +983,7 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
             if (logger.isDebugEnabled()) {
                 logger.debug("DelayedSetCenterZoom.execute({}: ({}) .. ({}),z={}) => ({}), z={} => {}",
                         debugContext,
-                        mMin, mMax, mZoomLevel, mapView.getMapCenter(), mapView.getZoomLevel(), getStatusForDebug());
+                        mMin, mMax, mZoomLevel, mapView.getMapCenter(), (int) mapView.getZoomLevelDouble(), getStatusForDebug());
             }
         }
 

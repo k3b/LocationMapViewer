@@ -26,6 +26,7 @@ import android.view.MotionEvent;
 import android.widget.Toast;
 
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.Projection;
 import org.osmdroid.views.overlay.Overlay;
 
 import de.k3b.android.widgets.Clipboard;
@@ -57,7 +58,7 @@ public class OverlayDebug extends Overlay {
     }
 
     @Override
-    protected void draw(Canvas c, MapView mapView, boolean shadow) {
+    public void draw(Canvas pCanvas, Projection pProjection) {
     }
 
     @Override

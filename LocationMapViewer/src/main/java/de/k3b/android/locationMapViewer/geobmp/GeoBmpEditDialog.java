@@ -19,6 +19,7 @@
 
 package de.k3b.android.locationMapViewer.geobmp;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.view.View;
@@ -46,8 +47,9 @@ public class GeoBmpEditDialog extends Dialog implements IGeoInfoHandler, IViewHo
         super(context);
         this.dialogResultConsumer = dialogResultConsumer;
         this.setContentView(layoutID); // R.layout.geobmp_edit);
-        this.buttonSave = (Button) this.findViewById(R.id.cmd_save);
-        this.buttonCancel = (Button) this.findViewById(R.id.cmd_cancel);
+
+        this.buttonSave = this.findViewById(R.id.cmd_save);
+        this.buttonCancel = this.findViewById(R.id.cmd_cancel);
 
         this.buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override

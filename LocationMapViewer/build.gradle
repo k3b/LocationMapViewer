@@ -2,19 +2,18 @@ apply plugin: 'com.android.application'
 apply plugin: 'maven'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+    compileSdkVersion 29
     defaultConfig {
         applicationId 'de.k3b.android.locationMapViewer'
-        minSdkVersion 10
-        targetSdkVersion 21
+        minSdkVersion 16
+        targetSdkVersion 23
         // 0.2.2.150321 (2)
         // fdroid 06.5.2015 (3) versionName "0.3.3.150506"
         // fdroid 30.3.2016 (4) versionName "0.3.4.160330"
         // fdroid 13.8.2016 (5) versionName "0.3.5.160813"
         // fdroid 13.8.2016 (6) versionName "0.3.5.170911"
-        versionName "0.3.5.170911"
-        versionCode 6
+        versionName "0.3.7.210429"
+        versionCode 7
     }
     buildTypes {
         release {
@@ -31,27 +30,26 @@ android {
 }
 
 dependencies {
-    // compile project(':geo:k3b-geoHelper')
-    compile 'com.github.k3b:k3b-geoHelper:1.1.5'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    // androidTestCompile 'org.mod4j.org:junit:3.8.2'
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-	
-    // required by osmdroid
-    compile 'com.android.support:support-v4:21.0.2'
+    implementation 'androidx.drawerlayout:drawerlayout:1.1.1'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+
+    implementation 'com.github.k3b:k3b-geoHelper:1.1.5'
+
     // this is osmdroid
-    // compile project(':osmdroid-android') // local copy
-    compile 'org.osmdroid:osmdroid-android:5.2'
+    // implementation project(':osmdroid-android') // local copy
+    implementation 'org.osmdroid:osmdroid-android:6.1.10'
     // non local copy from repositories
 	
-    // compile project(':OSMBonusPack')
-	compile 'com.github.MKergall.osmbonuspack:OSMBonusPack:v5.8.1'
+    // implementation project(':OSMBonusPack').
+    // Version must match osmdroid
+    // see https://github.com/mkergall/Osmbonuspack/releases
+	implementation 'com.github.MKergall:osmbonuspack:6.7.0'
 
-    // local copy
-    compile 'org.slf4j:slf4j-api:1.7.7@jar'
+    implementation 'org.slf4j:slf4j-api:1.7.7@jar'
     // include if you want to see debug/trace logmessages
-    // compile 'org.slf4j:slf4j-android:1.7.7@jar'
+    // implementation 'org.slf4j:slf4j-android:1.7.7@jar'
     // only error and warn
-    compile 'eu.lp0.slf4j:slf4j-android:1.7.7-1@jar'
-    // if you want to see debug traces, too. requires config file
+    implementation 'eu.lp0.slf4j:slf4j-android:1.7.7-1@jar'
 }

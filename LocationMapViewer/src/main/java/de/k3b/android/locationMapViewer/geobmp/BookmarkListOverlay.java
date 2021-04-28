@@ -27,12 +27,13 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
+
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.legacy.app.ActionBarDrawerToggle;
 
 import de.k3b.android.locationMapViewer.R;
 import de.k3b.android.locationMapViewer.constants.Constants;

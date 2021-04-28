@@ -14,9 +14,9 @@ public interface Constants {
     // ===========================================================
 
     public static final String PREFS_TILE_SOURCE = "tilesource";
-    public static final String PREFS_SCROLL_X = "scrollX";
-    public static final String PREFS_SCROLL_Y = "scrollY";
-    public static final String PREFS_ZOOM_LEVEL = "zoomLevel";
+    public static final String PREFS_SCROLL_X = "scroll_X";
+    public static final String PREFS_SCROLL_Y = "scroll_Y";
+    public static final String PREFS_ZOOM_LEVEL = "zoom_Level";
     public static final String PREFS_SHOW_LOCATION = "showLocation";
     public static final String PREFS_SHOW_MINIMAP = "showMiniMap";
     public static final String PREFS_CLUSTER_POINTS = "clusterPoints";

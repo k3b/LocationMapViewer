@@ -23,10 +23,10 @@ import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.MapTileProviderBase;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.util.TileSystem;
 import org.osmdroid.views.MapView;
 
 import de.k3b.geo.api.GeoPointDto;
-import microsoft.mappoint.TileSystem;
 
 /**
  * Created by k3b on 16.03.2015.
@@ -42,16 +42,16 @@ public class ZoomUtil {
      * @param min
      * @param max
      */
-    public static void zoomTo(MapView mapView, int zoom, IGeoPoint min, IGeoPoint max) {
+    public static void zoomTo(MapView mapView, double zoom, IGeoPoint min, IGeoPoint max) {
         MapTileProviderBase tileProvider = mapView.getTileProvider();
         IMapController controller = mapView.getController();
         IGeoPoint center = min;
 
         if (max != null) {
-            center = new GeoPoint((max.getLatitudeE6() + min.getLatitudeE6()) / 2, (max.getLongitudeE6() + min.getLongitudeE6()) / 2);
+            center = new GeoPoint((max.getLatitude() + min.getLatitude()) / 2, (max.getLongitude() + min.getLongitude()) / 2);
 
             if (zoom == NO_ZOOM) {
-                final double requiredMinimalGroundResolutionInMetersPerPixel = ((double) new GeoPoint(min.getLatitudeE6(), min.getLongitudeE6()).distanceTo(max)) / Math.min(mapView.getWidth(), mapView.getHeight());
+                final double requiredMinimalGroundResolutionInMetersPerPixel = ((double) new GeoPoint(min.getLatitude(), min.getLongitude()).distanceToAsDouble(max)) / Math.min(mapView.getWidth(), mapView.getHeight());
                 zoom = calculateZoom(center.getLatitude(), requiredMinimalGroundResolutionInMetersPerPixel, tileProvider.getMaximumZoomLevel(), tileProvider.getMinimumZoomLevel());
             }
         }

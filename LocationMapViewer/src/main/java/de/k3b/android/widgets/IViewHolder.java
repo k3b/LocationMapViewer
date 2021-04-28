@@ -27,5 +27,5 @@ import android.view.View;
  * Created by k3b on 26.03.2015.
  */
 public interface IViewHolder {
-    View findViewById(int id);
+    <T extends View> T findViewById(int id);
 }

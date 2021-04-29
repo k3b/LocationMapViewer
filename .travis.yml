@@ -1,22 +1,38 @@
 # travis build for LocationMapViewer
 language: android
+
+jdk:
+  - oraclejdk8
+
+addons:
+  apt:
+    packages:
+      # graphviz to render javadoc uml
+      # https://docs.travis-ci.com/user/multi-os/
+      - graphviz
+
 android:
   components:
     # https://github.com/travis-ci/travis-ci/issues/5036
     - tools
 
-    - build-tools-23.0.2
     - android-23
 
     - add-on
     - extra
 
 before_install:
-# http://stackoverflow.com/questions/33820638/travis-yml-gradlew-permission-denied
-# must execute
-# git update-index --chmod=+x gradlew
-# instead of 
-# - chmod +x gradlew
- 
+  # http://stackoverflow.com/questions/33820638/travis-yml-gradlew-permission-denied
+  # must execute
+  # git update-index --chmod=+x gradlew
+  # instead of
+  # - chmod +x gradlew
+
+  # https://stackoverflow.com/questions/52274229/travis-ci-android-28-licenses-have-not-been-accepted
+  # - yes | sdkmanager "platforms;android-28"
+
+  - yes | sdkmanager "platforms;android-23"
+
 script:
+  - jdk_switcher use oraclejdk8
   - ./gradlew assemble

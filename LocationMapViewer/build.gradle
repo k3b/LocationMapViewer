@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId 'de.k3b.android.locationMapViewer'
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 26
         // 0.2.2.150321 (2)
         // fdroid 06.5.2015 (3) versionName "0.3.3.150506"
         // fdroid 30.3.2016 (4) versionName "0.3.4.160330"

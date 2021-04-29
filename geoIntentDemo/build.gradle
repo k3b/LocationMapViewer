@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "de.k3b.android.locationMapViewer.demo"
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
     }

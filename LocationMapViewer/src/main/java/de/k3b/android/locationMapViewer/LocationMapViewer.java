@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 k3b
+ * Copyright (C) 2015-2021 k3b
  *
  * This file is part of de.k3b.android.LocationMapViewer (https://github.com/k3b/LocationMapViewer/) .
  *
@@ -20,7 +20,6 @@ package de.k3b.android.locationMapViewer;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -82,6 +81,7 @@ import de.k3b.android.locationMapViewer.geobmp.GeoBmpDto;
 import de.k3b.android.osmdroid.GuestureOverlay;
 import de.k3b.android.osmdroid.ZoomUtil;
 import de.k3b.android.widgets.AboutDialogPreference;
+import de.k3b.android.widgets.FilePermissionActivity;
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
@@ -103,7 +103,7 @@ import de.k3b.geo.io.gpx.GpxReaderBase;
  * no support for fragments.<br/>
  * The code is based on "org.osmdroid.samples.SampleWithMinimapItemizedoverlay in DemoApp OpenStreetMapViewer"
  */
-public class LocationMapViewer extends Activity implements Constants, BookmarkListOverlay.AdditionalPoints  {
+public class LocationMapViewer extends FilePermissionActivity implements Constants, BookmarkListOverlay.AdditionalPoints  {
     private static final Logger logger = LoggerFactory.getLogger(LocationMapViewer.class);
 
     // ===========================================================
@@ -164,10 +164,15 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //https://github.com/osmdroid/osmdroid/issues/366
-        //super important. Many tile servers, including open street maps, will BAN applications by user
+        //super important. Many tile servers, including open street maps, will
+        // BAN applications by user if this is not set
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
 
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onCreateEx(Bundle savedInstanceState) {
         Intent intent = this.getIntent();
 
         GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
@@ -501,7 +506,6 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
     }
 
@@ -558,6 +562,16 @@ public class LocationMapViewer extends Activity implements Constants, BookmarkLi
         this.mLocationOverlay.disableMyLocation();
 
         super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        // prevent exception "LocationMapViewer has leaked IntentReceiver"
+        // search for "osmdroid MinimapOverlay unregisterReceiver" found this solution
+        // https://stackoverflow.com/questions/37304905/leaked-intentreceiver-exception-using-osmdroid
+        this.mMapView.onDetach();
+
+        super.onDestroy();
     }
 
     private void saveLastXYZ() {

@@ -70,4 +70,6 @@ href="https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/mai
     <string name="bookmark_template_gps">"[GPS] "</string>
 
     <string name="title_cright_osm">"Karte (c) <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> Mitwirkende"</string>
+
+    <string name="permission_error">Fehlende Berechtigung</string>
 </resources>

@@ -32,6 +32,8 @@ before_install:
   # - yes | sdkmanager "platforms;android-28"
 
   - yes | sdkmanager "platforms;android-23"
+  - yes | sdkmanager "platforms;android-28"
+  - yes | sdkmanager "platforms;android-29"
 
 script:
   - jdk_switcher use oraclejdk8

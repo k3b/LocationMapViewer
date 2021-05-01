@@ -2,4 +2,4 @@ Made compatible with Android-7 and Android-10
 Dropped Support for Android-2.3
 Works with Android 4.1 and later
 Updated Libraries
-
+Reduced apk-Size below 600 KB

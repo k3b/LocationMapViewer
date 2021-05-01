@@ -1,0 +1,1 @@
+Afișarea informațiilor geografice din url sau din fișierul local gpx/kml pe o hartă

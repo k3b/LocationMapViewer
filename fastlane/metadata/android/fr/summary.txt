@@ -1,0 +1,1 @@
+Afficher les informations géographiques d'un url ou d'un fichier local gpx/kml dans une carte

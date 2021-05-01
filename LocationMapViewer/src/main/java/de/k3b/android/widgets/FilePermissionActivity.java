@@ -20,18 +20,19 @@ package de.k3b.android.widgets;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
-import java.io.File;
-
 import de.k3b.android.locationMapViewer.R;
+import de.k3b.android.locationMapViewer.constants.Constants;
 
 /**
  * Manage permission in lifecycle for Android-6 ff {@link android.app.Activity}.
@@ -47,22 +48,27 @@ import de.k3b.android.locationMapViewer.R;
  *
  *  Backport from https://github.com/k3b/aphotomanager/ FilePermissionActivity
  */
-public abstract class FilePermissionActivity extends Activity {
-    private static final int REQUEST_ROOT_DIR = 2001;
+public abstract class FilePermissionActivity extends Activity implements Constants {
     public static final String TAG = "k3b.FilePermAct";
-    private static IOnDirectoryPermissionGrantedHandler currentPermissionGrantedHandler = null;
 
     private static final int REQUEST_ID_READ_EXTERNAL_STORAGE = 2000;
     private static final String PERMISSION_READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
+    private Boolean permissionGrantedFile = null;
+
+    private static final int REQUEST_ID_READ_GPS = 2001;
+    private static final String PERMISSION_READ_GPS = Manifest.permission.ACCESS_FINE_LOCATION;
+    protected Boolean permissionGrantedGps = null;
+
     private boolean debugLog = true;
     int RESULT_NO_PERMISSIONS = -22;
 
+    protected Bundle lastInstanceState = null;
+    private boolean mustCallOnCreateEx = true;
+
     protected abstract void onCreateEx(Bundle savedInstanceState);
 
-    // workflow onCreate() => requestPermission(PERMISSION_READ_EXTERNAL_STORAGE) => onRequestPermissionsResult() => abstract onCreateEx()
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    private boolean hasFileReadPermissions() {
+        if (permissionGrantedFile != null) return permissionGrantedFile;
 
         final Uri uri = (getIntent() != null) ? getIntent().getData() : null;
 
@@ -71,9 +77,47 @@ public abstract class FilePermissionActivity extends Activity {
                 && ActivityCompat.checkSelfPermission(this, PERMISSION_READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             requestPermission(PERMISSION_READ_EXTERNAL_STORAGE, REQUEST_ID_READ_EXTERNAL_STORAGE);
-        } else {
-            onCreateEx(null);
+            return false;
         }
+
+        return true;
+    }
+
+    private boolean hasGpsPermissions() {
+        if (permissionGrantedGps != null) return permissionGrantedGps;
+
+        boolean showLocation = isShowLocation();
+
+        // if app wants to display my logcation: ask for permissions
+        if (showLocation && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+                && ActivityCompat.checkSelfPermission(this, PERMISSION_READ_GPS)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermission(PERMISSION_READ_GPS, REQUEST_ID_READ_GPS);
+            return false;
+        }
+
+        return true;
+    }
+
+    protected boolean checkPermissions() {
+        if (hasFileReadPermissions() && hasGpsPermissions()) {
+            if (mustCallOnCreateEx) {
+                onCreateEx(this.lastInstanceState);
+                mustCallOnCreateEx = false;
+            }
+            this.lastInstanceState = null;
+            return true;
+        }
+        return false;
+    }
+
+    // workflow onCreate() => requestPermission(PERMISSION_READ_EXTERNAL_STORAGE) => onRequestPermissionsResult() => abstract onCreateEx()
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        this.lastInstanceState = savedInstanceState;
+        super.onCreate(savedInstanceState);
+
+        checkPermissions();
     }
 
     private void requestPermission(final String permission, final int requestCode) {
@@ -87,26 +131,54 @@ public abstract class FilePermissionActivity extends Activity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case REQUEST_ID_READ_EXTERNAL_STORAGE: {
-                final boolean success = (grantResults != null)
-                        && (grantResults.length > 0)
-                        && (grantResults[0] == PackageManager.PERMISSION_GRANTED);
-                if (success) {
-                    if (debugLog) {
-                        Log.i(TAG, this.getClass().getSimpleName()
-                                + ": onRequestPermissionsResult(success) ");
-                    }
-                    onCreateEx(null);
-                } else {
-                    Log.i(TAG, this.getClass().getSimpleName()
-                            + ": " + getText(R.string.permission_error));
+                permissionGrantedFile = isGrantSuccess(grantResults, "File");
+                if (!permissionGrantedFile) {
                     Toast.makeText(this, R.string.permission_error, Toast.LENGTH_LONG).show();
                     setResult(RESULT_NO_PERMISSIONS, null);
                     finish();
+                    return;
                 }
+                checkPermissions();
+                return;
+            }
+            case REQUEST_ID_READ_GPS: {
+                if (isGrantSuccess(grantResults, "Gps")) {
+                    // don-t ask again
+                    permissionGrantedFile = true;
+                } else {
+                    boolean value = false;
+                    // disable in settings
+                    setShowLocation(value);
+                }
+                checkPermissions();
                 return;
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    protected boolean isShowLocation() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        return prefs.getBoolean(PREFS_SHOW_LOCATION, false);
+    }
+
+    protected void setShowLocation(boolean value) {
+        SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        prefs.putBoolean(PREFS_SHOW_LOCATION, value);
+        prefs.apply();
+    }
+
+    private boolean isGrantSuccess(int[] grantResults, String dbgContext) {
+        boolean success = (grantResults != null)
+                && (grantResults.length > 0)
+                && (grantResults[0] == PackageManager.PERMISSION_GRANTED);
+        if (debugLog) {
+            Log.i(TAG, this.getClass().getSimpleName()
+                    + ": onRequestPermissionsResult(" + dbgContext +
+                    "-success=" +success + ") ");
+        }
+
+        return success;
     }
 
     public interface IOnDirectoryPermissionGrantedHandler {

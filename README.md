@@ -12,7 +12,7 @@ Other Android apps can use LocationMapViewer through an Intent interface
 (see [GeoIntentDemo.java](https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/main/java/de/k3b/android/locationMapViewer/demo/GeoIntentDemoActivity.java) )
 or through html links like &lt;a href=&quot;geo:0,0?q=53.0,8.0(Hello)&quot;&gt;geo:0,0?q=53.0,8.0(Hello)&lt;/a&gt;<br/>
 
-Minimal requirements: 
+## Minimal requirements: 
 
 * version v0.3.5.170911(6) 
   * Android-2.3.7 - Android-7 (API 10ff)   
@@ -23,7 +23,7 @@ Minimal requirements:
 
 Licence: [GPLv3](http://www.gnu.org/licenses/gpl-3.0)<br/>
 
-Requred permissions:
+## Requred permissions:
 
 * INTERNET: to download map data from Open Streetmap Server
 * ACCESS_NETWORK_STATE and ACCESS_WIFI_STATE: to find out if wifi/internet is online to start downloaded geodata 

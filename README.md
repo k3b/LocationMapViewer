@@ -1,4 +1,4 @@
-#LocationMapViewer ![](https://github.com/k3b/LocationMapViewer/blob/master/LocationMapViewer/src/main/res/drawable/ic_launcher.png)
+# LocationMapViewer ![](https://github.com/k3b/LocationMapViewer/blob/master/LocationMapViewer/src/main/res/drawable/ic_launcher.png)
 
 An android app to display geografic information from url or local gpx/kml file in a [map](map). 
 
@@ -36,7 +36,7 @@ The code uses [osmdroid library](https://github.com/osmdroid/osmdroid)
 with [osmbonuspack library](http://code.google.com/p/osmbonuspack/)
 to display maps from [Open Street Map](http://www.openstreetmap.org).
 
-##Intent Interface
+## Intent Interface
 
 Other Android apps can use LocationMapViewer as plug-in/device-driver through an Intent interface
 or through html-a-href-links.

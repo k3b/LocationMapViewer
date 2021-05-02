@@ -12,9 +12,10 @@ android {
         // fdroid 30.3.2016 (4) versionName "0.3.4.160330"
         // fdroid 13.8.2016 (5) versionName "0.3.5.160813"
         // fdroid 13.8.2016 (6) versionName "0.3.5.170911"
-        // fdroid ??.2021 (7) versionName "0.3.7.210429" AO10
-        versionName "0.3.7.210429"
-        versionCode 7
+        // fdroid (7) versionName "0.3.7.210429" AO10 with verify error: wrong gradle-wrapper version
+        // fdroid ??.2021 (8) versionName "0.3.7.210502" AO10
+        versionName "0.3.7.210502"
+        versionCode 8
     }
     buildTypes {
         debug {

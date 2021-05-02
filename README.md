@@ -1,8 +1,12 @@
-#LocationMapViewer
+#LocationMapViewer ![](https://github.com/k3b/LocationMapViewer/blob/master/LocationMapViewer/src/main/res/drawable/ic_launcher.png)
 
-An app that can display geografic info in a map. It has support for **gpx** and **kml** files and **geo-uri-s**
+An android app to display geografic information from url or local gpx/kml file in a [map](map). 
+
+It has support for **gpx** and **kml** files and **geo-uri-s**
 and can work offline (without internet/wifi)
 once geodata is downloaded and cached.
+
+![](https://github.com/k3b/LocationMapViewer/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/1-LocationMapViewer.png)
 
 Other Android apps can use LocationMapViewer through an Intent interface
 (see [GeoIntentDemo.java](https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/main/java/de/k3b/android/locationMapViewer/demo/GeoIntentDemoActivity.java) )
@@ -51,3 +55,5 @@ LocationMapViewer is designed to be used by other apps. This means in Terms of [
 that uses the Intent-Iterface [is not considered a Derived Work.](https://en.wikipedia.org/wiki/GPL_v3#Point_of_view:_linking_is_irrelevant)
 
 In other words: you can used LocationMapViewer as a [driver for your non gpl/non opensource app.](http://www.rosenlaw.com/lj19.htm).
+
+For more informations see https://github.com/k3b/LocationMapViewer/wiki

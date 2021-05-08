@@ -64,3 +64,12 @@ that uses the Intent-Iterface [is not considered a Derived Work.](https://en.wik
 In other words: you can used LocationMapViewer as a [driver for your non gpl/non opensource app.](http://www.rosenlaw.com/lj19.htm).
 
 For more informations see https://github.com/k3b/LocationMapViewer/wiki
+
+-----
+
+## Donations: 
+
+If you like this app please consider to donating to https://wiki.openstreetmap.org/wiki/Donations .
+
+Since android-developping is a hobby (and an education tool) i donot want any 
+money for my apps so donation should go to projects i benefit from.

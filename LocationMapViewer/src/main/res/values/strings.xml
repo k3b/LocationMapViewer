@@ -72,4 +72,5 @@ href="https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/mai
     <string name="title_cright_osm">"Map Tiles (c) <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> Contributors"</string>
 
     <string name="permission_error">Missing permisions</string>
+    <string name="title_open_file">Open File</string>
 </resources>

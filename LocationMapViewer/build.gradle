@@ -5,6 +5,9 @@ android {
     compileSdkVersion 29
     defaultConfig {
         applicationId 'de.k3b.android.locationMapViewer'
+        // api-16(JELLY_BEAN = 4.2) OSMDROID Library
+        // api-19(KITKAT = Android-4.4) ACTION_OPEN_DOCUMENT
+        // api-21(LOLLIPOP = Android-5) for ACTION_OPEN_DOCUMENT_TREE
         minSdkVersion 16
         targetSdkVersion 26
         // 0.2.2.150321 (2)
@@ -13,7 +16,8 @@ android {
         // fdroid 13.8.2016 (5) versionName "0.3.5.160813"
         // fdroid 13.8.2016 (6) versionName "0.3.5.170911"
         // fdroid (7) versionName "0.3.7.210429" AO10 with verify error: wrong gradle-wrapper version
-        // fdroid ??.2021 (8) versionName "0.3.7.210502" AO10
+        // fdroid 21.05.2021 (8) versionName "0.3.7.210502" AO10 support
+        // ??? menu open File (android api-21)
         versionName "0.3.7.210502"
         versionCode 8
     }
@@ -52,7 +56,8 @@ dependencies {
     implementation 'androidx.drawerlayout:drawerlayout:1.1.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
-    implementation 'com.github.k3b:k3b-geoHelper:1.1.5'
+    // implementation 'com.github.k3b:k3b-geoHelper:1.1.5'
+    implementation 'com.github.k3b:k3b-geoHelper:master-SNAPSHOT'
 
     // this is osmdroid
     // implementation project(':osmdroid-android') // local copy
@@ -69,4 +74,7 @@ dependencies {
     // implementation 'org.slf4j:slf4j-android:1.7.7@jar'
     // only error and warn
     implementation 'eu.lp0.slf4j:slf4j-android:1.7.7-1@jar'
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.slf4j:slf4j-simple:1.7.7@jar'
 }

@@ -1,14 +1,20 @@
 D:\prj\eve\android\prj\LocationMapViewer.wrk\LocationMapViewer\todo.txt
 
-todo fastlane
-travis
 
-gpx/kml-files und content-uri
+----
 
-Update for AO10, ver 0.3.7.210429(7), sdk 23>29,minSdk Android2.3(10)>Android4.1(16), AndroidX, osmdroid 5.2>6.1.10, lat/lon/zoom int>double
+#17: added "File open" with gpx/kml/poi-symbol support relative to file
 
-
-
+- bubble
+v * with symbol
+* * increase bubble description text not empty
+- menu open documentfile file:
+v * kml/gpx/poi documentfile
+v * * with symbols
+> * * find optimal symbol size in map with border and overlay-bubble?
+* * kmz/gpz/kml.zip/gpx.zip compressed documentfile
+* * * with symbols
+- open content: url with symbols ???
 - settings hide zoombar
 
 v0.3.3.150506

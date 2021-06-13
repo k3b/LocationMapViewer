@@ -20,10 +20,12 @@ package de.k3b.android.locationMapViewer;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -36,12 +38,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.documentfile.provider.DocumentFile;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
@@ -57,7 +62,6 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.util.TileSystem;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
-import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.MinimapOverlay;
 import org.osmdroid.views.overlay.Overlay;
@@ -71,7 +75,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.k3b.android.GeoUtil;
 import de.k3b.android.locationMapViewer.constants.Constants;
@@ -88,6 +94,7 @@ import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.GeoUri;
 import de.k3b.geo.io.gpx.GeoXmlOrTextParser;
 import de.k3b.geo.io.gpx.GpxReaderBase;
+import de.k3b.util.ImageResize;
 
 /**
  * An app that can display geografic info in a map for Android 2.1 (Eclair, API 7) .<br/>
@@ -111,6 +118,8 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
     // ===========================================================
 
     private static final DecimalFormat LAT_LON2TEXT = new DecimalFormat("#.#########");
+    private static final int REQUEST_ID_PICK_KML_DIR = 126;
+    private static final boolean LOLLIPOP = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
 
     // ===========================================================
     // Fields
@@ -121,7 +130,6 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
      */
     private SharedPreferences mPrefs;
     private MapView mMapView;
-    private ItemizedOverlay<OverlayItem> mPointOfInterestOverlay;
     private MyLocationNewOverlay mLocationOverlay;
     private MinimapOverlay mMiniMapOverlay;
 
@@ -184,12 +192,9 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
             extraTitle = getString(R.string.app_name);
         }
         if (extraTitle == null) {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-                // must be called before this.setContentView(...) else crash
               this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
 
-        //Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
         mPoiIconWithData = getResources().getDrawable(R.drawable.marker_green);
         mPoiIconWithoutData = getResources().getDrawable(R.drawable.marker_no_data);
 
@@ -210,27 +215,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         mPOIOverlayNonCluster = (mUseClusterPoints) ? null : createNonClusterOverlay(overlays);
         mPOIOverlayCluster = (mUseClusterPoints) ? createPointOfInterestOverlay(overlays) : null;
 
-        final IGeoInfoHandler pointCollector = (mUseClusterPoints)
-            ? new IGeoInfoHandler() {
-                @Override
-                public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
-                    if (aGeoPoint != null) {
-                        mPOIOverlayCluster.add(createMarker(mMapView, aGeoPoint.clone()));
-                    }
-                    return true;
-                }
-            }
-            : new IGeoInfoHandler() {
-                @Override
-                public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
-                    if (aGeoPoint != null) {
-                        mPOIOverlayNonCluster.add(createMarker(mMapView, aGeoPoint.clone()));
-                    }
-                    return true;
-                }
-            };
-
-        pointCollector.onGeoInfo(geoPointFromIntent);
+        final IGeoInfoHandler pointCollector = createPointCollector(geoPointFromIntent);
 
         if (geoPointFromIntent != null) {
             initialWindow = new GeoBmpDto(geoPointFromIntent);
@@ -240,15 +225,10 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
             initialWindow.setName(getString(R.string.bookmark_template_initial) + geoPointFromIntent.getName());
         }
 
-        loadGeoPointDtosFromFile(intent, pointCollector);
+        loadGeoPointDtos(intent, pointCollector);
         loadGeoPointDtosFromExtra(intent.getStringExtra("de.k3b.POIS"), pointCollector);
 
-        List<? extends Overlay> items = (mUseClusterPoints) ? mPOIOverlayCluster.getItems() : mPOIOverlayNonCluster.getItems();
-        final int zoom = (geoPointFromIntent != null) ? geoPointFromIntent.getZoomMin() : GeoPointDto.NO_ZOOM;
-        this.mDelayedSetCenterZoom = (items.size() > 0) ? new DelayedSetCenterZoom(items, zoom) : null;
-        if (items.size() == 0) {
-            loadDemoItems(pointCollector);
-        }
+        zoomTo(geoPointFromIntent, pointCollector);
 
         createMyLocationOverlay(overlays);
 
@@ -289,6 +269,43 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         // else html a-href-links do not work.
         TextView t2 = (TextView) findViewById(R.id.cright_osm);
         t2.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    private IGeoInfoHandler createPointCollector(GeoPointDto geoPointFromIntent) {
+        final IGeoInfoHandler pointCollector = (mUseClusterPoints)
+            ? new IGeoInfoHandler() {
+                @Override
+                public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
+                    if (aGeoPoint != null) {
+                        mPOIOverlayCluster.add(createMarker(mMapView, aGeoPoint.clone()));
+                    }
+                    return true;
+                }
+            }
+            : new IGeoInfoHandler() {
+                @Override
+                public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
+                    if (aGeoPoint != null) {
+                        mPOIOverlayNonCluster.add(createMarker(mMapView, aGeoPoint.clone()));
+                    }
+                    return true;
+                }
+            };
+
+        if (mPOIOverlayCluster != null) mPOIOverlayCluster.getItems().clear();
+        if (mPOIOverlayNonCluster != null) mPOIOverlayNonCluster.getItems().clear();
+
+        pointCollector.onGeoInfo(geoPointFromIntent);
+        return pointCollector;
+    }
+
+    private void zoomTo(GeoPointDto geoPointFromIntent, IGeoInfoHandler pointCollector) {
+        List<? extends Overlay> items = (mUseClusterPoints) ? mPOIOverlayCluster.getItems() : mPOIOverlayNonCluster.getItems();
+        final int zoom = (geoPointFromIntent != null) ? geoPointFromIntent.getZoomMin() : GeoPointDto.NO_ZOOM;
+        this.mDelayedSetCenterZoom = (items.size() > 0) ? new DelayedSetCenterZoom(items, zoom) : null;
+        if (items.size() == 0) {
+            loadDemoItems(pointCollector);
+        }
     }
 
     private SharedPreferences getPrefs() {
@@ -359,8 +376,12 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
             public void onClick(View view) {
                 PopupMenu popup = new PopupMenu(LocationMapViewer.this, view);
                 popup.setOnMenuItemClickListener(popUpListener);
+                Menu menu = popup.getMenu();
                 MenuInflater inflater = popup.getMenuInflater();
-                inflater.inflate(R.menu.location_map_viewer, popup.getMenu());
+                if (LOLLIPOP) {
+                    inflater.inflate(R.menu.location_map_viewer_21, menu);
+                }
+                inflater.inflate(R.menu.location_map_viewer, menu);
                 popup.show();
             }
         });
@@ -381,12 +402,12 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                // not used
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                // not used
             }
         });
 
@@ -405,32 +426,79 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
     }
 
     private Marker createMarker(MapView map, IGeoPointInfo aGeoPoint) {
-        // final OverlayItem overlayItem = new OverlayItem(aGeoPoint.getId(), aGeoPoint.getName(), aGeoPoint.getDescription(), toOsmGeoPoint(aGeoPoint));
-        // items.add(overlayItem);
-
         Marker poiMarker = new Marker(map);
         poiMarker.setTitle(aGeoPoint.getName());
         final String description = aGeoPoint.getDescription();
+        String symbol = aGeoPoint.getSymbol();
+
         poiMarker.setSnippet(description);
         poiMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         poiMarker.setPosition(toOsmGeoPoint(aGeoPoint));
 
-        if (BookmarkUtil.isNotEmpty(description) || BookmarkUtil.isNotEmpty(aGeoPoint.getLink()) || BookmarkUtil.isNotEmpty(aGeoPoint.getName())) {
-            poiMarker.setIcon(mPoiIconWithData);
-            // 7.
-            poiMarker.setInfoWindow(new GeoPointMarkerInfoWindow(map));
-        } else {
-            poiMarker.setIcon(mPoiIconWithoutData);
-            poiMarker.setInfoWindow(null);
-        }
-        /*
-        if (poi.mThumbnail != null){
-            poiMarker.setImage(new BitmapDrawable(poi.mThumbnail));
-        }*/
+        boolean hasMarkerInfo = BookmarkUtil.isNotEmpty(description) ||
+                BookmarkUtil.isNotEmpty(aGeoPoint.getLink()) ||
+                BookmarkUtil.isNotEmpty(aGeoPoint.getName());
+        GeoPointMarkerInfoWindow infoWindow = null;
+        Drawable icon = mPoiIconWithoutData;
 
+        if (hasMarkerInfo) {
+            icon = this.mPoiIconWithData;
+            infoWindow = new GeoPointMarkerInfoWindow(map);
+        }
+        setImage(poiMarker, icon, symbol);
+
+        poiMarker.setInfoWindow(infoWindow);
         poiMarker.setRelatedObject(aGeoPoint);
 
         return poiMarker;
+    }
+
+    private void setImage(Marker poiMarker, Drawable defaultIcon, String symbol) {
+        Drawable icon = defaultIcon;
+        if (true && symbol != null && symbol.contains(":") && symbol.contains("/")) {
+            // must be absolute image uri probably "https://..." or "content://..."
+            InputStream inputStream = null;
+            BitmapDrawable drawable = null;
+            try {
+                inputStream = getContentResolver().openInputStream(Uri.parse(symbol));
+                drawable = (inputStream == null) ? null : new BitmapDrawable(getResources(), inputStream);
+            } catch (Exception e) {
+                logger.info("symbol '" + symbol + "' not loaded: " + e.getMessage(), e);
+            } finally {
+                closeSilently(inputStream);
+            }
+            if (drawable != null) {
+                Bitmap bitmap = drawable.getBitmap();
+                int width = bitmap.getWidth();
+                int height = bitmap.getHeight();
+
+                //!!! 50 pix is too small and needs a border to be visible in map
+                Double scale = ImageResize.getResizeFactor(width, height, 50);
+
+                if (scale != null) {
+                    width *= scale;
+                    height *= scale;
+                    Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap, width, height, false);
+
+                    icon = new BitmapDrawable(getResources(), bitmapResized);
+                } else {
+                    icon = drawable;
+                }
+
+            }
+            poiMarker.setImage(drawable);
+        }
+        poiMarker.setIcon(icon);
+    }
+
+    private void closeSilently(java.io.Closeable inputStream) {
+        if (inputStream != null) {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private RadiusMarkerClusterer createPointOfInterestOverlay(List<Overlay> overlays) {
@@ -471,8 +539,6 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         currentSelectedPosition.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         currentSelectedPosition.setTitle(title);
         currentSelectedPosition.setIcon(getResources().getDrawable(R.drawable.marker_yellow));
-        //startMarker.setImage(getResources().getDrawable(R.drawable.ic_launcher));
-        //startMarker.setInfoWindow(new MarkerInfoWindow(R.layout.bonuspack_bubble_black, map));
         currentSelectedPosition.setDraggable(true);
         overlays.add(currentSelectedPosition);
 
@@ -501,17 +567,27 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         return new GeoPoint(aGeoPoint.getLatitude(), aGeoPoint.getLongitude());
     }
 
-    private void loadGeoPointDtosFromFile(Intent intent, IGeoInfoHandler pointCollector) {
+    private void loadGeoPointDtos(DocumentFile documentFile, IGeoInfoHandler pointCollector) {
+        final Uri uri = (documentFile != null) ? documentFile.getUri() : null;
+        loadGeoPointDtos(uri, pointCollector);
+    }
+
+    private void loadGeoPointDtos(Intent intent, IGeoInfoHandler pointCollector) {
         final Uri uri = (intent != null) ? intent.getData() : null;
+        loadGeoPointDtos(uri, pointCollector);
+    }
+
+    private void loadGeoPointDtos(Uri uri, IGeoInfoHandler pointCollector) {
         if (uri != null) {
-            ContentResolver cr = getContentResolver();
-            GeoPointDto p = new GeoPointDto();
+            InputStream is = null;
             try {
-                InputStream is = cr.openInputStream(uri);
-                GpxReaderBase parser = new GpxReaderBase(pointCollector, p);
+                is = getContentResolver().openInputStream(uri);
+                GpxReaderBase parser = new GpxReaderBase(pointCollector, new GeoPointDto());
                 parser.parse(new InputSource(is));
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                closeSilently(is);
             }
         }
     }
@@ -729,6 +805,10 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
+
+        if (LOLLIPOP) {
+            inflater.inflate(R.menu.location_map_viewer_21, menu);
+        }
         inflater.inflate(R.menu.location_map_viewer, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -745,6 +825,9 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
 
         menu.findItem(R.id.cmd_settings).setVisible(!drawerOpen);
         menu.findItem(R.id.cmd_help).setVisible(!drawerOpen);
+        if (LOLLIPOP) {
+            menu.findItem(R.id.cmd_open_file).setVisible(!drawerOpen);
+        }
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -765,6 +848,10 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
                 this.showDialog(R.id.cmd_help);
                 return true;
 
+            case R.id.cmd_open_file:
+                onOpenDir(item.getTitle());
+                return true;
+                
             case R.id.cmd_settings: {
                 // set current xyz to prefs so they can be displayed/modified in the settings
                 final IGeoPoint mapCenter = mMapView.getMapCenter();
@@ -779,6 +866,15 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
             }
         }
         return false;
+    }
+
+    private void onOpenDir(CharSequence title) {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        intent.putExtra(Intent.EXTRA_TITLE, title);
+
+        this.startActivityForResult(intent, REQUEST_ID_PICK_KML_DIR);
     }
 
     /** implements interface BookmarkListOverlay.AdditionalPoints */
@@ -808,26 +904,132 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
     @Override
     protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
         if (logger.isDebugEnabled()) logger.debug("onActivityResult(requestCode="+requestCode+", resultCode="+resultCode+", data="+data+")");
-        switch (requestCode) {
-            case R.id.cmd_settings:
-                RestoreXYZ(); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
-
-                // apply xyz changes from settings back to view
-                int changes = setZoom(getPrefs().getString(PREFS_CURRENT_ZOOMLEVEL, "").trim())
-                        + setCenter(getPrefs().getString(PREFS_CURRENT_NORTH, "").trim(), getPrefs().getString(PREFS_CURRENT_EAST, "").trim());
-
-                if (changes > 0) {
-                    saveLastXYZ(); // otherwhise onResume() would overwrite the new values
-                }
-
-                if (super.isShowLocation() && this.permissionGrantedGps == null) {
-                    // settings: show location has just been enabled
-                    super.checkPermissions();
-                }
-                initShowLocation();
-                break;
+        if (requestCode == R.id.cmd_settings) {
+            onSettingsResult();
+        } else if (requestCode == REQUEST_ID_PICK_KML_DIR && resultCode == RESULT_OK && data != null) {
+            onPickDirResult(data.getData());
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void onPickDirResult(Uri data) {
+        final DocumentFile dir = DocumentFile.fromTreeUri(this, data);
+        if (dir != null && dir.exists() && dir.isDirectory()) {
+            DocumentFile[] files = dir.listFiles();
+            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,android.R.layout.select_dialog_singlechoice);
+            if (files != null) {
+                final Map<String, DocumentFile> name2file = new HashMap<>();
+                for (DocumentFile file : files) {
+                    String name = file.getName();
+                    String nameLower = name.toLowerCase();
+                    name2file.put(nameLower, file);
+                    if (nameLower.endsWith(".gpx") || nameLower.endsWith(".kml") || nameLower.endsWith(".poi")) {
+                        arrayAdapter.add(name);
+                    }
+                }
+
+                int count = arrayAdapter.getCount();
+                if (count == 1) {
+                    onPickFileResult(dir, arrayAdapter.getItem(0), name2file);
+                } else if (count > 1) {
+                    AlertDialog.Builder builderSingle = new AlertDialog.Builder(LocationMapViewer.this);
+                    builderSingle.setIcon(R.drawable.ic_launcher);
+                    builderSingle.setTitle(R.string.title_open_file);
+                    builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String strName = arrayAdapter.getItem(which);
+                            onPickFileResult(dir, strName, name2file);
+                            dialog.dismiss();
+                        }
+                    });
+                    builderSingle.show();
+                }
+            }
+        }
+    }
+
+    private void onPickFileResult(final DocumentFile dir, String name, final Map<String, DocumentFile> name2file) {
+        GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(this.getIntent());
+
+        final IGeoInfoHandler pointCollector = createPointCollector(geoPointFromIntent);
+        final IGeoInfoHandler pointConverter = new IGeoInfoHandler() {
+            @Override
+            public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
+                String symbol = convertSymbol(aGeoPoint, dir, name2file);
+                if (symbol != null) {
+                    ((GeoPointDto) aGeoPoint).setSymbol(symbol);
+                }
+                pointCollector.onGeoInfo(aGeoPoint);
+                return true;
+            }
+        };
+
+        loadGeoPointDtos(name2file.get(name.toLowerCase()), pointConverter);
+
+        zoomTo(geoPointFromIntent, pointConverter);
+    }
+
+    private String convertSymbol(final IGeoPointInfo aGeoPoint,final DocumentFile dir, final Map<String, DocumentFile> name2file) {
+        String symbol = aGeoPoint != null ? aGeoPoint.getSymbol() : null;
+        if (symbol != null && !symbol.contains(":") && symbol.contains(".")) {
+            symbol = symbol.toLowerCase();
+            DocumentFile doc = name2file.get(symbol);
+            if (doc == null && symbol.contains("/")) {
+                doc = addFiles(dir, symbol.split("/"), name2file);
+            }
+            if (doc != null) return doc.getUri().toString();
+        }
+        return null;
+    }
+
+    private DocumentFile addFiles(DocumentFile dir, String[] pathElements, Map<String, DocumentFile> name2file) {
+        DocumentFile currentdir = dir;
+        StringBuilder path = new StringBuilder();
+        DocumentFile doc = null;
+        int last = pathElements.length - 1;
+        for (int i = 0; i <= last; i++) {
+            if (path.length() > 0) path.append("/");
+            String parentPath = path.toString();
+            path.append(pathElements[i]);
+            String pathLowerCase = path.toString();
+            doc = name2file.get(pathLowerCase);
+            if (doc == null && i <= last && currentdir != null && currentdir.isDirectory()) {
+                DocumentFile[] children = currentdir.listFiles();
+                if (children != null) {
+                    for (DocumentFile child : children) {
+                        name2file.put(parentPath  + child.getName().toLowerCase(), child);
+                    }
+                    doc = name2file.get(pathLowerCase);
+                }
+            }
+            currentdir = doc;
+        }
+        return doc;
+    }
+
+    private void onSettingsResult() {
+        RestoreXYZ(); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
+
+        // apply xyz changes from settings back to view
+        int changes = setZoom(getPrefs().getString(PREFS_CURRENT_ZOOMLEVEL, "").trim())
+                + setCenter(getPrefs().getString(PREFS_CURRENT_NORTH, "").trim(), getPrefs().getString(PREFS_CURRENT_EAST, "").trim());
+
+        if (changes > 0) {
+            saveLastXYZ(); // otherwhise onResume() would overwrite the new values
+        }
+
+        if (super.isShowLocation() && this.permissionGrantedGps == null) {
+            // settings: show location has just been enabled
+            super.checkPermissions();
+        }
+        initShowLocation();
     }
 
     private int setCenter(String newNorthString, String newEastString) {
@@ -838,16 +1040,14 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
                 final IGeoPoint newCenter = new GeoPoint(north.doubleValue(),east.doubleValue());
                 final IGeoPoint oldCenter = mMapView.getMapCenter();
 
-                if ((newCenter.getLatitudeE6() != oldCenter.getLatitudeE6()) || (newCenter.getLongitudeE6() != oldCenter.getLongitudeE6())) {
+                if ((newCenter.getLatitude() != oldCenter.getLatitude()) || (newCenter.getLongitude() != oldCenter.getLongitude())) {
                     setDelayedCenter(newCenter);
                     return 1;
                 }
             } catch (Exception ex) {
-                if (logger.isDebugEnabled()) {
-                    if (logger.isWarnEnabled()) {
-                        logger.warn("Cannot set setCenter(n={},e={}) => {}",
-                                newNorthString, newEastString, ex.getMessage());
-                    }
+                if (logger.isWarnEnabled()) {
+                    logger.warn("Cannot set setCenter(n={},e={}) => {}",
+                            newNorthString, newEastString, ex.getMessage());
                 }
             }
         }
@@ -920,10 +1120,8 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         Dialog result = this.bookmarkListOverlay.onCreateDialog(id);
         if (result != null) return result;
 
-        switch (id) {
-            case R.id.cmd_help:
-                return AboutDialogPreference.createAboutDialog(this);
-
+        if (id == R.id.cmd_help) {
+            return AboutDialogPreference.createAboutDialog(this);
         }
         return null;
     }

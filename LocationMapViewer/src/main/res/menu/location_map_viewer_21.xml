@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2015 by k3b.
+  ~ Copyright (c) 2021 by k3b.
   ~
   ~ This file is part of LocationMapViewer.
   ~
@@ -19,14 +19,9 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/cmd_settings"
-        android:icon="@drawable/ic_action_settings"
-        android:title="@string/title_activity_settings"
-        android:orderInCategory="50"
+    <item android:id="@+id/cmd_open_file"
+        android:icon="@drawable/ic_action_holo_dark_folder"
+        android:title="@string/title_open_file"
+        android:orderInCategory="10"
         android:showAsAction="ifRoom"/>
-    <item android:id="@+id/cmd_help"
-        android:icon="@drawable/ic_action_help"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/about_summary" />
 </menu>

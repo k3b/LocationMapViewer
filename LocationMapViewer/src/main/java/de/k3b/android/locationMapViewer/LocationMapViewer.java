@@ -46,6 +46,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.documentfile.provider.DocumentFile;
 
 import org.osmdroid.api.IGeoPoint;
@@ -637,7 +638,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         //edit.putBoolean(PREFS_SHOW_GUESTURES, this.mGuesturesOverlay.isEnabled());
         edit.putBoolean(PREFS_DEBUG_GUESTURES, this.mGuesturesOverlay.isDebugEnabled());
 
-        edit.commit();
+        edit.apply();
 
         saveLastXYZ();
 
@@ -661,7 +662,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         edit.putFloat(PREFS_SCROLL_X, mMapView.getScrollX());
         edit.putFloat(PREFS_SCROLL_Y, mMapView.getScrollY());
         edit.putFloat(PREFS_ZOOM_LEVEL, (float) mMapView.getZoomLevelDouble());
-        edit.commit();
+        edit.apply();
         if (logger.isDebugEnabled()) {
             logger.debug("saved LastXYZ:" + getStatusForDebug());
         }
@@ -843,31 +844,28 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
 
     /** called by popup-menu */
     public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.cmd_help:
-                this.showDialog(R.id.cmd_help);
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == R.id.cmd_help) {
+            this.showDialog(R.id.cmd_help);
+            return true;
+        } else if (itemId == R.id.cmd_open_file && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            onOpenDir(item.getTitle());
+            return true;
+        } else if (itemId == R.id.cmd_settings) {// set current xyz to prefs so they can be displayed/modified in the settings
+            final IGeoPoint mapCenter = mMapView.getMapCenter();
 
-            case R.id.cmd_open_file:
-                onOpenDir(item.getTitle());
-                return true;
-                
-            case R.id.cmd_settings: {
-                // set current xyz to prefs so they can be displayed/modified in the settings
-                final IGeoPoint mapCenter = mMapView.getMapCenter();
-
-                final SharedPreferences.Editor edit = getPrefs().edit();
-                edit.putString(PREFS_CURRENT_ZOOMLEVEL, "" + (int) mMapView.getZoomLevelDouble());
-                edit.putString(PREFS_CURRENT_NORTH, LAT_LON2TEXT.format(mapCenter.getLatitude()));
-                edit.putString(PREFS_CURRENT_EAST, LAT_LON2TEXT.format(mapCenter.getLongitude()));
-                edit.commit();
-                SettingsActivity.show(this, R.id.cmd_settings);
-                return true;
-            }
+            final SharedPreferences.Editor edit = getPrefs().edit();
+            edit.putString(PREFS_CURRENT_ZOOMLEVEL, "" + (int) mMapView.getZoomLevelDouble());
+            edit.putString(PREFS_CURRENT_NORTH, LAT_LON2TEXT.format(mapCenter.getLatitude()));
+            edit.putString(PREFS_CURRENT_EAST, LAT_LON2TEXT.format(mapCenter.getLongitude()));
+            edit.apply();
+            SettingsActivity.show(this, R.id.cmd_settings);
+            return true;
         }
         return false;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void onOpenDir(CharSequence title) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
         intent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION

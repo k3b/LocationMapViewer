@@ -22,6 +22,7 @@ import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -46,6 +47,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.documentfile.provider.DocumentFile;
 
@@ -81,6 +83,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.k3b.android.GeoUtil;
+import de.k3b.android.geo.AndroidGeoLoadService;
 import de.k3b.android.locationMapViewer.constants.Constants;
 import de.k3b.android.locationMapViewer.geobmp.BookmarkListOverlay;
 import de.k3b.android.locationMapViewer.geobmp.BookmarkUtil;
@@ -89,6 +92,7 @@ import de.k3b.android.osmdroid.GuestureOverlay;
 import de.k3b.android.osmdroid.ZoomUtil;
 import de.k3b.android.widgets.AboutDialogPreference;
 import de.k3b.android.widgets.FilePermissionActivity;
+import de.k3b.geo.GeoLoadService;
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
@@ -112,7 +116,7 @@ import de.k3b.util.ImageResize;
  * The code is based on "org.osmdroid.samples.SampleWithMinimapItemizedoverlay in DemoApp OpenStreetMapViewer"
  */
 public class LocationMapViewer extends FilePermissionActivity implements Constants, BookmarkListOverlay.AdditionalPoints  {
-    private static final Logger logger = LoggerFactory.getLogger(LocationMapViewer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocationMapViewer.class);
 
     // ===========================================================
     // Constants
@@ -464,9 +468,9 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
                 inputStream = getContentResolver().openInputStream(Uri.parse(symbol));
                 drawable = (inputStream == null) ? null : new BitmapDrawable(getResources(), inputStream);
             } catch (Exception e) {
-                logger.info("symbol '" + symbol + "' not loaded: " + e.getMessage(), e);
+                LOGGER.info("symbol '" + symbol + "' not loaded: " + e.getMessage(), e);
             } finally {
-                closeSilently(inputStream);
+                GeoLoadService.closeSilently(inputStream);
             }
             if (drawable != null) {
                 Bitmap bitmap = drawable.getBitmap();
@@ -490,16 +494,6 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
             poiMarker.setImage(drawable);
         }
         poiMarker.setIcon(icon);
-    }
-
-    private void closeSilently(java.io.Closeable inputStream) {
-        if (inputStream != null) {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private RadiusMarkerClusterer createPointOfInterestOverlay(List<Overlay> overlays) {
@@ -582,13 +576,17 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         if (uri != null) {
             InputStream is = null;
             try {
-                is = getContentResolver().openInputStream(uri);
-                GpxReaderBase parser = new GpxReaderBase(pointCollector, new GeoPointDto());
-                parser.parse(new InputSource(is));
+                is = AndroidGeoLoadService.openGeoInputStream(this, uri);
+                if (is != null) {
+                    GpxReaderBase parser = new GpxReaderBase(pointCollector, new GeoPointDto());
+                    parser.parse(new InputSource(is));
+                } else {
+                    LOGGER.warn("No geo found in " + uri);
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Cannot open " + uri, e);
             } finally {
-                closeSilently(is);
+                AndroidGeoLoadService.closeSilently(is);
             }
         }
     }
@@ -663,13 +661,13 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         edit.putFloat(PREFS_SCROLL_Y, mMapView.getScrollY());
         edit.putFloat(PREFS_ZOOM_LEVEL, (float) mMapView.getZoomLevelDouble());
         edit.apply();
-        if (logger.isDebugEnabled()) {
-            logger.debug("saved LastXYZ:" + getStatusForDebug());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("saved LastXYZ:" + getStatusForDebug());
         }
     }
 
     private String getStatusForDebug() {
-        if (logger.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             StringBuilder result = new StringBuilder();
             final int scrollX = mMapView.getScrollX();
             final int scrollY = mMapView.getScrollY();
@@ -736,8 +734,8 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         controller.setZoom(getPrefs().getFloat(PREFS_ZOOM_LEVEL, zoom));
 
         mMapView.scrollTo((int) scrollX, (int) scrollY);
-        if (logger.isDebugEnabled()) {
-            logger.debug("onResume loaded lastXYZ:" + scrollX + "/" + scrollY + "/" + zoom + " => "
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("onResume loaded lastXYZ:" + scrollX + "/" + scrollY + "/" + zoom + " => "
                     + getStatusForDebug());
         }
     }
@@ -901,7 +899,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
     /** called if a sub-activity finishes */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
-        if (logger.isDebugEnabled()) logger.debug("onActivityResult(requestCode="+requestCode+", resultCode="+resultCode+", data="+data+")");
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("onActivityResult(requestCode="+requestCode+", resultCode="+resultCode+", data="+data+")");
         if (requestCode == R.id.cmd_settings) {
             onSettingsResult();
         } else if (requestCode == REQUEST_ID_PICK_KML_DIR && resultCode == RESULT_OK && data != null) {
@@ -912,45 +910,39 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
 
     private void onPickDirResult(Uri data) {
         final DocumentFile dir = DocumentFile.fromTreeUri(this, data);
-        if (dir != null && dir.exists() && dir.isDirectory()) {
-            DocumentFile[] files = dir.listFiles();
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,android.R.layout.select_dialog_singlechoice);
-            if (files != null) {
-                final Map<String, DocumentFile> name2file = new HashMap<>();
-                for (DocumentFile file : files) {
-                    String name = file.getName();
-                    String nameLower = name.toLowerCase();
-                    name2file.put(nameLower, file);
-                    if (nameLower.endsWith(".gpx") || nameLower.endsWith(".kml") || nameLower.endsWith(".poi")) {
-                        arrayAdapter.add(name);
-                    }
-                }
-
-                int count = arrayAdapter.getCount();
-                if (count == 1) {
-                    onPickFileResult(dir, arrayAdapter.getItem(0), name2file);
-                } else if (count > 1) {
-                    AlertDialog.Builder builderSingle = new AlertDialog.Builder(LocationMapViewer.this);
-                    builderSingle.setIcon(R.drawable.ic_launcher);
-                    builderSingle.setTitle(R.string.title_open_file);
-                    builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            String strName = arrayAdapter.getItem(which);
-                            onPickFileResult(dir, strName, name2file);
-                            dialog.dismiss();
-                        }
-                    });
-                    builderSingle.show();
-                }
-            }
+        final Map<String, DocumentFile> name2file = new HashMap<>();
+        final List<String> found = AndroidGeoLoadService.getGeoFiles(dir, name2file);
+        int count = found.size();
+        if (count == 1) {
+            onPickFileResult(dir, found.get(0), name2file);
+        } else if (count > 1) {
+            showGeoFilePicker(this, dir, name2file, found);
+        } else {
+            LOGGER.info("No Geo file found directly below " + data);
         }
+    }
+
+    private static void showGeoFilePicker(final LocationMapViewer parent, final DocumentFile dir, final Map<String, DocumentFile> name2file, List<String> found) {
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(parent,android.R.layout.select_dialog_singlechoice, found);
+
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(parent);
+        builderSingle.setIcon(R.drawable.ic_launcher);
+        builderSingle.setTitle(R.string.title_open_file);
+        builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String strName = arrayAdapter.getItem(which);
+                parent.onPickFileResult(dir, strName, name2file);
+                dialog.dismiss();
+            }
+        });
+        builderSingle.show();
     }
 
     private void onPickFileResult(final DocumentFile dir, String name, final Map<String, DocumentFile> name2file) {
@@ -960,7 +952,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         final IGeoInfoHandler pointConverter = new IGeoInfoHandler() {
             @Override
             public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
-                String symbol = convertSymbol(aGeoPoint, dir, name2file);
+                String symbol = AndroidGeoLoadService.convertSymbol(aGeoPoint, dir, name2file);
                 if (symbol != null) {
                     ((GeoPointDto) aGeoPoint).setSymbol(symbol);
                 }
@@ -974,43 +966,6 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         zoomTo(geoPointFromIntent, pointConverter);
     }
 
-    private String convertSymbol(final IGeoPointInfo aGeoPoint,final DocumentFile dir, final Map<String, DocumentFile> name2file) {
-        String symbol = aGeoPoint != null ? aGeoPoint.getSymbol() : null;
-        if (symbol != null && !symbol.contains(":") && symbol.contains(".")) {
-            symbol = symbol.toLowerCase();
-            DocumentFile doc = name2file.get(symbol);
-            if (doc == null && symbol.contains("/")) {
-                doc = addFiles(dir, symbol.split("/"), name2file);
-            }
-            if (doc != null) return doc.getUri().toString();
-        }
-        return null;
-    }
-
-    private DocumentFile addFiles(DocumentFile dir, String[] pathElements, Map<String, DocumentFile> name2file) {
-        DocumentFile currentdir = dir;
-        StringBuilder path = new StringBuilder();
-        DocumentFile doc = null;
-        int last = pathElements.length - 1;
-        for (int i = 0; i <= last; i++) {
-            if (path.length() > 0) path.append("/");
-            String parentPath = path.toString();
-            path.append(pathElements[i]);
-            String pathLowerCase = path.toString();
-            doc = name2file.get(pathLowerCase);
-            if (doc == null && i <= last && currentdir != null && currentdir.isDirectory()) {
-                DocumentFile[] children = currentdir.listFiles();
-                if (children != null) {
-                    for (DocumentFile child : children) {
-                        name2file.put(parentPath  + child.getName().toLowerCase(), child);
-                    }
-                    doc = name2file.get(pathLowerCase);
-                }
-            }
-            currentdir = doc;
-        }
-        return doc;
-    }
 
     private void onSettingsResult() {
         RestoreXYZ(); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
@@ -1043,8 +998,8 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
                     return 1;
                 }
             } catch (Exception ex) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn("Cannot set setCenter(n={},e={}) => {}",
+                if (LOGGER.isWarnEnabled()) {
+                    LOGGER.warn("Cannot set setCenter(n={},e={}) => {}",
                             newNorthString, newEastString, ex.getMessage());
                 }
             }
@@ -1061,8 +1016,8 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
                     return 1;
                 }
             } catch (Exception ex) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn("Cannot set setZoom({}) => {}",
+                if (LOGGER.isWarnEnabled()) {
+                    LOGGER.warn("Cannot set setZoom({}) => {}",
                             newZoomString, ex.getMessage());
                 }
             }
@@ -1223,8 +1178,8 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         public void execute(String debugContext, MapView mapView) {
             ZoomUtil.zoomTo(mapView, mZoomLevel, mMin, mMax);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("DelayedSetCenterZoom.execute({}: ({}) .. ({}),z={}) => ({}), z={} => {}",
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("DelayedSetCenterZoom.execute({}: ({}) .. ({}),z={}) => ({}), z={} => {}",
                         debugContext,
                         mMin, mMax, mZoomLevel, mapView.getMapCenter(), (int) mapView.getZoomLevelDouble(), getStatusForDebug());
             }

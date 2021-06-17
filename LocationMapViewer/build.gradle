@@ -57,9 +57,9 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.annotation:annotation:1.1.0'
 
-    implementation 'com.github.k3b:k3b-geoHelper:1.1.5'
+    // implementation 'com.github.k3b:k3b-geoHelper:1.1.5'
     // implementation 'com.github.k3b:k3b-geoHelper:master-SNAPSHOT'
-    // implementation 'com.github.k3b:k3b-geoHelper:WikipediaAndroid-SNAPSHOT'
+    implementation 'com.github.k3b:k3b-geoHelper:WikipediaAndroid-SNAPSHOT'
 
     // this is osmdroid
     // implementation project(':osmdroid-android') // local copy

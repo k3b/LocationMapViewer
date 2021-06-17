@@ -41,64 +41,6 @@ import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.util.Unzip;
 
 public class AndroidGeoLoadService extends GeoLoadService {
-    /**
-     * @return list of found existing geo-filenames (without path) below dir
-     * */
-    @NonNull
-    public static List<String> getGeoFiles(DocumentFile dir, Map<String, DocumentFile> name2file) {
-        final List<String> found = new ArrayList<>();
-        DocumentFile[] files = listFiles(dir);
-        if (files != null) {
-            for (DocumentFile file : files) {
-                String name = getName(file);
-                String nameLower = name.toLowerCase();
-                name2file.put(nameLower, file);
-                if (isGeo(nameLower)) {
-                    found.add(name);
-                }
-            }
-        }
-        return found;
-    }
-
-    public static String convertSymbol(final IGeoPointInfo aGeoPoint, final DocumentFile dir, final Map<String, DocumentFile> name2file) {
-        String symbol = aGeoPoint != null ? aGeoPoint.getSymbol() : null;
-        if (symbol != null && !symbol.contains(":") && symbol.contains(".")) {
-            symbol = symbol.toLowerCase();
-            DocumentFile doc = name2file.get(symbol);
-            if (doc == null && symbol.contains("/")) {
-                doc = addFiles(dir, symbol.split("/"), name2file);
-            }
-            if (doc != null) return getUri(doc);
-        }
-        return null;
-    }
-
-    private static DocumentFile addFiles(DocumentFile dir, String[] pathElements, Map<String, DocumentFile> name2file) {
-        DocumentFile currentdir = dir;
-        StringBuilder path = new StringBuilder();
-        DocumentFile doc = null;
-        int last = pathElements.length - 1;
-        for (int i = 0; i <= last; i++) {
-            if (path.length() > 0) path.append("/");
-            String parentPath = path.toString();
-            path.append(pathElements[i]);
-            String pathLowerCase = path.toString();
-            doc = name2file.get(pathLowerCase);
-            if (doc == null && i <= last) {
-                DocumentFile[] children = listFiles(currentdir);
-                if (children != null) {
-                    for (DocumentFile child : children) {
-                        name2file.put(parentPath  + getName(child).toLowerCase(), child);
-                    }
-                    doc = name2file.get(pathLowerCase);
-                }
-            }
-            currentdir = doc;
-        }
-        return doc;
-    }
-
     @NonNull
     public static InputStream openGeoInputStream(Context context, Uri uri, String name) throws IOException {
         InputStream is = null;
@@ -120,26 +62,5 @@ public class AndroidGeoLoadService extends GeoLoadService {
         File unzipRootDir = new File(context.getCacheDir(), "unzip");
         File geoUnzipDir = new File(unzipRootDir, name + ".dir");
         return geoUnzipDir;
-    }
-
-    // ----- File api abstractions
-    private static String getName(@NonNull DocumentFile file) {
-        return file.getName();
-    }
-
-    @Nullable
-    private static DocumentFile[] listFiles(@Nullable DocumentFile dir) {
-        if (isExistingDirectory(dir)) {
-            return dir.listFiles();
-        }
-        return null;
-    }
-
-    private static boolean isExistingDirectory(@Nullable DocumentFile dir) {
-        return dir != null && dir.exists() && dir.isDirectory();
-    }
-
-    private static String getUri(DocumentFile doc) {
-        return doc.getUri().toString();
     }
 }

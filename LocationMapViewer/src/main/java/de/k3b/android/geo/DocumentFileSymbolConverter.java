@@ -23,6 +23,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import de.k3b.geo.SymbolConverterBase;
@@ -33,6 +35,30 @@ public class DocumentFileSymbolConverter extends SymbolConverterBase<DocumentFil
                                        @Nullable final Map<String, DocumentFile> name2file,
                                        @Nullable IGeoInfoHandler nextConverter) {
         super(rootDir, name2file, nextConverter);
+    }
+
+    public static List<String> getGeoFiles(DocumentFile dir, Map<String, DocumentFile> name2file) {
+        return new DocumentFileSymbolConverter(dir, name2file, null).getGeoFiles(dir);
+    }
+
+    /**
+     * @return list of found existing geo-filenames (without path) below dir
+     * */
+    @NonNull
+    public List<String> getGeoFiles(DocumentFile dir) {
+        final List<String> found = new ArrayList<>();
+        DocumentFile[] files = listFiles(dir);
+        if (files != null) {
+            for (DocumentFile file : files) {
+                String name = getName(file);
+                String nameLower = name.toLowerCase();
+                name2file.put(nameLower, file);
+                if (isGeo(nameLower)) {
+                    found.add(name);
+                }
+            }
+        }
+        return found;
     }
 
     // ----- File api abstractions

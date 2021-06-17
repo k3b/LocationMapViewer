@@ -52,6 +52,6 @@ public class FileSymbolConverter extends SymbolConverterBase<File> implements IG
     }
 
     @NonNull @Override protected String getUri(@NonNull File doc) {
-        return doc.getAbsolutePath();
+        return "file://" + doc.getAbsolutePath();
     }
 }

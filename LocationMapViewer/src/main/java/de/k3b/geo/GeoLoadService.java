@@ -29,8 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.k3b.geo.api.IGeoPointInfo;
-import de.k3b.io.GeoConfig;
+import de.k3b.io.GeoConfig2;
 
 /* TODO: move to Geohelper */
 public class GeoLoadService {
@@ -62,50 +61,13 @@ public class GeoLoadService {
     }
 
     public static boolean isGeo(String nameLower) {
-        return GeoConfig.isOneOf(nameLower, GeoConfig.EXT_ALL);
+        return GeoConfig.isOneOf(nameLower, GeoConfig2.EXT_ALL);
     }
 
     public static boolean iszip(String nameLower) {
         return GeoConfig.isOneOf(nameLower, GeoConfig.EXT_ALL_ZIP);
     }
 
-    public static String convertSymbol(final IGeoPointInfo aGeoPoint, final File dir, final Map<String, File> name2file) {
-        String symbol = aGeoPoint != null ? aGeoPoint.getSymbol() : null;
-        if (symbol != null && !symbol.contains(":") && symbol.contains(".")) {
-            symbol = symbol.toLowerCase();
-            File doc = name2file.get(symbol);
-            if (doc == null && symbol.contains("/")) {
-                doc = addFiles(dir, symbol.split("/"), name2file);
-            }
-            if (doc != null) return getUri(doc);
-        }
-        return null;
-    }
-
-    private static File addFiles(File dir, String[] pathElements, Map<String, File> name2file) {
-        File currentdir = dir;
-        StringBuilder path = new StringBuilder();
-        File doc = null;
-        int last = pathElements.length - 1;
-        for (int i = 0; i <= last; i++) {
-            if (path.length() > 0) path.append("/");
-            String parentPath = path.toString();
-            path.append(pathElements[i]);
-            String pathLowerCase = path.toString();
-            doc = name2file.get(pathLowerCase);
-            if (doc == null && i <= last) {
-                File[] children = listFiles(currentdir);
-                if (children != null) {
-                    for (File child : children) {
-                        name2file.put(parentPath  + getName(child).toLowerCase(), child);
-                    }
-                    doc = name2file.get(pathLowerCase);
-                }
-            }
-            currentdir = doc;
-        }
-        return doc;
-    }
 
     private static String getName(@NonNull File file) {
         return file.getName();

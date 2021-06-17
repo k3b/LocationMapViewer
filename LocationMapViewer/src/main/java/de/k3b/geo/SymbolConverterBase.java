@@ -28,6 +28,7 @@ import java.util.Map;
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
+import de.k3b.io.GeoConfig2;
 
 /**
  * A {@link IGeoInfoHandler} in a chain of {@link IGeoInfoHandler}s that converts
@@ -49,6 +50,9 @@ public abstract class SymbolConverterBase<T>  implements IGeoInfoHandler {
         this.rootDir = rootDir;
         this.name2file = name2file != null ? name2file : new HashMap<String, T>();
         this.nextConverter = nextConverter;
+        if (this.name2file.size() == 0) {
+            addFiles("", rootDir);
+        }
     }
 
     // IGeoInfoHandler
@@ -79,25 +83,36 @@ public abstract class SymbolConverterBase<T>  implements IGeoInfoHandler {
         T currentdir = rootDir;
         StringBuilder path = new StringBuilder();
         T doc = null;
-        int last = pathElements.length - 1;
-        for (int i = 0; i <= last; i++) {
+        for (String pathElement : pathElements) {
             if (path.length() > 0) path.append("/");
             String parentPath = path.toString();
-            path.append(pathElements[i]);
+            path.append(pathElement);
             String pathLowerCase = path.toString();
             doc = name2file.get(pathLowerCase);
-            if (doc == null && i <= last) {
-                T[] children = listFiles(currentdir);
-                if (children != null) {
-                    for (T child : children) {
-                        name2file.put(parentPath  + getName(child).toLowerCase(), child);
-                    }
-                    doc = name2file.get(pathLowerCase);
-                }
+            if (doc == null) {
+                addFiles(parentPath, currentdir);
+                doc = name2file.get(pathLowerCase);
             }
             currentdir = doc;
         }
         return doc;
+    }
+
+    private void addFiles(String parentPath, T currentdir) {
+        T[] children = listFiles(currentdir);
+        if (children != null) {
+            for (T child : children) {
+                name2file.put(parentPath + getName(child).toLowerCase(), child);
+            }
+        }
+    }
+
+    public static boolean isGeo(String nameLower) {
+        return GeoConfig.isOneOf(nameLower, GeoConfig2.EXT_ALL);
+    }
+
+    public static boolean iszip(String nameLower) {
+        return GeoConfig.isOneOf(nameLower, GeoConfig.EXT_ALL_ZIP);
     }
 
     // Abstract OS-Specific methods

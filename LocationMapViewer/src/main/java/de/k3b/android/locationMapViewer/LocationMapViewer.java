@@ -74,8 +74,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URLDecoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -562,21 +565,24 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         return new GeoPoint(aGeoPoint.getLatitude(), aGeoPoint.getLongitude());
     }
 
-    private void loadGeoPointDtos(DocumentFile documentFile, IGeoInfoHandler pointCollector) {
+    private void loadGeoPointDtos(DocumentFile documentFile, IGeoInfoHandler pointCollector, String name) {
         final Uri uri = (documentFile != null) ? documentFile.getUri() : null;
-        loadGeoPointDtos(uri, pointCollector);
+        loadGeoPointDtos(uri, pointCollector, name);
     }
 
     private void loadGeoPointDtos(Intent intent, IGeoInfoHandler pointCollector) {
         final Uri uri = (intent != null) ? intent.getData() : null;
-        loadGeoPointDtos(uri, pointCollector);
+        loadGeoPointDtos(uri, pointCollector, null);
     }
 
-    private void loadGeoPointDtos(Uri uri, IGeoInfoHandler pointCollector) {
+    private void loadGeoPointDtos(Uri uri, IGeoInfoHandler pointCollector, String name) {
         if (uri != null) {
             InputStream is = null;
             try {
-                is = AndroidGeoLoadService.openGeoInputStream(this, uri);
+                if (name == null) {
+                    name = new File(URLDecoder.decode(uri.getLastPathSegment(),"UTF8")).getName();
+                }
+                is = AndroidGeoLoadService.openGeoInputStream(this, uri, name);
                 if (is != null) {
                     GpxReaderBase parser = new GpxReaderBase(pointCollector, new GeoPointDto());
                     parser.parse(new InputSource(is));
@@ -945,13 +951,19 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         builderSingle.show();
     }
 
-    private void onPickFileResult(final DocumentFile dir, String name, final Map<String, DocumentFile> name2file) {
+    private void onPickFileResult(final DocumentFile dir, final String name, final Map<String, DocumentFile> name2file) {
         GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(this.getIntent());
 
         final IGeoInfoHandler pointCollector = createPointCollector(geoPointFromIntent);
+        final boolean iszip = AndroidGeoLoadService.iszip(name);
         final IGeoInfoHandler pointConverter = new IGeoInfoHandler() {
             @Override
             public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
+                /*
+                String symbol = iszip
+                        ? AndroidGeoLoadService.convertSymbol(aGeoPoint, AndroidGeoLoadService.getUnzipDirFile(LocationMapViewer.this, name), name2file)
+                        : AndroidGeoLoadService.convertSymbol(aGeoPoint, dir, name2file);
+                 */
                 String symbol = AndroidGeoLoadService.convertSymbol(aGeoPoint, dir, name2file);
                 if (symbol != null) {
                     ((GeoPointDto) aGeoPoint).setSymbol(symbol);
@@ -961,7 +973,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
             }
         };
 
-        loadGeoPointDtos(name2file.get(name.toLowerCase()), pointConverter);
+        loadGeoPointDtos(name2file.get(name.toLowerCase()), pointConverter, name);
 
         zoomTo(geoPointFromIntent, pointConverter);
     }

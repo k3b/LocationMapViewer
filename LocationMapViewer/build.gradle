@@ -55,9 +55,11 @@ dependencies {
 
     implementation 'androidx.drawerlayout:drawerlayout:1.1.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.annotation:annotation:1.1.0'
 
-    // implementation 'com.github.k3b:k3b-geoHelper:1.1.5'
-    implementation 'com.github.k3b:k3b-geoHelper:master-SNAPSHOT'
+    implementation 'com.github.k3b:k3b-geoHelper:1.1.5'
+    // implementation 'com.github.k3b:k3b-geoHelper:master-SNAPSHOT'
+    // implementation 'com.github.k3b:k3b-geoHelper:WikipediaAndroid-SNAPSHOT'
 
     // this is osmdroid
     // implementation project(':osmdroid-android') // local copy
@@ -74,6 +76,7 @@ dependencies {
     // implementation 'org.slf4j:slf4j-android:1.7.7@jar'
     // only error and warn
     implementation 'eu.lp0.slf4j:slf4j-android:1.7.7-1@jar'
+//  implementation 'org.jetbrains:annotations-java5:15.0'
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.slf4j:slf4j-simple:1.7.7@jar'

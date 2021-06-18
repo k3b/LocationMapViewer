@@ -47,6 +47,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.documentfile.provider.DocumentFile;
 
@@ -72,12 +74,9 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLDecoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,8 +100,6 @@ import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.GeoUri;
-import de.k3b.geo.io.gpx.GeoXmlOrTextParser;
-import de.k3b.geo.io.gpx.GpxReaderBase;
 import de.k3b.util.ImageResize;
 
 /**
@@ -225,8 +222,6 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         mPOIOverlayNonCluster = (mUseClusterPoints) ? null : createNonClusterOverlay(overlays);
         mPOIOverlayCluster = (mUseClusterPoints) ? createPointOfInterestOverlay(overlays) : null;
 
-        final IGeoInfoHandler pointCollector = createPointCollector(geoPointFromIntent);
-
         if (geoPointFromIntent != null) {
             initialWindow = new GeoBmpDto(geoPointFromIntent);
             BitmapDrawable drawable = (BitmapDrawable) getDrawableEx(R.drawable.marker_no_data);
@@ -234,11 +229,6 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
 
             initialWindow.setName(getString(R.string.bookmark_template_initial) + geoPointFromIntent.getName());
         }
-
-        loadGeoPointDtos(intent, pointCollector);
-        loadGeoPointDtosFromExtra(intent.getStringExtra("de.k3b.POIS"), pointCollector);
-
-        zoomTo(geoPointFromIntent, pointCollector);
 
         createMyLocationOverlay(overlays);
 
@@ -279,6 +269,8 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         // else html a-href-links do not work.
         TextView t2 = (TextView) findViewById(R.id.cright_osm);
         t2.setMovementMethod(LinkMovementMethod.getInstance());
+        openGeoFileFromIntent();
+
     }
 
     private Drawable getDrawableEx(int p) {
@@ -332,18 +324,6 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         }
 
         return mPrefs;
-    }
-
-    private void loadGeoPointDtosFromExtra(String pois, IGeoInfoHandler pointCollector) {
-        if (pois != null) {
-            List<GeoBmpDto> result = new GeoXmlOrTextParser<GeoBmpDto>().get(new GeoBmpDto(), pois);
-
-            if (result != null) {
-                for(GeoBmpDto item : result) {
-                    pointCollector.onGeoInfo(item);
-                }
-            }
-        }
     }
 
     private FolderOverlay createNonClusterOverlay(List<Overlay> overlays) {
@@ -573,38 +553,6 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         if (aGeoPoint == null) return null;
 
         return new GeoPoint(aGeoPoint.getLatitude(), aGeoPoint.getLongitude());
-    }
-
-    private void loadGeoPointDtos(DocumentFile documentFile, IGeoInfoHandler pointCollector, String name) {
-        final Uri uri = (documentFile != null) ? documentFile.getUri() : null;
-        loadGeoPointDtos(uri, pointCollector, name);
-    }
-
-    private void loadGeoPointDtos(Intent intent, IGeoInfoHandler pointCollector) {
-        final Uri uri = (intent != null) ? intent.getData() : null;
-        loadGeoPointDtos(uri, pointCollector, null);
-    }
-
-    private void loadGeoPointDtos(Uri uri, IGeoInfoHandler pointCollector, String name) {
-        if (uri != null) {
-            InputStream is = null;
-            try {
-                if (name == null) {
-                    name = new File(URLDecoder.decode(uri.getLastPathSegment(),"UTF8")).getName();
-                }
-                is = AndroidGeoLoadService.openGeoInputStream(this, uri, name);
-                if (is != null) {
-                    GpxReaderBase parser = new GpxReaderBase(pointCollector, new GeoPointDto());
-                    parser.parse(new InputSource(is));
-                } else {
-                    LOGGER.warn("No geo found in {}" , uri);
-                }
-            } catch (IOException e) {
-                LOGGER.warn("Cannot open " + uri, e);
-            } finally {
-                AndroidGeoLoadService.closeSilently(is);
-            }
-        }
     }
 
     private GeoPointDto getGeoPointDtoFromIntent(Intent intent) {
@@ -938,7 +886,9 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         }
     }
 
-    private static void showGeoFilePicker(final LocationMapViewer parent, final DocumentFile dir, final Map<String, DocumentFile> name2file, List<String> found) {
+    private static void showGeoFilePicker(
+            @NonNull final LocationMapViewer parent, @NonNull final DocumentFile dir,
+            @NonNull final Map<String, DocumentFile> name2file,@NonNull List<String> found) {
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(parent,android.R.layout.select_dialog_singlechoice, found);
 
         AlertDialog.Builder builderSingle = new AlertDialog.Builder(parent);
@@ -961,20 +911,36 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         builderSingle.show();
     }
 
-    private void onPickGeoFileResult(final DocumentFile dir, final String name, final Map<String, DocumentFile> name2file) {
-        GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(this.getIntent());
+    private void onPickGeoFileResult(@NonNull final DocumentFile dir, @NonNull final String name, @NonNull final Map<String, DocumentFile> name2file) {
+        DocumentFile documentFile = name2file.get(name.toLowerCase());
+        Uri uri = (documentFile != null) ? documentFile.getUri() : null;
+
+        openGeoFile(uri, dir, name2file, name);
+    }
+
+    private void openGeoFileFromIntent() {
+        Uri uri = getIntent().getData();
+        openGeoFile(uri, null, null, AndroidGeoLoadService.getName(uri));
+    }
+
+    private void openGeoFile(Uri uri, DocumentFile dir, Map<String, DocumentFile> name2file, String name) {
+        Intent intent = this.getIntent();
+        GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
 
         final IGeoInfoHandler pointCollector = createPointCollector(geoPointFromIntent);
 
         IGeoInfoHandler pointCollectorWithSymbolConverter = null;
-        if (DocumentFileSymbolConverter.iszip(name)) {
+        if (name != null && DocumentFileSymbolConverter.iszip(name)) {
             File fileDir = AndroidGeoLoadService.getUnzipDirFile(LocationMapViewer.this, name);
             pointCollectorWithSymbolConverter = new FileSymbolConverter(fileDir, null, pointCollector);
-        } else {
+        } else if (dir != null){
             pointCollectorWithSymbolConverter = new DocumentFileSymbolConverter(dir, name2file, pointCollector);
+        } else {
+            pointCollectorWithSymbolConverter = pointCollector;
         }
 
-        loadGeoPointDtos(name2file.get(name.toLowerCase()), pointCollectorWithSymbolConverter, name);
+        AndroidGeoLoadService.loadGeoPointDtos(this, uri, pointCollectorWithSymbolConverter, name);
+        AndroidGeoLoadService.loadGeoPointDtosFromText(intent.getStringExtra("de.k3b.POIS"), pointCollector);
 
         zoomTo(geoPointFromIntent, pointCollectorWithSymbolConverter);
     }

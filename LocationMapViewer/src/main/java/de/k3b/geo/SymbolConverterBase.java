@@ -28,7 +28,6 @@ import java.util.Map;
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
-import de.k3b.io.GeoConfig2;
 
 /**
  * A {@link IGeoInfoHandler} in a chain of {@link IGeoInfoHandler}s that converts
@@ -108,7 +107,7 @@ public abstract class SymbolConverterBase<T>  implements IGeoInfoHandler {
     }
 
     public static boolean isGeo(String nameLower) {
-        return GeoConfig.isOneOf(nameLower, GeoConfig2.EXT_ALL);
+        return GeoConfig.isOneOf(nameLower, GeoConfig.EXT_ALL);
     }
 
     public static boolean iszip(String nameLower) {

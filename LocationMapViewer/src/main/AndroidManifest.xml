@@ -139,6 +139,26 @@
                     android:mimeType="*/*"
                     android:pathPattern=".*\\.kml"
                     android:scheme="file" />
+                <data android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.gpz"
+                    android:scheme="file" />
+                <data android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.kmz"
+                    android:scheme="file" />
+                <data android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.poz"
+                    android:scheme="file" />
+                <data android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.gpx\\.zip"
+                    android:scheme="file" />
+                <data android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.kml\\.zip"
+                    android:scheme="file" />
             </intent-filter>
 
             <!-- http(s)/ftp with mime null-host -->
@@ -154,9 +174,14 @@
                 <data android:scheme="ftp" />
                 <data android:scheme="content" />
                 <data android:mimeType="application/vnd.google-earth.kml+xml" />
+                <data android:mimeType="application/vnd.google-earth.kmz" />
                 <data android:mimeType="application/xml+kml" />
                 <data android:mimeType="application/xml+gpx" />
                 <data android:mimeType="application/xml+poi" />
+                <data android:mimeType="application/zip+xml+kml" />
+                <data android:mimeType="application/zip+xml+gpx" />
+                <data android:mimeType="application/zip+xml+poi" />
+                <data android:mimeType="application/zip" />
                 <data android:host="*" />
             </intent-filter>
 
@@ -174,9 +199,13 @@
                 <data android:scheme="file" />
 
                 <data android:mimeType="application/vnd.google-earth.kml+xml" />
+                <data android:mimeType="application/vnd.google-earth.kmz" />
                 <data android:mimeType="application/xml+kml" />
                 <data android:mimeType="application/xml+gpx" />
                 <data android:mimeType="application/xml+poi" />
+                <data android:mimeType="application/zip+xml+kml" />
+                <data android:mimeType="application/zip+xml+gpx" />
+                <data android:mimeType="application/zip+xml+poi" />
             </intent-filter>
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW"/>

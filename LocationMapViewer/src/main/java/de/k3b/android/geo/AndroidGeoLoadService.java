@@ -20,41 +20,74 @@
 package de.k3b.android.geo;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
-import androidx.documentfile.provider.DocumentFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 import de.k3b.geo.GeoLoadService;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.util.Unzip;
+import de.k3b.util.Unzip2;
 
 public class AndroidGeoLoadService extends GeoLoadService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AndroidGeoLoadService.class);
 
+    /**
+     * @param isZipped null: means unknows: try to find out
+     * @return
+     * @throws IOException
+     */
     @NonNull
-    public static InputStream openGeoInputStream(Context context, Uri uri, String name) throws IOException {
-        InputStream is = null;
-        is = context.getContentResolver().openInputStream(uri);
+    public static InputStream openGeoInputStream(Context context, Uri uri, String name, Boolean isZipped) throws IOException {
+        InputStream inputStream = null;
+        inputStream = new BufferedInputStream(context.getContentResolver().openInputStream(uri));
 
-        if (iszip(name)) {
-            File geoUnzipDir = getUnzipDirFile(context, name);
-            Unzip.unzip(name, is, geoUnzipDir);
-            GeoLoadService.closeSilently(is);
-            is = null;
-            File geofile = getFirstGeoFile(geoUnzipDir);
-            if (geofile != null) is = new FileInputStream(geofile);
+        // https://stackoverflow.com/questions/1809007/best-way-to-detect-if-a-stream-is-zipped-in-java
+        // find out if stream inputStream zip
+        if (isZipped == null) {
+            isZipped = isZipStream(inputStream);
         }
-        return is;
+
+        if (isZipped) {
+            File geoUnzipDir = getUnzipDirFile(context, name);
+            Unzip.unzip(name, inputStream, geoUnzipDir);
+            GeoLoadService.closeSilently(inputStream);
+            inputStream = null;
+            File geofile = getFirstGeoFile(geoUnzipDir);
+            if (geofile != null) inputStream = new BufferedInputStream(new FileInputStream(geofile));
+        }
+        return inputStream;
+    }
+
+    public static boolean isZipStream(InputStream inputStream) {
+        // todo inline with Unzip.isZipStream
+        return Unzip2.isZipStream(inputStream);
+    }
+
+    public static boolean isZipStream(Context context, Uri uri) {
+        boolean result = false;
+        if (uri != null) {
+            InputStream is = null;
+            try {
+                is = new BufferedInputStream(context.getContentResolver().openInputStream(uri));
+                result = Unzip2.isZipStream(is);
+            } catch (FileNotFoundException e) {
+                // assume no zip stream
+            } finally {
+                closeSilently(is);
+            }
+        }
+        return result;
     }
 
     @NonNull
@@ -64,26 +97,16 @@ public class AndroidGeoLoadService extends GeoLoadService {
         return geoUnzipDir;
     }
 
-    public static void loadGeoPointDtos(Context context, DocumentFile documentFile, IGeoInfoHandler pointCollector) {
-        if (documentFile != null) {
-            loadGeoPointDtos(context, documentFile.getUri(), pointCollector, documentFile.getName());
-        }
-    }
-
-    public static void loadGeoPointDtos(Context context, Intent intent, IGeoInfoHandler pointCollector) {
-        final Uri uri = (intent != null) ? intent.getData() : null;
-        loadGeoPointDtos(context, uri, pointCollector, null);
-    }
-
-
-    public static void loadGeoPointDtos(Context context, Uri uri, IGeoInfoHandler pointCollector, String name) {
+    public static void loadGeoPointDtos(Context context, Uri uri, IGeoInfoHandler pointCollector,
+                                        String name, Boolean isZipped) {
         if (uri != null) {
             InputStream is = null;
             try {
                 if (name == null) {
                     name = getName(uri);
                 }
-                is = AndroidGeoLoadService.openGeoInputStream(context, uri, name);
+                is = AndroidGeoLoadService.openGeoInputStream(context, uri, name, isZipped);
+
                 loadGeoPointDtos(is, pointCollector);
             } catch (IOException e) {
                 LOGGER.warn("loadGeoPointDtos: Cannot open " + uri, e);

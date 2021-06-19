@@ -60,6 +60,7 @@ dependencies {
     // implementation 'com.github.k3b:k3b-geoHelper:1.1.5'
     // implementation 'com.github.k3b:k3b-geoHelper:master-SNAPSHOT'
     implementation 'com.github.k3b:k3b-geoHelper:WikipediaAndroid-SNAPSHOT'
+    // implementation 'com.github.k3b:k3b-geoHelper:WikipediaAndroid-v1.1.4-gf51d7c7-63'
 
     // this is osmdroid
     // implementation project(':osmdroid-android') // local copy

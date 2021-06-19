@@ -48,7 +48,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.documentfile.provider.DocumentFile;
 
@@ -911,7 +910,8 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         builderSingle.show();
     }
 
-    private void onPickGeoFileResult(@NonNull final DocumentFile dir, @NonNull final String name, @NonNull final Map<String, DocumentFile> name2file) {
+    private void onPickGeoFileResult(@NonNull final DocumentFile dir, @NonNull final String name,
+                                     @NonNull final Map<String, DocumentFile> name2file) {
         DocumentFile documentFile = name2file.get(name.toLowerCase());
         Uri uri = (documentFile != null) ? documentFile.getUri() : null;
 
@@ -919,27 +919,40 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
     }
 
     private void openGeoFileFromIntent() {
-        Uri uri = getIntent().getData();
-        openGeoFile(uri, null, null, AndroidGeoLoadService.getName(uri));
+        Intent intent = getIntent();
+
+        if (intent != null) {
+
+            Uri uri = intent.getData();
+
+            // used by https://github.com/SimpleMobileTools/Simple-File-Manager to reveal the original file name
+            // if uri looks like this content://media/external/file/12345
+            String name = AndroidGeoLoadService.getName(intent.getStringExtra("file_path_2"));
+            if (name == null) {
+                name = AndroidGeoLoadService.getName(uri);
+            }
+
+            openGeoFile(uri, null, null, name);
+        }
     }
 
-    private void openGeoFile(Uri uri, DocumentFile dir, Map<String, DocumentFile> name2file, String name) {
+    private void openGeoFile(Uri uri, DocumentFile relativeRootDir, Map<String, DocumentFile> name2file, String name) {
         Intent intent = this.getIntent();
         GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
 
         final IGeoInfoHandler pointCollector = createPointCollector(geoPointFromIntent);
+        IGeoInfoHandler pointCollectorWithSymbolConverter = pointCollector;
 
-        IGeoInfoHandler pointCollectorWithSymbolConverter = null;
-        if (name != null && DocumentFileSymbolConverter.iszip(name)) {
-            File fileDir = AndroidGeoLoadService.getUnzipDirFile(LocationMapViewer.this, name);
-            pointCollectorWithSymbolConverter = new FileSymbolConverter(fileDir, null, pointCollector);
-        } else if (dir != null){
-            pointCollectorWithSymbolConverter = new DocumentFileSymbolConverter(dir, name2file, pointCollector);
-        } else {
-            pointCollectorWithSymbolConverter = pointCollector;
+        if (uri != null) {
+            boolean isZipStream = AndroidGeoLoadService.isZipStream(this, uri);
+            if (isZipStream) {
+                File fileDir = AndroidGeoLoadService.getUnzipDirFile(this, name);
+                pointCollectorWithSymbolConverter = new FileSymbolConverter(fileDir, null, pointCollector);
+            } else if (relativeRootDir != null) {
+                pointCollectorWithSymbolConverter = new DocumentFileSymbolConverter(relativeRootDir, name2file, pointCollector);
+            }
+            AndroidGeoLoadService.loadGeoPointDtos(this, uri, pointCollectorWithSymbolConverter, name, isZipStream);
         }
-
-        AndroidGeoLoadService.loadGeoPointDtos(this, uri, pointCollectorWithSymbolConverter, name);
         AndroidGeoLoadService.loadGeoPointDtosFromText(intent.getStringExtra("de.k3b.POIS"), pointCollector);
 
         zoomTo(geoPointFromIntent, pointCollectorWithSymbolConverter);

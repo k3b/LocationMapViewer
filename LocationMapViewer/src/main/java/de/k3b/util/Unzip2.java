@@ -34,6 +34,22 @@ public class Unzip2 {
     public static final String TAG = Unzip.class.getSimpleName();
     private static final Logger LOGGER = LoggerFactory.getLogger(TAG);
 
+    // see https://stackoverflow.com/questions/1809007/best-way-to-detect-if-a-stream-is-zipped-in-java/68038770#68038770
+    public static boolean isZipStream(InputStream inputStream) {
+        if (inputStream == null || !inputStream.markSupported()) {
+            throw new IllegalArgumentException("InputStream must support mark-reset. Use BufferedInputstream()");
+        }
+        boolean isZipped = false;
+        try {
+            inputStream.mark(64);
+            isZipped = new ZipInputStream(inputStream).getNextEntry() != null;
+            inputStream.reset();
+        } catch (IOException ex) {
+            // cannot be opend as zip.
+        }
+        return isZipped;
+    }
+
     public static void unzip(String name, InputStream inputStream, File destinationDir) throws IOException {
         ZipInputStream zipInputStream = null;
         String message = "unzip('" + name +

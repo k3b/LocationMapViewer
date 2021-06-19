@@ -43,7 +43,6 @@ import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.io.gpx.GeoXmlOrTextParser;
 import de.k3b.geo.io.gpx.GpxReaderBase;
-import de.k3b.io.GeoConfig2;
 
 /* TODO: move to Geohelper */
 public class GeoLoadService {
@@ -76,12 +75,12 @@ public class GeoLoadService {
         return null;
     }
 
-    public static boolean isGeo(String nameLower) {
-        return GeoConfig.isOneOf(nameLower, GeoConfig2.EXT_ALL);
+    public static boolean isGeo(String name) {
+        return GeoConfig.isOneOf(name, GeoConfig.EXT_ALL);
     }
 
-    public static boolean iszip(String nameLower) {
-        return GeoConfig.isOneOf(nameLower, GeoConfig.EXT_ALL_ZIP);
+    public static boolean iszip(String name) {
+        return GeoConfig.isOneOf(name, GeoConfig.EXT_ALL_ZIP);
     }
 
 
@@ -138,15 +137,23 @@ public class GeoLoadService {
     }
 
     public static String getName(Uri uri) {
+        String decodedPath = null;
         if (uri != null) {
             String lastPathSegment = uri.getLastPathSegment();
             try {
-                return new File(URLDecoder.decode(lastPathSegment, "UTF8")).getName();
+                decodedPath = URLDecoder.decode(lastPathSegment, "UTF8");
+
             } catch (UnsupportedEncodingException ignore) {
                 LOGGER.warn("getName(uri={}) => {}" , uri, ignore.getMessage());
                 return lastPathSegment;
             }
+            decodedPath = getName(decodedPath);
         }
-        return null;
+        return decodedPath;
+    }
+
+    public static String getName(String decodedPath) {
+        if (decodedPath == null) return null;
+        return new File(decodedPath).getName();
     }
 }

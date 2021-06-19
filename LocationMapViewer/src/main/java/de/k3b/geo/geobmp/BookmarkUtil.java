@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 by k3b.
+ * Copyright (c) 2015-2021 by k3b.
  *
  * This file is part of LocationMapViewer.
  *
@@ -17,7 +17,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 
-package de.k3b.android.locationMapViewer.geobmp;
+package de.k3b.geo.geobmp;
 
 import de.k3b.geo.api.IGeoPointInfo;
 
@@ -30,8 +30,8 @@ public class BookmarkUtil {
     private static int id =1;
 
     /** clones item (i.e. currentPositon) and mark it as new */
-    public static GeoBmpDto createBookmark(GeoBmpDto template) {
-        GeoBmpDto result = (GeoBmpDto) template.clone();
+    public static <DTO extends GeoBmpDto>DTO createBookmark(DTO template) {
+        DTO result = (DTO) template.clone();
         result
                 .setBitmap(template.getBitmap())
                 .setName("")                    // to be set in rename dialog
@@ -40,11 +40,11 @@ public class BookmarkUtil {
         return result;
     }
 
-    public static boolean isBookmark(GeoBmpDto item) {
+    public static <DTO extends GeoBmpDto>boolean isBookmark(DTO item) {
         return ((item != null) && (item.getDescription() == null));
     }
 
-    public static boolean isNew(GeoBmpDto item) {
+    public static <DTO extends GeoBmpDto>boolean isNew(DTO item) {
         return ((item != null) && (item.getId() == null));
     }
 
@@ -55,7 +55,7 @@ public class BookmarkUtil {
     /**
      * sets data for NewItemPlaceholder
      */
-    public static GeoBmpDto markAsTemplate(final GeoBmpDto template) {
+    public static <DTO extends GeoBmpDto>DTO markAsTemplate(final DTO template) {
         if (template != null) {
             final String newId = "#" + (id++);
             if (!isNotEmpty(template.getName())) {

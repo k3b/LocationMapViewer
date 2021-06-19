@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 by k3b.
+ * Copyright (c) 2015-2021 by k3b.
  *
  * This file is part of LocationMapViewer.
  *
@@ -33,7 +33,7 @@ import de.k3b.geo.io.GeoFormatter;
 import de.k3b.util.IsoDateTimeParser;
 
 /**
- * Connects a {@link GeoBmpDto} data element
+ * Connects a {@link GeoBmpDtoAndroid} data element
  * with the corresponding gui elements.
  *
  * This implements convention over configuration.
@@ -43,7 +43,7 @@ import de.k3b.util.IsoDateTimeParser;
  */
 public class GeoBmpBinder {
     /** hack for adapter in listview where i cannot controll the class generated */
-    public static void toGui(final View gui, GeoBmpDto item) {
+    public static void toGui(final View gui, GeoBmpDtoAndroid item) {
         toGui(new IViewHolder() {
             @Override
             public View findViewById(int id) {
@@ -52,7 +52,7 @@ public class GeoBmpBinder {
         }, item);
     }
 
-    public static void toGui(IViewHolder gui, GeoBmpDto item) {
+    public static void toGui(IViewHolder gui, GeoBmpDtoAndroid item) {
         TextView textView;
 
         textView = (TextView) gui.findViewById(R.id.name);
@@ -87,7 +87,7 @@ public class GeoBmpBinder {
         if (thumbnail != null) thumbnail.setImageBitmap(item.getBitmap());
     }
 
-    public static void fromGui(IViewHolder gui, GeoBmpDto currentItem) {
+    public static void fromGui(IViewHolder gui, GeoBmpDtoAndroid currentItem) {
         EditText textView;
 
         // id and bitmap are not read from gui

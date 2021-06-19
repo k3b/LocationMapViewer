@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 by k3b.
+ * Copyright (c) 2015-2021 by k3b.
  *
  * This file is part of LocationMapViewer.
  *
@@ -39,6 +39,7 @@ import de.k3b.android.locationMapViewer.R;
 import de.k3b.android.locationMapViewer.constants.Constants;
 import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
+import de.k3b.geo.geobmp.BookmarkUtil;
 
 /**
  * Handles BookmarkList as part of the mapview
@@ -49,7 +50,7 @@ public class BookmarkListOverlay implements IGeoInfoHandler, Constants {
     private ActionBarDrawerToggle mDrawerToggle;
 
     public interface AdditionalPoints {
-        GeoBmpDto[] getAdditionalPoints();
+        GeoBmpDtoAndroid[] getAdditionalPoints();
     }
     // private static final int MENU_ADD_CATEGORY = Menu.FIRST;
     private static final int EDIT_MENU_ID = Menu.FIRST + 137;
@@ -72,7 +73,7 @@ public class BookmarkListOverlay implements IGeoInfoHandler, Constants {
         bookMarkController = new BookmarkListController(context, (ListView) context.findViewById(android.R.id.list));
         bookMarkController.setSelChangedListener(new BookmarkListController.OnSelChangedListener() {
             @Override
-            public void onSelChanged(GeoBmpDto newSelection) {
+            public void onSelChanged(GeoBmpDtoAndroid newSelection) {
                 BookmarkListOverlay.this.onSelChanged(newSelection);
             }
         });
@@ -81,7 +82,7 @@ public class BookmarkListOverlay implements IGeoInfoHandler, Constants {
         createButtons();
     }
 
-    protected void onSelChanged(GeoBmpDto newSelection) {
+    protected void onSelChanged(GeoBmpDtoAndroid newSelection) {
         final boolean sel = (newSelection != null);
         cmdEdit.setEnabled(sel);
         cmdDelete.setEnabled(sel && BookmarkUtil.isBookmark(newSelection));
@@ -188,7 +189,7 @@ public class BookmarkListOverlay implements IGeoInfoHandler, Constants {
         return this;
     }
 
-    public void showGeoPointEditDialog(GeoBmpDto geoPointInfo) {
+    public void showGeoPointEditDialog(GeoBmpDtoAndroid geoPointInfo) {
         if (geoPointInfo != null) {
             if (this.edit == null) {
                 this.edit = new GeoBmpEditDialog(this.context, this, R.layout.geobmp_edit_name);
@@ -216,7 +217,7 @@ public class BookmarkListOverlay implements IGeoInfoHandler, Constants {
 
     /** before deleting: "Are you shure?" */
     private void deleteConfirm() {
-        final GeoBmpDto currentItem = this.bookMarkController.getCurrentItem();
+        final GeoBmpDtoAndroid currentItem = this.bookMarkController.getCurrentItem();
         if (currentItem != null) {
             final String message = String.format(
                     this.context.getString(R.string.format_question_delete).toString(),

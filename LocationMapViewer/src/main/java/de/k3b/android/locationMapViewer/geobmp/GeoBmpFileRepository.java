@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 by k3b.
+ * Copyright (c) 2015-2021 by k3b.
  *
  * This file is part of LocationMapViewer.
  *
@@ -27,12 +27,13 @@ import java.io.Writer;
 
 import de.k3b.android.GeoUtil;
 import de.k3b.geo.api.IGeoRepository;
+import de.k3b.geo.geobmp.BookmarkUtil;
 import de.k3b.geo.io.GeoFileRepository;
 
 /**
  * Created by k3b on 24.03.2015.
  */
-public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDto> {
+public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDtoAndroid> {
     private final File iconDir;
 
     /**
@@ -41,13 +42,13 @@ public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDto> {
      * @param file
      */
     public GeoBmpFileRepository(File file) {
-        super(file, new GeoBmpDto());
+        super(file, new GeoBmpDtoAndroid());
         this.iconDir = new File(file.getAbsolutePath() + ".icons");
         this.iconDir.mkdirs();
     }
 
-    protected GeoBmpDto loadItem(String line) {
-        GeoBmpDto geo = (GeoBmpDto) super.loadItem(line);
+    protected GeoBmpDtoAndroid loadItem(String line) {
+        GeoBmpDtoAndroid geo = (GeoBmpDtoAndroid) super.loadItem(line);
         File bmpFile = getBmpFile(geo);
 
         if ((bmpFile != null) && (bmpFile.exists())) {
@@ -56,7 +57,7 @@ public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDto> {
         return geo;
     }
 
-    protected boolean saveItem(Writer writer, GeoBmpDto geo) throws IOException {
+    protected boolean saveItem(Writer writer, GeoBmpDtoAndroid geo) throws IOException {
         final boolean valid = super.saveItem(writer, geo);
 
         File bmpFile = (valid) ? getBmpFile(geo) : null;
@@ -67,7 +68,7 @@ public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDto> {
         return valid;
     }
 
-    private File getBmpFile(GeoBmpDto geo) {
+    private File getBmpFile(GeoBmpDtoAndroid geo) {
         if (geo == null) return null;
         final String id = geo.getId();
 
@@ -84,7 +85,7 @@ public class GeoBmpFileRepository extends GeoFileRepository<GeoBmpDto> {
      * @return true if successful
      */
     @Override
-    public IGeoRepository<GeoBmpDto> delete(GeoBmpDto item) {
+    public IGeoRepository<GeoBmpDtoAndroid> delete(GeoBmpDtoAndroid item) {
         File file = getBmpFile(item);
         if (file != null) file.delete();
 

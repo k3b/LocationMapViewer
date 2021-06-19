@@ -87,8 +87,8 @@ import de.k3b.android.geo.AndroidGeoLoadService;
 import de.k3b.android.geo.DocumentFileSymbolConverter;
 import de.k3b.android.locationMapViewer.constants.Constants;
 import de.k3b.android.locationMapViewer.geobmp.BookmarkListOverlay;
-import de.k3b.android.locationMapViewer.geobmp.BookmarkUtil;
-import de.k3b.android.locationMapViewer.geobmp.GeoBmpDto;
+import de.k3b.geo.geobmp.BookmarkUtil;
+import de.k3b.android.locationMapViewer.geobmp.GeoBmpDtoAndroid;
 import de.k3b.android.osmdroid.GuestureOverlay;
 import de.k3b.android.osmdroid.ZoomUtil;
 import de.k3b.android.widgets.AboutDialogPreference;
@@ -161,7 +161,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
     private SeekBar mZoomBar;
 
     /** first visible window as bookmark candidate */
-    private GeoBmpDto initialWindow = null;
+    private GeoBmpDtoAndroid initialWindow = null;
     private BookmarkListOverlay bookmarkListOverlay;
     private ImageButton cmdShowMenu = null;
     private Boolean showLocation = null;
@@ -222,7 +222,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         mPOIOverlayCluster = (mUseClusterPoints) ? createPointOfInterestOverlay(overlays) : null;
 
         if (geoPointFromIntent != null) {
-            initialWindow = new GeoBmpDto(geoPointFromIntent);
+            initialWindow = new GeoBmpDtoAndroid(geoPointFromIntent);
             BitmapDrawable drawable = (BitmapDrawable) getDrawableEx(R.drawable.marker_no_data);
             initialWindow.setBitmap(drawable.getBitmap());
 
@@ -256,7 +256,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
 
         this.bookmarkListOverlay = new BookmarkListOverlay(this, this) {
             @Override
-            protected void onSelChanged(GeoBmpDto newSelection) {
+            protected void onSelChanged(GeoBmpDtoAndroid newSelection) {
                 super.onSelChanged(newSelection);
 
                 if (newSelection != null) {
@@ -836,25 +836,25 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
     }
 
     /** implements interface BookmarkListOverlay.AdditionalPoints */
-    public GeoBmpDto[] getAdditionalPoints() {
+    public GeoBmpDtoAndroid[] getAdditionalPoints() {
         GeoPoint gps = (this.mLocationOverlay != null) ? this.mLocationOverlay.getMyLocation() : null;
 
-        GeoBmpDto gpsWindow = null;
+        GeoBmpDtoAndroid gpsWindow = null;
         if (gps != null) {
-            gpsWindow = new GeoBmpDto();
+            gpsWindow = new GeoBmpDtoAndroid();
             GeoUtil.createBookmark(gps, IGeoPointInfo.NO_ZOOM, getString(R.string.bookmark_template_gps), gpsWindow);
             BitmapDrawable drawable = (BitmapDrawable) getDrawableEx(R.drawable.person);
             gpsWindow.setBitmap(drawable.getBitmap());
 
         }
-        GeoBmpDto currentWindow = getCurrentAsGeoPointDto(getString(R.string.bookmark_template_current));
-        return new GeoBmpDto[]{currentWindow, gpsWindow, initialWindow};
+        GeoBmpDtoAndroid currentWindow = getCurrentAsGeoPointDto(getString(R.string.bookmark_template_current));
+        return new GeoBmpDtoAndroid[]{currentWindow, gpsWindow, initialWindow};
     }
 
-    private GeoBmpDto getCurrentAsGeoPointDto(String name) {
-        GeoBmpDto current = new GeoBmpDto();
+    private GeoBmpDtoAndroid getCurrentAsGeoPointDto(String name) {
+        GeoBmpDtoAndroid current = new GeoBmpDtoAndroid();
         GeoUtil.createBookmark(this.mMapView.getMapCenter(), (int) this.mMapView.getZoomLevelDouble(), name, current);
-        current.setBitmap(GeoUtil.createBitmapFromMapView(mMapView, GeoBmpDto.WIDTH, GeoBmpDto.HEIGHT));
+        current.setBitmap(GeoUtil.createBitmapFromMapView(mMapView, GeoBmpDtoAndroid.WIDTH, GeoBmpDtoAndroid.HEIGHT));
         return current;
     }
 
@@ -953,7 +953,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
             }
             AndroidGeoLoadService.loadGeoPointDtos(this, uri, pointCollectorWithSymbolConverter, name, isZipStream);
         }
-        AndroidGeoLoadService.loadGeoPointDtosFromText(intent.getStringExtra("de.k3b.POIS"), pointCollector);
+        AndroidGeoLoadService.loadGeoPointDtosFromText(intent.getStringExtra("de.k3b.POIS"), pointCollector, new GeoBmpDtoAndroid());
 
         zoomTo(geoPointFromIntent, pointCollectorWithSymbolConverter);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 by k3b.
+ * Copyright (c) 2015-2021 by k3b.
  *
  * This file is part of LocationMapViewer.
  *
@@ -30,6 +30,7 @@ import java.util.List;
 import de.k3b.android.locationMapViewer.R;
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.api.IGeoRepository;
+import de.k3b.geo.geobmp.BookmarkUtil;
 
 /**
  * Gui-type independendant handling to display/update a BookmarkList.
@@ -39,11 +40,11 @@ import de.k3b.geo.api.IGeoRepository;
 public class BookmarkListController {
     private static final String BOOKMARKS_FILE_NAME = "favorites.txt";
 
-    private GeoBmpDto currentItem;
+    private GeoBmpDtoAndroid currentItem;
 
-    public BookmarkListController setAdditionalPoints(GeoBmpDto[] additionalPoints) {
+    public BookmarkListController setAdditionalPoints(GeoBmpDtoAndroid[] additionalPoints) {
         this.additionalPoints = additionalPoints;
-        for (GeoBmpDto template : this.additionalPoints) {
+        for (GeoBmpDtoAndroid template : this.additionalPoints) {
             BookmarkUtil.markAsTemplate(template);
         }
         return this;
@@ -51,13 +52,13 @@ public class BookmarkListController {
 
     interface OnSelChangedListener
     {
-        void onSelChanged(GeoBmpDto newSelection);
+        void onSelChanged(GeoBmpDtoAndroid newSelection);
     }
 
     private final Context context;
     private final ListView listView;
-    private final IGeoRepository<GeoBmpDto> repository;
-    private GeoBmpDto[] additionalPoints = null;
+    private final IGeoRepository<GeoBmpDtoAndroid> repository;
+    private GeoBmpDtoAndroid[] additionalPoints = null;
     private OnSelChangedListener selChangedListener = null;
 
     public BookmarkListController(Context context, final ListView listView) {
@@ -68,7 +69,7 @@ public class BookmarkListController {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                final GeoBmpDto currenSelection = (GeoBmpDto) listView.getItemAtPosition(position);
+                final GeoBmpDtoAndroid currenSelection = (GeoBmpDtoAndroid) listView.getItemAtPosition(position);
                 setCurrentItem(currenSelection);
             }
         });
@@ -79,7 +80,7 @@ public class BookmarkListController {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View childView,
                                        int position, long id) {
-                onSelChanged((GeoBmpDto) listView.getItemAtPosition(position));
+                onSelChanged((GeoBmpDtoAndroid) listView.getItemAtPosition(position));
             }
 
             @Override
@@ -97,7 +98,7 @@ public class BookmarkListController {
     }
 
     public BookmarkListController reloadGuiFromRepository() {
-        final ArrayAdapter<GeoBmpDto> adapter = GeoBmpListAdapter.createAdapter(this.context,
+        final ArrayAdapter<GeoBmpDtoAndroid> adapter = GeoBmpListAdapter.createAdapter(this.context,
                 R.layout.geobmp_list_view_row, repository, additionalPoints);
         this.listView.setAdapter(adapter);
         this.setCurrentItem(adapter.isEmpty() ? null : adapter.getItem(0));
@@ -105,7 +106,7 @@ public class BookmarkListController {
     }
 
 
-    public void setCurrentItem(GeoBmpDto newSelection) {
+    public void setCurrentItem(GeoBmpDtoAndroid newSelection) {
         final GeoBmpListAdapter listAdapter = (GeoBmpListAdapter) this.listView.getAdapter();
         listAdapter.setCurrentSelecion(newSelection);
 
@@ -116,16 +117,16 @@ public class BookmarkListController {
         }
     }
 
-    public GeoBmpDto getCurrentItem() {
+    public GeoBmpDtoAndroid getCurrentItem() {
         return currentItem;
     }
 
     public void update(IGeoPointInfo geoPointInfo) {
         if (BookmarkUtil.isValid(geoPointInfo)) {
-            GeoBmpDto item = (GeoBmpDto) geoPointInfo;
+            GeoBmpDtoAndroid item = (GeoBmpDtoAndroid) geoPointInfo;
             if (BookmarkUtil.isNew(item)) {
                 item.setId(repository.createId());
-                List<GeoBmpDto> items = this.repository.load();
+                List<GeoBmpDtoAndroid> items = this.repository.load();
                 items.add(0, item);
             }
             this.repository.save();

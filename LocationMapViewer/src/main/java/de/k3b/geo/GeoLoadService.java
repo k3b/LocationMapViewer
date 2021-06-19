@@ -19,8 +19,6 @@
 
 package de.k3b.geo;
 
-import android.net.Uri;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -38,6 +36,7 @@ import java.util.Map;
 
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoInfoHandler;
+import de.k3b.geo.io.gpx.GeoXmlOrTextParser;
 import de.k3b.geo.io.gpx.GpxReaderBase;
 
 /* TODO: move to Geohelper */
@@ -125,4 +124,16 @@ public class GeoLoadService {
         if (decodedPath == null) return null;
         return new File(decodedPath).getName();
     }
+    public static <T extends GeoPointDto>void loadGeoPointDtosFromText(String pois, IGeoInfoHandler pointCollector, T factoryItem) {
+        if (pois != null) {
+            List<T> result = new GeoXmlOrTextParser<T>().get(factoryItem, pois);
+
+            if (result != null) {
+                for(T item : result) {
+                    pointCollector.onGeoInfo(item);
+                }
+            }
+        }
+    }
+
 }

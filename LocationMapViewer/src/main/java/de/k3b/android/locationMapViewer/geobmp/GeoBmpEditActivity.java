@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 by k3b.
+ * Copyright (c) 2015-2021 by k3b.
  *
  * This file is part of LocationMapViewer.
  *
@@ -22,8 +22,6 @@ package de.k3b.android.locationMapViewer.geobmp;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -38,7 +36,7 @@ public class GeoBmpEditActivity extends Activity implements IGeoInfoHandler, IVi
     private Button buttonSave;
     private Button buttonCancel;
 
-    private GeoBmpDto currentItem = null;
+    private GeoBmpDtoAndroid currentItem = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,17 +86,17 @@ public class GeoBmpEditActivity extends Activity implements IGeoInfoHandler, IVi
 
     @Override
     public boolean onGeoInfo(IGeoPointInfo geoInfo) {
-        this.currentItem = (GeoBmpDto) geoInfo;
+        this.currentItem = (GeoBmpDtoAndroid) geoInfo;
 
         load(this.currentItem);
         return true;
     }
 
-    void load(GeoBmpDto currentItem) {
+    void load(GeoBmpDtoAndroid currentItem) {
         GeoBmpBinder.toGui(this, currentItem);
     }
 
-    private void save(GeoBmpDto currentItem) {
+    private void save(GeoBmpDtoAndroid currentItem) {
         GeoBmpBinder.fromGui(this, currentItem);
     }
 

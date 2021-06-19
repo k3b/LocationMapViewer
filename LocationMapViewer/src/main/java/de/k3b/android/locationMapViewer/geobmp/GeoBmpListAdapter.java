@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 by k3b.
+ * Copyright (c) 2015-2021 by k3b.
  *
  * This file is part of LocationMapViewer.
  *
@@ -33,7 +33,7 @@ import de.k3b.geo.api.IGeoRepository;
 
 /** Adapter to display IGeoPointInfo in a ListView. */
 class GeoBmpListAdapter extends
-        ArrayAdapter<GeoBmpDto> {
+        ArrayAdapter<GeoBmpDtoAndroid> {
 
     /**
      * Corresponds to filter ignore catagory or edit to create a new category
@@ -44,29 +44,29 @@ class GeoBmpListAdapter extends
      * The Resource used for the adapter
      */
     private final int viewId;
-    private GeoBmpDto currentSelecion;
+    private GeoBmpDtoAndroid currentSelecion;
 
     private int colorSelected;
     private int colorNotSelected;
 
     private GeoBmpListAdapter(final Context context,
-                              final int textViewResourceId, final List<GeoBmpDto> items) {
+                              final int textViewResourceId, final List<GeoBmpDtoAndroid> items) {
         super(context, textViewResourceId, items);
         this.viewId = textViewResourceId;
         colorSelected = context.getResources().getColor(R.color.list_overlay_selected);
         colorNotSelected = context.getResources().getColor(R.color.list_overlay_not_selected);
     }
 
-    public static ArrayAdapter<GeoBmpDto> createAdapter(
+    public static ArrayAdapter<GeoBmpDtoAndroid> createAdapter(
             final Context context, final int viewId,
             final IGeoRepository repository,
-            final GeoBmpDto... additionalPoints
+            final GeoBmpDtoAndroid... additionalPoints
     ) {
-        final List<GeoBmpDto> items = repository.reload();
+        final List<GeoBmpDtoAndroid> items = repository.reload();
 
         if (additionalPoints != null) {
             for(int index = additionalPoints.length -1; index >= 0; index--) {
-                final GeoBmpDto item = additionalPoints[index];
+                final GeoBmpDtoAndroid item = additionalPoints[index];
                 if (item != null) {
                     items.add(0, item);
                 }
@@ -78,7 +78,7 @@ class GeoBmpListAdapter extends
     @Override
     public View getView(final int position, final View convertView,
                         final ViewGroup parent) {
-        final GeoBmpDto obj = this.getItem(position);
+        final GeoBmpDtoAndroid obj = this.getItem(position);
 
         View itemView = convertView;
         if (itemView == null) {
@@ -98,7 +98,7 @@ class GeoBmpListAdapter extends
         return itemView;
     }
 
-    private void setItemContent(final View itemView, final GeoBmpDto dto) {
+    private void setItemContent(final View itemView, final GeoBmpDtoAndroid dto) {
         if (dto != null) {
             GeoBmpBinder.toGui(itemView, dto);
 
@@ -115,7 +115,7 @@ class GeoBmpListAdapter extends
         }
     }
 
-    public void setCurrentSelecion(GeoBmpDto currentSelecion) {
+    public void setCurrentSelecion(GeoBmpDtoAndroid currentSelecion) {
         if (this.currentSelecion != currentSelecion) {
             this.currentSelecion = currentSelecion;
             notifyDataSetChanged();

@@ -33,9 +33,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.List;
 
+import de.k3b.android.locationMapViewer.geobmp.GeoBmpDto;
 import de.k3b.geo.GeoLoadService;
 import de.k3b.geo.api.IGeoInfoHandler;
+import de.k3b.geo.io.gpx.GeoXmlOrTextParser;
 import de.k3b.util.Unzip;
 import de.k3b.util.Unzip2;
 
@@ -114,6 +119,33 @@ public class AndroidGeoLoadService extends GeoLoadService {
                 AndroidGeoLoadService.closeSilently(is);
             }
         }
+    }
+    public static void loadGeoPointDtosFromText(String pois, IGeoInfoHandler pointCollector) {
+        if (pois != null) {
+            List<GeoBmpDto> result = new GeoXmlOrTextParser<GeoBmpDto>().get(new GeoBmpDto(), pois);
+
+            if (result != null) {
+                for(GeoBmpDto item : result) {
+                    pointCollector.onGeoInfo(item);
+                }
+            }
+        }
+    }
+    
+    public static String getName(Uri uri) {
+        String decodedPath = null;
+        if (uri != null) {
+            String lastPathSegment = uri.getLastPathSegment();
+            try {
+                decodedPath = URLDecoder.decode(lastPathSegment, "UTF8");
+
+            } catch (UnsupportedEncodingException ignore) {
+                LOGGER.warn("getName(uri={}) => {}" , uri, ignore.getMessage());
+                return lastPathSegment;
+            }
+            decodedPath = getName(decodedPath);
+        }
+        return decodedPath;
     }
 
 }

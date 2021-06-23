@@ -1,0 +1,3 @@
+* kml, gpx, poi format now supports symbols (icon in map or popup)
+* added support for formats kmz (kml in zip), gpz (gpx in zip), poz (poi in zip)
+* Toolbar "open file" action to pick a gpx, kml, kmx, ..... geo file

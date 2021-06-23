@@ -17,9 +17,9 @@ android {
         // fdroid 13.8.2016 (6) versionName "0.3.5.170911"
         // fdroid (7) versionName "0.3.7.210429" AO10 with verify error: wrong gradle-wrapper version
         // fdroid 21.05.2021 (8) versionName "0.3.7.210502" AO10 support
-        // ??? menu open File (android api-21)
-        versionName "0.3.7.210502"
-        versionCode 8
+        // fdroid ??? (9) versionName "0.3.8.210625" added support for symbols and open kmz files (=kml in zip)
+        versionName "0.3.8.210625"
+        versionCode 9
     }
     buildTypes {
         debug {
@@ -59,7 +59,11 @@ dependencies {
 
     // implementation 'com.github.k3b:k3b-geoHelper:1.1.5'
     // implementation 'com.github.k3b:k3b-geoHelper:master-SNAPSHOT'
-    implementation 'com.github.k3b:k3b-geoHelper:WikipediaAndroid-SNAPSHOT'
+    implementation 'com.github.k3b:k3b-geoHelper:v1.1.7'
+    // implementation 'com.github.k3b:k3b-geoHelperAndroid:v1.1.7'
+    // implementation 'com.github.k3b:k3b-geoHelper:1.1.6-SNAPSHOT'
+    // implementation 'com.github.k3b:k3b-geoHelperAndroid:1.1.6-SNAPSHOT'
+    // implementation 'com.github.k3b:k3b-geoHelper:WikipediaAndroid-SNAPSHOT'
     // implementation 'com.github.k3b:k3b-geoHelper:WikipediaAndroid-v1.1.4-gf51d7c7-63'
 
     // this is osmdroid

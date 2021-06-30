@@ -18,8 +18,9 @@ android {
         // fdroid (7) versionName "0.3.7.210429" AO10 with verify error: wrong gradle-wrapper version
         // fdroid 21.05.2021 (8) versionName "0.3.7.210502" AO10 support
         // fdroid ??? (9) versionName "0.3.8.210625" added support for symbols and open kmz files (=kml in zip)
-        versionName "0.3.8.210625"
-        versionCode 9
+        // fdroid ??? (10) versionName "0.3.8.210725" fixed crash when opend with a geo uri (#18)
+        versionName "0.3.8.210725"
+        versionCode 10
     }
     buildTypes {
         debug {
@@ -59,8 +60,8 @@ dependencies {
 
     // implementation 'com.github.k3b:k3b-geoHelper:1.1.5'
     // implementation 'com.github.k3b:k3b-geoHelper:master-SNAPSHOT'
-    implementation 'com.github.k3b:k3b-geoHelper:v1.1.7'
-    // implementation 'com.github.k3b:k3b-geoHelperAndroid:v1.1.7'
+    implementation 'com.github.k3b:k3b-geoHelper:v1.1.8'
+    // implementation 'com.github.k3b:k3b-geoHelperAndroid:v1.1.8'
     // implementation 'com.github.k3b:k3b-geoHelper:1.1.6-SNAPSHOT'
     // implementation 'com.github.k3b:k3b-geoHelperAndroid:1.1.6-SNAPSHOT'
     // implementation 'com.github.k3b:k3b-geoHelper:WikipediaAndroid-SNAPSHOT'

@@ -1,8 +1,8 @@
 # LocationMapViewer ![](https://github.com/k3b/LocationMapViewer/blob/master/LocationMapViewer/src/main/res/drawable/ic_launcher.png)
 
-An android app to display geografic information from url or local gpx/kml file in a [map](map). 
+An android app to display geografic information from url or local gpx/kml/kmz/zip file in a [map](map). 
 
-It has support for **gpx** and **kml** files and **geo-uri-s**
+It has support for **gpx**, **kml** and **kmz** files and **geo-uri-s**
 and can work offline (without internet/wifi)
 once geodata is downloaded and cached.
 
@@ -55,8 +55,25 @@ Examples:
         * displays a pin at the location using zoomlevel "6"
 * uri=file:/path/to/waypoints.gpx
     * displays a xml+gpx waypointfile
-* uri=file:/path/to/waypoints.kml
+* uri=content:/path/to/waypoints.kml
     * displays a vnd.google-earth.kml+xml waypointfile
+
+LocationMapViewer can handle local files that end with 
+
+* .kml, .kml.zip, .kmz (kml in zip) 
+* .gpx, .gpx.zip, .gpz (gpx in zip)
+* .poi, .poi.zip, .poz (poi in zip)
+
+LocationMapViewer can handle http(s): and content: urls with mime 
+
+* application/vnd.google-earth.kml+xml
+* application/vnd.google-earth.kmz
+* application/xml+kml
+* application/xml+gpx
+* application/xml+poi
+* application/zip+xml+kml
+* application/zip+xml+gpx
+* application/zip+xml+poi
 
 LocationMapViewer is designed to be used by other apps. This means in Terms of [GPLv3](http://www.gnu.org/licenses/gpl-3.0) that your app
 that uses the Intent-Iterface [is not considered a Derived Work.](https://en.wikipedia.org/wiki/GPL_v3#Point_of_view:_linking_is_irrelevant)

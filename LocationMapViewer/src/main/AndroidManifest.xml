@@ -181,6 +181,14 @@
                 <data android:mimeType="application/zip+xml+kml" />
                 <data android:mimeType="application/zip+xml+gpx" />
                 <data android:mimeType="application/zip+xml+poi" />
+
+                <data android:mimeType="application/kml+xml" />
+                <data android:mimeType="application/gpx+xml" />
+                <data android:mimeType="application/poi+xml" />
+                <data android:mimeType="application/kml+xml+zip" />
+                <data android:mimeType="application/gpx+xml+zip" />
+                <data android:mimeType="application/poi+xml+zip" />
+
                 <data android:mimeType="application/zip" />
                 <data android:host="*" />
             </intent-filter>

@@ -221,7 +221,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         mPOIOverlayNonCluster = (mUseClusterPoints) ? null : createNonClusterOverlay(overlays);
         mPOIOverlayCluster = (mUseClusterPoints) ? createPointOfInterestOverlay(overlays) : null;
 
-        if (geoPointFromIntent != null) {
+        if (hasLocation(geoPointFromIntent)) {
             initialWindow = new GeoBmpDtoAndroid(geoPointFromIntent);
             BitmapDrawable drawable = (BitmapDrawable) getDrawableEx(R.drawable.marker_no_data);
             initialWindow.setBitmap(drawable.getBitmap());
@@ -236,7 +236,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         createZoomBar();
 
         // interactive overlay last=on top
-        if (geoPointFromIntent != null) {
+        if (hasLocation(geoPointFromIntent)) {
             final String title = geoPointFromIntent.getName();
             createMarkerOverlayForMovablePosition(overlays, mMapView, title, toOsmGeoPoint(geoPointFromIntent));
         }
@@ -259,7 +259,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
             protected void onSelChanged(GeoBmpDtoAndroid newSelection) {
                 super.onSelChanged(newSelection);
 
-                if (newSelection != null) {
+                if (hasLocation(newSelection)) {
                     setDelayedCenterZoom(newSelection);
                 }
             }
@@ -285,7 +285,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
             ? new IGeoInfoHandler() {
                 @Override
                 public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
-                    if (aGeoPoint != null) {
+                    if (hasLocation(aGeoPoint)) {
                         mPOIOverlayCluster.add(createMarker(mMapView, aGeoPoint.clone()));
                     }
                     return true;
@@ -294,7 +294,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
             : new IGeoInfoHandler() {
                 @Override
                 public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
-                    if (aGeoPoint != null) {
+                    if (hasLocation(aGeoPoint)) {
                         mPOIOverlayNonCluster.add(createMarker(mMapView, aGeoPoint.clone()));
                     }
                     return true;
@@ -308,9 +308,13 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         return pointCollector;
     }
 
+    public boolean hasLocation(IGeoPointInfo aGeoPoint) {
+        return aGeoPoint != null && !GeoPointDto.isEmpty(aGeoPoint);
+    }
+
     private void zoomTo(GeoPointDto geoPointFromIntent, IGeoInfoHandler pointCollector) {
         List<? extends Overlay> items = (mUseClusterPoints) ? mPOIOverlayCluster.getItems() : mPOIOverlayNonCluster.getItems();
-        final int zoom = (geoPointFromIntent != null) ? geoPointFromIntent.getZoomMin() : GeoPointDto.NO_ZOOM;
+        final int zoom = (hasLocation(geoPointFromIntent)) ? geoPointFromIntent.getZoomMin() : GeoPointDto.NO_ZOOM;
         this.mDelayedSetCenterZoom = (!items.isEmpty()) ? new DelayedSetCenterZoom(items, zoom) : null;
         if (items.isEmpty()) {
             loadDemoItems(pointCollector);
@@ -428,7 +432,8 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         final String description = aGeoPoint.getDescription();
         String symbol = aGeoPoint.getSymbol();
 
-        poiMarker.setSnippet(description);
+        // will be calculated in GeoPointMarkerInfoWindow#onOpen()
+        // poiMarker.setSnippet( stripHtml(description));
         poiMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         poiMarker.setPosition(toOsmGeoPoint(aGeoPoint));
 

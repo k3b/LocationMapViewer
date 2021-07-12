@@ -31,6 +31,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
+import de.k3b.android.util.HtmlUtils;
 import de.k3b.geo.api.GeoPointDto;
 
 /**
@@ -58,7 +59,7 @@ class GeoPointMarkerInfoWindow extends MarkerInfoWindow implements View.OnClickL
         mSelectedPoi = (GeoPointDto) marker.getRelatedObject();
         if (mSelectedPoi != null) {
             setText(R.id.bubble_title, mSelectedPoi.getName());
-            setText(R.id.bubble_description, mSelectedPoi.getDescription());
+            setText(R.id.bubble_description, HtmlUtils.interpreteHtml(mSelectedPoi.getDescription()));
 
             if (mSelectedPoi.getLink() != null) {
                 Button btn = (Button) (mView.findViewById(R.id.bubble_moreinfo));
@@ -78,7 +79,7 @@ class GeoPointMarkerInfoWindow extends MarkerInfoWindow implements View.OnClickL
         }
     }
 
-    private void setText(int resourceId, String value) {
+    private void setText(int resourceId, CharSequence value) {
         if (value != null) {
             TextView tv = (TextView) mView.findViewById(resourceId);
             tv.setVisibility(View.VISIBLE);

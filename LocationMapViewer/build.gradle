@@ -60,8 +60,8 @@ dependencies {
 
     // implementation 'com.github.k3b:k3b-geoHelper:1.1.5'
     // implementation 'com.github.k3b:k3b-geoHelper:master-SNAPSHOT'
-    implementation 'com.github.k3b:k3b-geoHelper:v1.1.8'
-    // implementation 'com.github.k3b:k3b-geoHelperAndroid:v1.1.8'
+    implementation 'com.github.k3b:k3b-geoHelper:v1.1.9-SNAPSHOT'
+    implementation 'com.github.k3b:k3b-geoHelperAndroid:v1.1.9-SNAPSHOT'
     // implementation 'com.github.k3b:k3b-geoHelper:1.1.6-SNAPSHOT'
     // implementation 'com.github.k3b:k3b-geoHelperAndroid:1.1.6-SNAPSHOT'
     // implementation 'com.github.k3b:k3b-geoHelper:WikipediaAndroid-SNAPSHOT'

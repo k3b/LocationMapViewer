@@ -31,14 +31,16 @@ public class HtmlUtils {
 
     // Pattern.DOTALL == mulitline matching; ".*?" anything non-greedy
     private static Pattern htmlComment = Pattern.compile("<!--.*?-->", Pattern.DOTALL);
+    private static Pattern htmlImage = Pattern.compile("<img.*?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
     public static CharSequence interpreteHtml(String html) {
         if (html != null && isHtml.matcher(html).find()) {
-            String htmlWithoutComments = htmlComment.matcher(html).replaceAll("");
+            String htmlSanitzied = htmlComment.matcher(html).replaceAll("");
+            htmlSanitzied = htmlImage.matcher(htmlSanitzied).replaceAll("");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                return Html.fromHtml(htmlWithoutComments, Html.FROM_HTML_MODE_COMPACT);
+                return Html.fromHtml(htmlSanitzied, Html.FROM_HTML_MODE_COMPACT);
             } else {
-                return Html.fromHtml(htmlWithoutComments);
+                return Html.fromHtml(htmlSanitzied);
             }
         }
         return html;

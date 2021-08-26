@@ -52,7 +52,6 @@ import androidx.annotation.RequiresApi;
 import androidx.documentfile.provider.DocumentFile;
 
 import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.clustering.StaticCluster;
 import org.osmdroid.config.Configuration;
@@ -247,12 +246,6 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         mMapView.setMultiTouchControls(true);
 
         loadFromSettings();
-        // setCenterZoom does not work in Android2.1-onCreate() because getHeight() and getWidth() return 0;
-        // initial center must be set later
-        // see http://stackoverflow.com/questions/10411975/how-to-get-the-width-and-height-of-an-image-view-in-android/10412209#10412209
-//        if (initalMapCenterZoom != null) {
-//            setCenterZoom(initalMapCenterZoom);
-//        }
 
         this.bookmarkListOverlay = new BookmarkListOverlay(this, this) {
             @Override
@@ -273,7 +266,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
     }
 
     private Drawable getDrawableEx(int p) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (LOLLIPOP) {
             return getResources().getDrawable(p, theme);
         } else {
             return getResources().getDrawable(p);
@@ -601,12 +594,11 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         edit.putString(PREFS_TILE_SOURCE, mMapView.getTileProvider().getTileSource().name());
         edit.putBoolean(PREFS_SHOW_MINIMAP, mMiniMapOverlay.isEnabled());
         edit.putBoolean(PREFS_CLUSTER_POINTS, this.mUseClusterPoints);
-        //edit.putBoolean(PREFS_SHOW_GUESTURES, this.mGuesturesOverlay.isEnabled());
         edit.putBoolean(PREFS_DEBUG_GUESTURES, this.mGuesturesOverlay.isDebugEnabled());
 
         edit.apply();
 
-        saveLastXYZ();
+        saveLatLonZoom();
 
         this.mLocationOverlay.disableMyLocation();
 
@@ -623,14 +615,25 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         super.onDestroy();
     }
 
-    private void saveLastXYZ() {
+    private void saveLatLonZoom() {
+        final IGeoPoint mapCenter = mMapView.getMapCenter();
+
         final SharedPreferences.Editor edit = getPrefs().edit();
-        edit.putFloat(PREFS_SCROLL_X, mMapView.getScrollX());
-        edit.putFloat(PREFS_SCROLL_Y, mMapView.getScrollY());
-        edit.putFloat(PREFS_ZOOM_LEVEL, (float) mMapView.getZoomLevelDouble());
+        edit.putString(PREFS_CURRENT_ZOOMLEVEL, "" + (int) mMapView.getZoomLevelDouble());
+        edit.putString(PREFS_CURRENT_NORTH, LAT_LON2TEXT.format(mapCenter.getLatitude()));
+        edit.putString(PREFS_CURRENT_EAST, LAT_LON2TEXT.format(mapCenter.getLongitude()));
         edit.apply();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("saved LastXYZ:{}", getStatusForDebug());
+            LOGGER.debug("saveLatLonZoom:{}", getStatusForDebug());
+        }
+    }
+
+    private void restoreLatLonZoom() {
+        setZoom(getPrefs().getString(PREFS_CURRENT_ZOOMLEVEL, "").trim());
+        setCenter(getPrefs().getString(PREFS_CURRENT_NORTH, "").trim(),
+                getPrefs().getString(PREFS_CURRENT_EAST, "").trim());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("restoreLatLonZoom:{}", getStatusForDebug());
         }
     }
 
@@ -690,21 +693,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
             this.mMapView.invalidate();
         }
 
-        RestoreXYZ();
-    }
-
-    private void RestoreXYZ() {
-        final float zoom = getPrefs().getFloat(PREFS_ZOOM_LEVEL, 3);
-        final float scrollX = getPrefs().getFloat(PREFS_SCROLL_X, 0);
-        final float scrollY = getPrefs().getFloat(PREFS_SCROLL_Y, 0);
-
-        final IMapController controller = mMapView.getController();
-        controller.setZoom(getPrefs().getFloat(PREFS_ZOOM_LEVEL, zoom));
-
-        mMapView.scrollTo((int) scrollX, (int) scrollY);
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("onResume loaded lastXYZ:{}/{}/{} => {}",scrollX , scrollY , zoom ,getStatusForDebug());
-        }
+        restoreLatLonZoom();
     }
 
     protected void initShowLocation() {
@@ -813,17 +802,11 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         if (itemId == R.id.cmd_help) {
             this.showDialog(R.id.cmd_help);
             return true;
-        } else if (itemId == R.id.cmd_open_file && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        } else if (itemId == R.id.cmd_open_file && LOLLIPOP) {
             onOpenDir(item.getTitle());
             return true;
         } else if (itemId == R.id.cmd_settings) {// set current xyz to prefs so they can be displayed/modified in the settings
-            final IGeoPoint mapCenter = mMapView.getMapCenter();
-
-            final SharedPreferences.Editor edit = getPrefs().edit();
-            edit.putString(PREFS_CURRENT_ZOOMLEVEL, "" + (int) mMapView.getZoomLevelDouble());
-            edit.putString(PREFS_CURRENT_NORTH, LAT_LON2TEXT.format(mapCenter.getLatitude()));
-            edit.putString(PREFS_CURRENT_EAST, LAT_LON2TEXT.format(mapCenter.getLongitude()));
-            edit.apply();
+            saveLatLonZoom();
             SettingsActivity.show(this, R.id.cmd_settings);
             return true;
         }
@@ -963,17 +946,9 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         zoomTo(geoPointFromIntent, pointCollectorWithSymbolConverter);
     }
 
-
     private void onSettingsResult() {
-        RestoreXYZ(); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
-
-        // apply xyz changes from settings back to view
-        int changes = setZoom(getPrefs().getString(PREFS_CURRENT_ZOOMLEVEL, "").trim())
-                + setCenter(getPrefs().getString(PREFS_CURRENT_NORTH, "").trim(), getPrefs().getString(PREFS_CURRENT_EAST, "").trim());
-
-        if (changes > 0) {
-            saveLastXYZ(); // otherwhise onResume() would overwrite the new values
-        }
+        // onActivityResult is called before onResume(): maxe shure last xyz are restored.
+        restoreLatLonZoom();
 
         if (super.isShowLocation() && this.permissionGrantedGps == null) {
             // settings: show location has just been enabled
@@ -982,7 +957,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         initShowLocation();
     }
 
-    private int setCenter(String newNorthString, String newEastString) {
+    private void setCenter(String newNorthString, String newEastString) {
         if ((newNorthString.length() > 0) && (newEastString.length() > 0)) {
             try {
                 final Number east = LAT_LON2TEXT.parse(newEastString);
@@ -992,7 +967,6 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
 
                 if ((newCenter.getLatitude() != oldCenter.getLatitude()) || (newCenter.getLongitude() != oldCenter.getLongitude())) {
                     setDelayedCenter(newCenter);
-                    return 1;
                 }
             } catch (Exception ex) {
                 if (LOGGER.isWarnEnabled()) {
@@ -1001,16 +975,14 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
                 }
             }
         }
-        return 0;
     }
 
-    private int setZoom(String newZoomString) {
+    private void setZoom(String newZoomString) {
         if (newZoomString.length() > 0) {
             try {
                 int newZoom = Integer.parseInt(getPrefs().getString(PREFS_CURRENT_ZOOMLEVEL, "-1"));
                 if ((newZoom != -1) && (newZoom != (int) mMapView.getZoomLevelDouble())) {
                     setDelayedZoom(newZoom);
-                    return 1;
                 }
             } catch (Exception ex) {
                 if (LOGGER.isWarnEnabled()) {
@@ -1019,7 +991,6 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
                 }
             }
         }
-        return 0;
     }
 
     // ===========================================================

@@ -56,12 +56,12 @@ dependencies {
 
     implementation 'androidx.drawerlayout:drawerlayout:1.1.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.annotation:annotation:1.2.0'
 
     // implementation 'com.github.k3b:k3b-geoHelper:1.1.5'
     // implementation 'com.github.k3b:k3b-geoHelper:master-SNAPSHOT'
-    implementation 'com.github.k3b:k3b-geoHelper:v1.1.9-SNAPSHOT'
-    implementation 'com.github.k3b:k3b-geoHelperAndroid:v1.1.9-SNAPSHOT'
+    implementation 'com.github.k3b:k3b-geoHelper:v1.1.9'
+    // implementation 'com.github.k3b:k3b-geoHelperAndroid:v1.1.9'
     // implementation 'com.github.k3b:k3b-geoHelper:1.1.6-SNAPSHOT'
     // implementation 'com.github.k3b:k3b-geoHelperAndroid:1.1.6-SNAPSHOT'
     // implementation 'com.github.k3b:k3b-geoHelper:WikipediaAndroid-SNAPSHOT'
@@ -69,7 +69,7 @@ dependencies {
 
     // this is osmdroid
     // implementation project(':osmdroid-android') // local copy
-    implementation 'org.osmdroid:osmdroid-android:6.1.10'
+    implementation 'org.osmdroid:osmdroid-android:6.1.11'
     // non local copy from repositories
 	
     // implementation project(':OSMBonusPack').

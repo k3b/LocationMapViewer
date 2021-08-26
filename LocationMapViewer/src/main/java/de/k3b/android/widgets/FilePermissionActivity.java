@@ -51,6 +51,19 @@ import de.k3b.android.locationMapViewer.constants.Constants;
 public abstract class FilePermissionActivity extends Activity implements Constants {
     public static final String TAG = "k3b.FilePermAct";
 
+    /* TODO allow Mapsforge Support for android 10ff
+
+        https://developer.android.com/training/data-storage/manage-all-files
+
+        Declare the MANAGE_EXTERNAL_STORAGE permission in the manifest
+
+Use the ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION intent action to direct users to a system settings page where they can enable the following option for your app: Allow access to manage all files.
+
+    <application android:requestLegacyExternalStorage="true"  /> android-q (api 29) allow file access
+
+
+     */
+
     private static final int REQUEST_ID_READ_EXTERNAL_STORAGE = 2000;
     private static final String PERMISSION_READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
     private Boolean permissionGrantedFile = null;

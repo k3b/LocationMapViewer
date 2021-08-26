@@ -19,12 +19,10 @@
 package de.k3b.android.locationMapViewer;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
-import org.osmdroid.api.IGeoPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +52,8 @@ public class SettingsActivity extends PreferenceActivity implements Constants {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.addPreferencesFromResource(R.xml.preferences);
+        if (Global.USE_DOCUMENT_PROVIDER) {
+            this.addPreferencesFromResource(R.xml.preferences_mapsforge);
+        }
     }
-
 }

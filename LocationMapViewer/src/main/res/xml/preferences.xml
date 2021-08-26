@@ -24,6 +24,7 @@ this program. If not, see <http://www.gnu.org/licenses/>
     android:title="@string/title_activity_settings">
     <PreferenceCategory
         android:key="first_category"
+        android:order="10"
         android:title="@string/prefs_cat_overlays_title">
 
         <CheckBoxPreference
@@ -50,6 +51,7 @@ this program. If not, see <http://www.gnu.org/licenses/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/prefs_current_header"
+        android:order="100"
         android:key="third_category">
         <de.k3b.android.widgets.EditTextPreferenceWithSummary
             android:key="currentZoom"
@@ -63,6 +65,7 @@ this program. If not, see <http://www.gnu.org/licenses/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/prefs_header_development"
+        android:order="500"
         android:key="second_category">
         <!--
         <CheckBoxPreference

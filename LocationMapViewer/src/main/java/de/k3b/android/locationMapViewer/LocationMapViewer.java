@@ -61,6 +61,7 @@ import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.util.TileSystem;
 import org.osmdroid.views.CustomZoomButtonsController;
@@ -87,6 +88,7 @@ import de.k3b.android.geo.AndroidGeoLoadService;
 import de.k3b.android.geo.DocumentFileSymbolConverter;
 import de.k3b.android.locationMapViewer.constants.Constants;
 import de.k3b.android.locationMapViewer.geobmp.BookmarkListOverlay;
+import de.k3b.android.osmdroid.forge.MapsForgeSupport;
 import de.k3b.geo.geobmp.BookmarkUtil;
 import de.k3b.android.locationMapViewer.geobmp.GeoBmpDtoAndroid;
 import de.k3b.android.osmdroid.GuestureOverlay;
@@ -177,6 +179,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        MapsForgeSupport.init(getApplication());
         //https://github.com/osmdroid/osmdroid/issues/366
         //super important. Many tile servers, including open street maps, will
         // BAN applications by user if this is not set
@@ -185,8 +188,10 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         super.onCreate(savedInstanceState);
     }
 
+    // called after permissions are granted
     @Override
     protected void onCreateEx(Bundle savedInstanceState) {
+        Global.prefs2Global(this);
         Intent intent = this.getIntent();
 
         GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(intent);
@@ -207,6 +212,15 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         this.setContentView(R.layout.mapview);
 
         mMapView = (MapView) this.findViewById(R.id.mapview);
+
+        if ((Global.mapsForgeDir == null) || (!Global.mapsForgeDir.exists()) || (!Global.mapsForgeDir.isDirectory())) {
+            Global.mapsForgeEnabled = false;
+        }
+
+        if (Global.mapsForgeEnabled) {
+
+            MapsForgeSupport.load(this, mMapView, Global.mapsForgeDir);
+        }
 
         final List<Overlay> overlays = this.mMapView.getOverlays();
 
@@ -270,10 +284,36 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         t2.setMovementMethod(LinkMovementMethod.getInstance());
         openGeoFileFromIntent();
 
+        restoreXYZ(savedInstanceState);
+    }
+
+    private void saveLastXYZ(Bundle savedInstanceState) {
+        BoundingBox currentViewPort = this.mMapView.getBoundingBox();
+        GeoPoint currentCenter = currentViewPort.getCenterWithDateLine();
+
+        final SharedPreferences.Editor edit = getPrefs().edit();
+        edit.putFloat(PREFS_SCROLL_X, (float) currentCenter.getLatitude());
+        edit.putFloat(PREFS_SCROLL_Y, (float) currentCenter.getLongitude());
+        edit.putFloat(PREFS_ZOOM_LEVEL, (float) mMapView.getZoomLevelDouble());
+        edit.apply();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("saved LastXYZ:{}", getStatusForDebug());
+        }
+        if (savedInstanceState != null) {
+            savedInstanceState.putFloat(PREFS_SCROLL_X, (float) currentCenter.getLatitude());
+            savedInstanceState.putFloat(PREFS_SCROLL_Y, (float) currentCenter.getLongitude());
+            savedInstanceState.putFloat(PREFS_ZOOM_LEVEL, (float) mMapView.getZoomLevelDouble());
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        saveLastXYZ(savedInstanceState);
     }
 
     private Drawable getDrawableEx(int p) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (LOLLIPOP) {
             return getResources().getDrawable(p, theme);
         } else {
             return getResources().getDrawable(p);
@@ -597,20 +637,26 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
 
     @Override
     public void onPause() {
+        savePrefs();
+
+        saveLastXYZ(null);
+
+        this.mLocationOverlay.disableMyLocation();
+
+        super.onPause();
+    }
+
+    public void savePrefs() {
         final SharedPreferences.Editor edit = getPrefs().edit();
         edit.putString(PREFS_TILE_SOURCE, mMapView.getTileProvider().getTileSource().name());
         edit.putBoolean(PREFS_SHOW_MINIMAP, mMiniMapOverlay.isEnabled());
         edit.putBoolean(PREFS_CLUSTER_POINTS, this.mUseClusterPoints);
         //edit.putBoolean(PREFS_SHOW_GUESTURES, this.mGuesturesOverlay.isEnabled());
         edit.putBoolean(PREFS_DEBUG_GUESTURES, this.mGuesturesOverlay.isDebugEnabled());
+        edit.putString("mapsForgeDir", (Global.mapsForgeDir != null) ? Global.mapsForgeDir.getAbsolutePath() : null);
+        edit.putBoolean("mapsForgeEnabled", Global.mapsForgeEnabled);
 
         edit.apply();
-
-        saveLastXYZ();
-
-        this.mLocationOverlay.disableMyLocation();
-
-        super.onPause();
     }
 
     @Override
@@ -621,17 +667,6 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         this.mMapView.onDetach();
 
         super.onDestroy();
-    }
-
-    private void saveLastXYZ() {
-        final SharedPreferences.Editor edit = getPrefs().edit();
-        edit.putFloat(PREFS_SCROLL_X, mMapView.getScrollX());
-        edit.putFloat(PREFS_SCROLL_Y, mMapView.getScrollY());
-        edit.putFloat(PREFS_ZOOM_LEVEL, (float) mMapView.getZoomLevelDouble());
-        edit.apply();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("saved LastXYZ:{}", getStatusForDebug());
-        }
     }
 
     private String getStatusForDebug() {
@@ -690,18 +725,30 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
             this.mMapView.invalidate();
         }
 
-        RestoreXYZ();
+        restoreXYZ(null);
     }
 
-    private void RestoreXYZ() {
-        final float zoom = getPrefs().getFloat(PREFS_ZOOM_LEVEL, 3);
-        final float scrollX = getPrefs().getFloat(PREFS_SCROLL_X, 0);
-        final float scrollY = getPrefs().getFloat(PREFS_SCROLL_Y, 0);
+    private void restoreXYZ(Bundle savedInstanceState) {
+        float zoom = 3;
+        float scrollX = 0;
+        float scrollY = 0;
+
+        if (savedInstanceState != null) {
+            zoom = savedInstanceState.getFloat(PREFS_ZOOM_LEVEL, zoom);
+            scrollX = savedInstanceState.getFloat(PREFS_SCROLL_X, scrollX);
+            scrollY = savedInstanceState.getFloat(PREFS_SCROLL_Y, scrollY);
+        } else {
+            SharedPreferences prefs = getPrefs();
+            zoom = prefs.getFloat(PREFS_ZOOM_LEVEL, zoom);
+            scrollX = prefs.getFloat(PREFS_SCROLL_X, scrollX);
+            scrollY = prefs.getFloat(PREFS_SCROLL_Y, scrollY);
+        }
 
         final IMapController controller = mMapView.getController();
-        controller.setZoom(getPrefs().getFloat(PREFS_ZOOM_LEVEL, zoom));
+        controller.setZoom(zoom);
 
         mMapView.scrollTo((int) scrollX, (int) scrollY);
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("onResume loaded lastXYZ:{}/{}/{} => {}",scrollX , scrollY , zoom ,getStatusForDebug());
         }
@@ -734,6 +781,10 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
 
     private void loadFromSettings() {
         SharedPreferences mPrefs = getPrefs();
+
+        Global.mapsForgeDir = getPref(mPrefs, "mapsForgeDir", Global.mapsForgeDir);
+        Global.mapsForgeEnabled = getPref(mPrefs, "mapsForgeEnabled", Global.mapsForgeEnabled);
+
         final String tileSourceName = mPrefs.getString(PREFS_TILE_SOURCE,
                 TileSourceFactory.DEFAULT_TILE_SOURCE.name());
         try {
@@ -745,6 +796,22 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         initShowLocation();
 
         this.mGuesturesOverlay.setDebugEnabled(mPrefs.getBoolean(PREFS_DEBUG_GUESTURES, false));
+    }
+
+    private static boolean getPref(SharedPreferences prefs, String key, boolean defaultValue) {
+        return prefs.getBoolean(key, defaultValue);
+    }
+
+    /** load File preference from SharedPreferences */
+    private static File getPref(SharedPreferences prefs, String key, File defaultValue) {
+        String value         = prefs.getString(key, null);
+        if (isNullOrEmpty(value)) return defaultValue;
+
+        return new File(value);
+    }
+
+    private static boolean isNullOrEmpty(String value) {
+        return (value == null) || (value.trim().length() == 0);
     }
 
     @Override
@@ -813,7 +880,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
         if (itemId == R.id.cmd_help) {
             this.showDialog(R.id.cmd_help);
             return true;
-        } else if (itemId == R.id.cmd_open_file && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        } else if (itemId == R.id.cmd_open_file && LOLLIPOP) {
             onOpenDir(item.getTitle());
             return true;
         } else if (itemId == R.id.cmd_settings) {// set current xyz to prefs so they can be displayed/modified in the settings
@@ -965,14 +1032,16 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
 
 
     private void onSettingsResult() {
-        RestoreXYZ(); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
+        // this.recreate();
+
+        restoreXYZ(null); // onActivityResult is called before onResume(): maxe shure last xyz are restored.
 
         // apply xyz changes from settings back to view
         int changes = setZoom(getPrefs().getString(PREFS_CURRENT_ZOOMLEVEL, "").trim())
                 + setCenter(getPrefs().getString(PREFS_CURRENT_NORTH, "").trim(), getPrefs().getString(PREFS_CURRENT_EAST, "").trim());
 
         if (changes > 0) {
-            saveLastXYZ(); // otherwhise onResume() would overwrite the new values
+            saveLastXYZ(null); // otherwhise onResume() would overwrite the new values
         }
 
         if (super.isShowLocation() && this.permissionGrantedGps == null) {
@@ -980,6 +1049,7 @@ public class LocationMapViewer extends FilePermissionActivity implements Constan
             super.checkPermissions();
         }
         initShowLocation();
+
     }
 
     private int setCenter(String newNorthString, String newEastString) {

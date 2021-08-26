@@ -40,6 +40,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!--
+    ?? required to access mapsforge ??
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
          permission ACCESS_NETWORK_STATE and ACCESS_WIFI_STATE
         osmdroid can find out if internet is available and if it is wlan or cellphone-network to decide
         when to download or refresh downloaded tiles.
@@ -63,11 +66,22 @@
         android:name="android.hardware.location.gps"
         android:required="false" />
 
+    <!--
+
+    android:requestLegacyExternalStorage="true" workaround to allow mapsforege for android-10
+
+    for android 11ff we might need
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
+    :-(
+
+    -->
     <application
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:requestLegacyExternalStorage="true"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".LocationMapViewer"

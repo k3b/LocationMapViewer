@@ -73,4 +73,10 @@ href="https://github.com/k3b/LocationMapViewer/blob/master/geoIntentDemo/src/mai
 
     <string name="permission_error">Missing permisions</string>
     <string name="title_open_file">Open File</string>
+
+    <string name="geo_show_menu_title">Show in map</string>
+    <string name="settings_maps_forge_enable_tile">Use Mapsforge offline map</string>
+    <string name="settings_maps_forge_enable_summary">... which you manually downloaded via pc</string>
+    <string name="settings_maps_forge_dir_title">Mapsforge offline Folder</string>
+
 </resources>

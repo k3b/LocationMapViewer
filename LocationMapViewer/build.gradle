@@ -2,14 +2,15 @@ apply plugin: 'com.android.application'
 apply plugin: 'maven'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId 'de.k3b.android.locationMapViewer'
         // api-16(JELLY_BEAN = 4.2) OSMDROID Library
         // api-19(KITKAT = Android-4.4) ACTION_OPEN_DOCUMENT
         // api-21(LOLLIPOP = Android-5) for ACTION_OPEN_DOCUMENT_TREE
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion 29 // compile 30+target 29 required for mapsforge :-(
+
         // 0.2.2.150321 (2)
         // fdroid 06.5.2015 (3) versionName "0.3.3.150506"
         // fdroid 30.3.2016 (4) versionName "0.3.4.160330"
@@ -56,26 +57,32 @@ dependencies {
 
     implementation 'androidx.drawerlayout:drawerlayout:1.1.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.annotation:annotation:1.2.0'
 
     // implementation 'com.github.k3b:k3b-geoHelper:1.1.5'
     // implementation 'com.github.k3b:k3b-geoHelper:master-SNAPSHOT'
-    implementation 'com.github.k3b:k3b-geoHelper:v1.1.9-SNAPSHOT'
-    implementation 'com.github.k3b:k3b-geoHelperAndroid:v1.1.9-SNAPSHOT'
+    implementation 'com.github.k3b:k3b-geoHelper:v1.1.9'
+    // implementation 'com.github.k3b:k3b-geoHelperAndroid:v1.1.9-SNAPSHOT'
     // implementation 'com.github.k3b:k3b-geoHelper:1.1.6-SNAPSHOT'
     // implementation 'com.github.k3b:k3b-geoHelperAndroid:1.1.6-SNAPSHOT'
     // implementation 'com.github.k3b:k3b-geoHelper:WikipediaAndroid-SNAPSHOT'
     // implementation 'com.github.k3b:k3b-geoHelper:WikipediaAndroid-v1.1.4-gf51d7c7-63'
 
-    // this is osmdroid
+    // this is osmdroid https://github.com/osmdroid/osmdroid/
     // implementation project(':osmdroid-android') // local copy
-    implementation 'org.osmdroid:osmdroid-android:6.1.10'
-    // non local copy from repositories
-	
+    implementation 'org.osmdroid:osmdroid-android:6.1.11'
+    implementation ('org.osmdroid:osmdroid-mapsforge:6.1.11')
+
     // implementation project(':OSMBonusPack').
     // Version must match osmdroid
     // see https://github.com/mkergall/Osmbonuspack/releases
 	implementation 'com.github.MKergall:osmbonuspack:6.7.0'
+
+    //Mapsforge rendering and database support, which is LGPL
+    implementation 'org.mapsforge:mapsforge-map-android:0.16.0'
+    implementation 'org.mapsforge:mapsforge-map:0.16.0'
+    implementation 'org.mapsforge:mapsforge-themes:0.16.0'
+
 
     implementation 'org.slf4j:slf4j-api:1.7.7@jar'
     // include if you want to see debug/trace logmessages

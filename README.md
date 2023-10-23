@@ -1,6 +1,6 @@
 # LocationMapViewer ![](https://github.com/k3b/LocationMapViewer/blob/master/LocationMapViewer/src/main/res/drawable/ic_launcher.png)
 
-An android app to display geografic information from url or local gpx/kml/kmz/zip file in a [map](map). 
+An Android app to display geographic information from url or local gpx/kml/kmz/zip file in a [map](map). 
 
 It has support for **gpx**, **kml** and **kmz** files and **geo-uri-s**
 and can work offline (without internet/wifi)
@@ -23,7 +23,7 @@ or through html links like &lt;a href=&quot;geo:0,0?q=53.0,8.0(Hello)&quot;&gt;g
 
 Licence: [GPLv3](http://www.gnu.org/licenses/gpl-3.0)<br/>
 
-## Requred permissions:
+## Required permissions:
 
 * INTERNET: to download map data from Open Streetmap Server
 * ACCESS_NETWORK_STATE and ACCESS_WIFI_STATE: to find out if wifi/internet is online to start downloaded geodata 
@@ -88,5 +88,5 @@ For more informations see https://github.com/k3b/LocationMapViewer/wiki
 
 If you like this app please consider to donating to https://wiki.openstreetmap.org/wiki/Donations .
 
-Since android-developping is a hobby (and an education tool) i donot want any 
-money for my apps so donation should go to projects i benefit from.
+Since android-developping is a hobby (and an education tool) i do not want any 
+money for my apps so donation should go to projects I benefit from.
